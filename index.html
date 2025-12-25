@@ -18,26 +18,60 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            position: relative;
         }
         .container {
             max-width: 500px;
             width: 100%;
             padding: 20px;
         }
+        
+        /* Переключатель языка */
+        .language-switcher {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+        .lang-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+            min-width: 60px;
+        }
+        .lang-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .lang-btn.active {
+            background: #ff7f00;
+            border-color: #ff7f00;
+        }
+        
         h1 {
             color: #ff7f00;
             margin-bottom: 10px;
             font-size: 28px;
+            margin-top: 40px;
         }
         .subtitle {
             color: #aaa;
             margin-bottom: 30px;
             font-size: 16px;
         }
+        
+        /* Колесо */
         .wheel-container {
             position: relative;
-            width: 300px;
-            height: 300px;
+            width: 320px;
+            height: 320px;
             margin: 0 auto 40px;
         }
         .wheel {
@@ -46,44 +80,54 @@
             border-radius: 50%;
             background: conic-gradient(
                 from 0deg,
-                #ff7f00 0deg 60deg,
-                #3498db 60deg 120deg,
-                #2ecc71 120deg 180deg,
-                #e74c3c 180deg 240deg,
-                #9b59b6 240deg 300deg,
-                #f1c40f 300deg 360deg
+                #ff7f00 0deg 36deg,          /* Nothing (40%) - оранжевый */
+                #3498db 36deg 54deg,         /* Mini breakdown (15%) - синий */
+                #2ecc71 54deg 72deg,         /* Loops/MIDI (15%) - зеленый */
+                #9b59b6 72deg 84deg,         /* Sound pack (10%) - фиолетовый */
+                #e74c3c 84deg 90deg,         /* Old drop (5%) - красный */
+                #f1c40f 90deg 104.4deg,      /* 10% discount (7%) - желтый */
+                #1abc9c 104.4deg 115.2deg,   /* 15% discount (4%) - бирюзовый */
+                #e67e22 115.2deg 118.8deg,   /* 20% discount (1.5%) - оранжевый2 */
+                #34495e 118.8deg 122.4deg,   /* 7 days access (1%) - темно-серый */
+                #d35400 122.4deg 123.6deg,   /* 30 days access (0.5%) - коричневый */
+                #1a1a1a 123.6deg 360deg      /* Пустое место */
             );
-            transition: transform 4s cubic-bezier(0.17, 0.67, 0.23, 0.99);
+            transition: transform 5.5s cubic-bezier(0.2, 0.8, 0.3, 0.99);
             position: relative;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 8px solid #2d1b69;
         }
         .pointer {
             position: absolute;
-            top: -20px;
+            top: -25px;
             left: 50%;
             transform: translateX(-50%);
-            width: 30px;
-            height: 40px;
+            width: 35px;
+            height: 50px;
             background: #ff7f00;
             clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
             z-index: 10;
+            filter: drop-shadow(0 3px 5px rgba(0,0,0,0.5));
         }
+        
+        /* Кнопка спина */
         .spin-btn {
             background: linear-gradient(135deg, #ff7f00 0%, #ff5500 100%);
             color: white;
             border: none;
-            padding: 18px 40px;
-            font-size: 20px;
+            padding: 18px 50px;
+            font-size: 22px;
             font-weight: bold;
             border-radius: 50px;
             cursor: pointer;
-            margin: 20px 0;
-            box-shadow: 0 5px 15px rgba(255, 127, 0, 0.4);
+            margin: 25px 0;
+            box-shadow: 0 8px 20px rgba(255, 127, 0, 0.4);
             transition: all 0.3s;
+            letter-spacing: 1px;
         }
         .spin-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(255, 127, 0, 0.6);
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(255, 127, 0, 0.6);
         }
         .spin-btn:disabled {
             background: #555;
@@ -91,92 +135,400 @@
             transform: none;
             box-shadow: none;
         }
+        
+        /* Результат */
         .result {
             background: rgba(255, 255, 255, 0.1);
             border-radius: 15px;
-            padding: 20px;
+            padding: 25px;
             margin: 20px 0;
-            border-left: 4px solid #ff7f00;
+            border-left: 5px solid #ff7f00;
             display: none;
+            backdrop-filter: blur(10px);
         }
         .prize-name {
-            font-size: 22px;
+            font-size: 24px;
             color: #ff7f00;
-            margin: 10px 0;
+            margin: 15px 0;
+            font-weight: bold;
         }
         .prize-desc {
             color: #ccc;
-            font-size: 14px;
-            margin: 10px 0 20px;
+            font-size: 15px;
+            margin: 15px 0 25px;
+            line-height: 1.5;
         }
         .claim-btn {
             background: #2ecc71;
             color: white;
             border: none;
-            padding: 12px 25px;
+            padding: 14px 30px;
             border-radius: 25px;
             cursor: pointer;
             font-weight: bold;
+            font-size: 16px;
             display: none;
+            transition: all 0.3s;
         }
+        .claim-btn:hover {
+            background: #27ae60;
+            transform: translateY(-2px);
+        }
+        
+        /* Блок с призами */
+        .prizes-info {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 25px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .prizes-title {
+            color: #ff7f00;
+            font-size: 18px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        .prizes-list {
+            text-align: left;
+            color: #ddd;
+            font-size: 14px;
+            line-height: 1.8;
+            padding-left: 10px;
+        }
+        .prizes-list li {
+            margin-bottom: 8px;
+        }
+        .prizes-note {
+            color: #aaa;
+            font-size: 13px;
+            margin-top: 15px;
+            font-style: italic;
+        }
+        
+        /* Правила */
         .rules {
             background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 30px;
-            font-size: 13px;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 25px;
+            font-size: 14px;
             color: #aaa;
             text-align: left;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .cooldown-info {
+            color: #ff7f00;
+            font-size: 13px;
+            margin-top: 8px;
+            display: none;
+            font-weight: bold;
+        }
+        
+        /* Анимации */
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 127, 0, 0.5); }
+            50% { box-shadow: 0 0 30px rgba(255, 127, 0, 0.8); }
+        }
+        .spin-btn:not(:disabled) {
+            animation: glow 2s infinite;
         }
     </style>
 </head>
 <body>
+    <div class="language-switcher">
+        <button class="lang-btn active" onclick="setLanguage('ru')">RU</button>
+        <button class="lang-btn" onclick="setLanguage('en')">EN</button>
+    </div>
+    
     <div class="container">
-        <h1>🎡 301secrets Wheel</h1>
-        <p class="subtitle">Крути колесо и забери свой приз!</p>
+        <h1 id="title">🎡 Колесо фортуны 301secrets</h1>
+        <p class="subtitle" id="subtitle">Крути колесо и забери свой приз!</p>
         
         <div class="wheel-container">
             <div class="pointer"></div>
             <div class="wheel" id="wheel"></div>
         </div>
         
-        <button class="spin-btn" id="spinBtn" onclick="spinWheel()">🎯 КРУТИТЬ КОЛЕСО</button>
+        <button class="spin-btn" id="spinBtn" onclick="checkSpinAvailability()">🎯 КРУТИТЬ КОЛЕСО</button>
+        <div class="cooldown-info" id="cooldownInfo"></div>
         
         <div class="result" id="result">
-            <div>🎉 Твой выигрыш:</div>
+            <div id="resultTitle">🎉 Твой выигрыш:</div>
             <div class="prize-name" id="prizeName"></div>
             <div class="prize-desc" id="prizeDesc"></div>
-            <button class="claim-btn" id="claimBtn" onclick="claimPrize()">🪙 ЗАБРАТЬ ПРИЗ</button>
+            <button class="claim-btn" id="claimBtn" onclick="claimPrize()">🪇 ЗАБРАТЬ ПРИЗ</button>
         </div>
         
-        <div class="rules">
+        <!-- НОВЫЙ БЛОК: Что можно выиграть -->
+        <div class="prizes-info" id="prizesInfo">
+            <div class="prizes-title" id="prizesTitle">Что можно выиграть?</div>
+            <div class="prizes-list" id="prizesList">
+                <div>• Мои эксклюзивные лупы, MIDI, FLP</div>
+                <div>• Ограниченный контент из 301secrets</div>
+                <div>• Скидки на полный доступ</div>
+                <div>• Бесплатные 7 / 30 дней доступа в 301secrets</div>
+            </div>
+            <div class="prizes-note" id="prizesNote">
+                Некоторые награды редкие • Есть пустые слоты • Повторный спин через 24 часа
+            </div>
+        </div>
+        
+        <div class="rules" id="rules">
             <strong>📜 Правила:</strong><br>
-            1. Одна попытка в день<br>
-            2. Призы выдаются автоматически<br>
-            3. Скидки действуют 7 дней<br>
+            1. Одна попытка в 24 часа<br>
+            2. Скидки действуют 48 часов<br>
+            3. Доступ к привату — одноразово<br>
             4. Файлы приходят в личку от бота
         </div>
     </div>
     
     <script>
+        // ==================== НОВАЯ СТРУКТУРА ПРИЗОВ ====================
         const prizes = [
-            { name: "5% Скидка на приватку", desc: "Действует 7 дней на полный доступ", type: "discount", value: "5%", weight: 30 },
-            { name: "Эксклюзивный FLP", desc: "Готовый проект для изучения", type: "content", value: "flp", weight: 25 },
-            { name: "10% Скидка на приватку", desc: "Действует 7 дней на полный доступ", type: "discount", value: "10%", weight: 20 },
-            { name: "Набор пресетов", desc: "5 уникальных пресетов для Serum", type: "content", value: "presets", weight: 15 },
-            { name: "Гайд по сведению", desc: "PDF с 10 профессиональными техниками", type: "guide", value: "mixing_guide", weight: 5 },
-            { name: "Приветственный кик", desc: "Шутливый приз для настроения", type: "joke", value: "kick_sample", weight: 5 }
+            // 🔹 A. Нейтральные / пустые (40%)
+            { 
+                name: "Nothing this time", 
+                name_ru: "Пока не сегодня",
+                desc: "Try again tomorrow", 
+                desc_ru: "Попробуй завтра",
+                type: "empty", 
+                value: null, 
+                weight: 40 
+            },
+            
+            // 🔹 B. Контент (45%)
+            { 
+                name: "Mini breakdown (exclusive)", 
+                name_ru: "Мини-разбор (эксклюзив)",
+                desc: "Detailed breakdown of a recent track", 
+                desc_ru: "Детальный разбор свежего трека",
+                type: "content", 
+                value: "mini_breakdown", 
+                weight: 15 
+            },
+            { 
+                name: "Loops / MIDI from private stash", 
+                name_ru: "Лупы / MIDI из приватки",
+                desc: "3 exclusive loops or MIDI files", 
+                desc_ru: "3 эксклюзивных лупа или MIDI-файла",
+                type: "content", 
+                value: "loops_midi", 
+                weight: 15 
+            },
+            { 
+                name: "Small sound pack", 
+                name_ru: "Небольшой звуковой пак",
+                desc: "10 unique sounds for your productions", 
+                desc_ru: "10 уникальных звуков для продакшена",
+                type: "content", 
+                value: "sound_pack", 
+                weight: 10 
+            },
+            { 
+                name: "Old private drop (limited)", 
+                name_ru: "Старый приватный дроп (ограничено)",
+                desc: "Archived content from previous months", 
+                desc_ru: "Архивный контент с прошлых месяцев",
+                type: "content", 
+                value: "old_drop", 
+                weight: 5 
+            },
+            
+            // 🔹 C. Скидки (12.5%)
+            { 
+                name: "10% discount on full access", 
+                name_ru: "Скидка 10% на полный доступ",
+                desc: "Valid for 48 hours. One-time use.", 
+                desc_ru: "Действует 48 часов. Одноразово.",
+                type: "discount", 
+                value: "10", 
+                weight: 7 
+            },
+            { 
+                name: "15% discount on full access", 
+                name_ru: "Скидка 15% на полный доступ",
+                desc: "Valid for 48 hours. One-time use.", 
+                desc_ru: "Действует 48 часов. Одноразово.",
+                type: "discount", 
+                value: "15", 
+                weight: 4 
+            },
+            { 
+                name: "20% discount on full access", 
+                name_ru: "Скидка 20% на полный доступ",
+                desc: "Valid for 48 hours. One-time use.", 
+                desc_ru: "Действует 48 часов. Одноразово.",
+                type: "discount", 
+                value: "20", 
+                weight: 1.5 
+            },
+            
+            // 🔹 D. Доступ (1.5%)
+            { 
+                name: "7 days full access", 
+                name_ru: "7 дней полного доступа",
+                desc: "One week in the private group", 
+                desc_ru: "Неделя в приватной группе",
+                type: "access", 
+                value: "7_days", 
+                weight: 1 
+            },
+            { 
+                name: "1 month full access", 
+                name_ru: "1 месяц полного доступа",
+                desc: "Legendary prize! Full month access", 
+                desc_ru: "Легендарный приз! Месяц доступа",
+                type: "access", 
+                value: "30_days", 
+                weight: 0.5 
+            }
         ];
         
+        // ==================== ПЕРЕМЕННЫЕ ====================
+        let currentLang = 'ru';
         let isSpinning = false;
         let currentPrize = null;
+        let lastSpinTime = null;
+        
+        // ==================== ПЕРЕВОДЫ ====================
+        const translations = {
+            ru: {
+                title: "🎡 Колесо фортуны 301secrets",
+                subtitle: "Крути колесо и забери свой приз!",
+                spinBtn: "🎯 КРУТИТЬ КОЛЕСО",
+                resultTitle: "🎉 Твой выигрыш:",
+                claimBtn: "🪇 ЗАБРАТЬ ПРИЗ",
+                sending: "⌛ Отправляем...",
+                sent: "✅ Приз отправлен!",
+                recorded: "✅ Приз записан!",
+                cooldown: "Подожди ещё {hours} часов",
+                prizesTitle: "Что можно выиграть?",
+                prizesList: [
+                    "• Мои эксклюзивные лупы, MIDI, FLP",
+                    "• Ограниченный контент из 301secrets",
+                    "• Скидки на полный доступ",
+                    "• Бесплатные 7 / 30 дней доступа в 301secrets"
+                ],
+                prizesNote: "Некоторые награды редкие • Есть пустые слоты • Повторный спин через 24 часа",
+                rulesTitle: "📜 Правила:",
+                rules: [
+                    "1. Одна попытка в 24 часа",
+                    "2. Скидки действуют 48 часов",
+                    "3. Доступ к привату — одноразово",
+                    "4. Файлы приходят в личку от бота"
+                ],
+                finalNote: "Удачи! 🍀"
+            },
+            en: {
+                title: "🎡 301secrets Fortune Wheel",
+                subtitle: "Spin the wheel and claim your prize!",
+                spinBtn: "🎯 SPIN THE WHEEL",
+                resultTitle: "🎉 Your prize:",
+                claimBtn: "🪇 CLAIM PRIZE",
+                sending: "⌛ Sending...",
+                sent: "✅ Prize sent!",
+                recorded: "✅ Prize recorded!",
+                cooldown: "Wait {hours} more hours",
+                prizesTitle: "What you can unlock?",
+                prizesList: [
+                    "• My exclusive loops, midi, flps",
+                    "• Limited content from 301secrets",
+                    "• Discounts on full access",
+                    "• Free 7 / 30 days of full access to 301secrets"
+                ],
+                prizesNote: "Some rewards are rare • There are also empty slots • You can spin again in 24 hours",
+                rulesTitle: "📜 Rules:",
+                rules: [
+                    "1. One try every 24 hours",
+                    "2. Discounts valid for 48 hours",
+                    "3. Private access is one-time",
+                    "4. Files arrive via bot DM"
+                ],
+                finalNote: "Let's see what you get 🍀"
+            }
+        };
+        
+        // ==================== ФУНКЦИИ ЯЗЫКА ====================
+        function setLanguage(lang) {
+            currentLang = lang;
+            updateTexts();
+            
+            // Обновляем активную кнопку
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent === lang.toUpperCase()) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Сохраняем в localStorage
+            localStorage.setItem('wheel_lang', lang);
+        }
+        
+        function updateTexts() {
+            const t = translations[currentLang];
+            
+            // Основные тексты
+            document.getElementById('title').textContent = t.title;
+            document.getElementById('subtitle').textContent = t.subtitle;
+            document.getElementById('spinBtn').textContent = t.spinBtn;
+            document.getElementById('resultTitle').textContent = t.resultTitle;
+            document.getElementById('claimBtn').textContent = t.claimBtn;
+            
+            // Блок с призами
+            document.getElementById('prizesTitle').textContent = t.prizesTitle;
+            const prizesList = document.getElementById('prizesList');
+            prizesList.innerHTML = t.prizesList.map(item => `<div>${item}</div>`).join('');
+            document.getElementById('prizesNote').textContent = t.prizesNote;
+            
+            // Правила
+            const rulesElement = document.getElementById('rules');
+            rulesElement.innerHTML = `<strong>${t.rulesTitle}</strong><br>${t.rules.join('<br>')}`;
+            
+            // Если есть текущий приз, обновляем его текст
+            if (currentPrize) {
+                document.getElementById('prizeName').textContent = 
+                    currentLang === 'ru' ? currentPrize.name_ru : currentPrize.name;
+                document.getElementById('prizeDesc').textContent = 
+                    currentLang === 'ru' ? currentPrize.desc_ru : currentPrize.desc;
+            }
+        }
+        
+        // ==================== ФУНКЦИИ КОЛЕСА ====================
+        function checkSpinAvailability() {
+            if (isSpinning) return;
+            
+            // Проверяем кулдаун (24 часа)
+            if (lastSpinTime) {
+                const hoursPassed = (Date.now() - lastSpinTime) / (1000 * 60 * 60);
+                if (hoursPassed < 24) {
+                    const hoursLeft = Math.ceil(24 - hoursPassed);
+                    const t = translations[currentLang];
+                    document.getElementById('cooldownInfo').textContent = 
+                        t.cooldown.replace('{hours}', hoursLeft);
+                    document.getElementById('cooldownInfo').style.display = 'block';
+                    return;
+                }
+            }
+            
+            document.getElementById('cooldownInfo').style.display = 'none';
+            spinWheel();
+        }
         
         function spinWheel() {
             if (isSpinning) return;
             isSpinning = true;
-            document.getElementById("spinBtn").disabled = true;
-            document.getElementById("result").style.display = "none";
             
+            const spinBtn = document.getElementById("spinBtn");
+            const wheel = document.getElementById("wheel");
+            
+            spinBtn.disabled = true;
+            document.getElementById("result").style.display = "none";
+            document.getElementById("claimBtn").style.display = "none";
+            
+            // Выбираем приз по весам (шансы остаются те же)
             const random = Math.random() * 100;
             let currentWeight = 0;
             for (const prize of prizes) {
@@ -187,67 +539,186 @@
                 }
             }
             
+            // Определяем позицию приза для анимации
             const prizeIndex = prizes.indexOf(currentPrize);
             const segmentAngle = 360 / prizes.length;
-            const targetAngle = 3600 + (prizeIndex * segmentAngle) + (Math.random() * segmentAngle * 0.5);
             
-            document.getElementById("wheel").style.transform = `rotate(${targetAngle}deg)`;
+            // Специальная анимация с замедлением
+            // 1. Быстрый старт
+            // 2. 3 полных оборота (1080 градусов)
+            // 3. + позиция приза
+            // 4. + случайное смещение внутри сегмента
+            const baseRotation = 1080; // 3 полных оборота
+            const targetAngle = baseRotation + (prizeIndex * segmentAngle) + (Math.random() * segmentAngle * 0.7);
             
+            // Сбрасываем трансформацию для плавного старта
+            wheel.style.transition = 'transform 0.1s ease-out';
+            wheel.style.transform = 'rotate(0deg)';
+            
+            // Небольшая задержка перед основной анимацией
             setTimeout(() => {
-                showPrize();
-                isSpinning = false;
-                document.getElementById("spinBtn").disabled = false;
-            }, 4000);
+                // Основная анимация с плавным замедлением
+                wheel.style.transition = 'transform 5.5s cubic-bezier(0.2, 0.8, 0.3, 0.99)';
+                wheel.style.transform = `rotate(${targetAngle}deg)`;
+                
+                // Добавляем эффект "дрожания" в конце
+                setTimeout(() => {
+                    wheel.style.transition = 'transform 0.3s ease-out';
+                    const currentRot = targetAngle % 360;
+                    wheel.style.transform = `rotate(${targetAngle + 2}deg)`;
+                    
+                    setTimeout(() => {
+                        wheel.style.transform = `rotate(${targetAngle - 1}deg)`;
+                        
+                        setTimeout(() => {
+                            wheel.style.transform = `rotate(${targetAngle}deg)`;
+                        }, 100);
+                    }, 150);
+                }, 5300);
+                
+                // Сохраняем время спина
+                lastSpinTime = Date.now();
+                localStorage.setItem('last_spin_time', lastSpinTime);
+                
+                // Показываем результат после завершения анимации
+                setTimeout(() => {
+                    showPrize();
+                    isSpinning = false;
+                    spinBtn.disabled = false;
+                }, 5800);
+                
+            }, 50);
         }
         
         function showPrize() {
-            document.getElementById("prizeName").textContent = currentPrize.name;
-            document.getElementById("prizeDesc").textContent = currentPrize.desc;
-            document.getElementById("result").style.display = "block";
-            document.getElementById("claimBtn").style.display = "block";
-            
+            const prizeName = document.getElementById("prizeName");
+            const prizeDesc = document.getElementById("prizeDesc");
             const resultDiv = document.getElementById("result");
+            const claimBtn = document.getElementById("claimBtn");
+            
+            prizeName.textContent = currentLang === 'ru' ? currentPrize.name_ru : currentPrize.name;
+            prizeDesc.textContent = currentLang === 'ru' ? currentPrize.desc_ru : currentPrize.desc;
+            
+            resultDiv.style.display = "block";
+            claimBtn.style.display = "block";
+            
+            // Анимация появления
             resultDiv.style.opacity = "0";
-            resultDiv.style.transform = "translateY(20px)";
+            resultDiv.style.transform = "translateY(20px) scale(0.95)";
             setTimeout(() => {
-                resultDiv.style.transition = "all 0.5s";
+                resultDiv.style.transition = "all 0.6s cubic-bezier(0.2, 0.8, 0.3, 1)";
                 resultDiv.style.opacity = "1";
-                resultDiv.style.transform = "translateY(0)";
+                resultDiv.style.transform = "translateY(0) scale(1)";
             }, 10);
+            
+            // Анимация кнопки
+            setTimeout(() => {
+                claimBtn.style.opacity = "0";
+                claimBtn.style.transform = "translateY(10px)";
+                setTimeout(() => {
+                    claimBtn.style.transition = "all 0.5s ease-out";
+                    claimBtn.style.opacity = "1";
+                    claimBtn.style.transform = "translateY(0)";
+                }, 10);
+            }, 200);
         }
         
         function claimPrize() {
             if (!currentPrize) return;
-            document.getElementById("claimBtn").textContent = "⌛ Отправляем...";
-            document.getElementById("claimBtn").disabled = true;
             
+            const claimBtn = document.getElementById("claimBtn");
+            const t = translations[currentLang];
+            
+            claimBtn.textContent = t.sending;
+            claimBtn.disabled = true;
+            
+            // Отправляем данные в Telegram бота
             if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
+                const user = Telegram.WebApp.initDataUnsafe.user;
                 Telegram.WebApp.sendData(JSON.stringify({
                     action: "wheel_prize",
                     prize: currentPrize,
-                    user_id: Telegram.WebApp.initDataUnsafe.user?.id,
+                    user_id: user?.id,
+                    username: user?.username,
+                    language: currentLang,
                     time: new Date().toISOString()
                 }));
-                setTimeout(() => { Telegram.WebApp.close(); }, 2000);
-                document.getElementById("claimBtn").textContent = "✅ Приз отправлен!";
+                
+                // Закрываем через 2 секунды
+                setTimeout(() => { 
+                    Telegram.WebApp.close(); 
+                }, 2000);
+                
+                claimBtn.textContent = t.sent;
             } else {
-                document.getElementById("claimBtn").textContent = "✅ Приз записан!";
-                console.log("Выигранный приз:", currentPrize);
+                // Для теста без Telegram
+                claimBtn.textContent = t.recorded;
+                console.log("Выигранный приз:", {
+                    prize: currentPrize,
+                    language: currentLang,
+                    time: new Date().toISOString()
+                });
+                
+                // Показываем всплывающее окно с призом
                 setTimeout(() => {
-                    alert(`🎉 Вы выиграли: ${currentPrize.name}\nБот пришлёт приз в ближайшее время!`);
+                    alert(`${t.resultTitle}\n\n${currentLang === 'ru' ? currentPrize.name_ru : currentPrize.name}\n\n${currentLang === 'ru' ? currentPrize.desc_ru : currentPrize.desc}`);
                 }, 500);
             }
         }
         
+        // ==================== ИНИЦИАЛИЗАЦИЯ ====================
         document.addEventListener('DOMContentLoaded', function() {
+            // Инициализируем Telegram WebApp
             if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
                 Telegram.WebApp.ready();
                 Telegram.WebApp.expand();
+                
+                // Проверяем тему
                 if (Telegram.WebApp.colorScheme === 'dark') {
                     document.body.style.background = '#1a1a1a';
                 }
-                document.getElementById("claimBtn").style.display = "block";
+                
+                // Получаем язык пользователя
+                const userLang = Telegram.WebApp.initDataUnsafe.user?.language_code || 'ru';
+                const savedLang = localStorage.getItem('wheel_lang') || (userLang === 'en' ? 'en' : 'ru');
+                setLanguage(savedLang);
+                
+            } else {
+                // Для теста без Telegram
+                const savedLang = localStorage.getItem('wheel_lang') || 'ru';
+                setLanguage(savedLang);
             }
+            
+            // Восстанавливаем время последнего спина
+            const savedSpinTime = localStorage.getItem('last_spin_time');
+            if (savedSpinTime) {
+                lastSpinTime = parseInt(savedSpinTime);
+                
+                // Проверяем, можно ли крутить
+                if (lastSpinTime) {
+                    const hoursPassed = (Date.now() - lastSpinTime) / (1000 * 60 * 60);
+                    if (hoursPassed < 24) {
+                        const hoursLeft = Math.ceil(24 - hoursPassed);
+                        const t = translations[currentLang];
+                        document.getElementById('cooldownInfo').textContent = 
+                            t.cooldown.replace('{hours}', hoursLeft);
+                        document.getElementById('cooldownInfo').style.display = 'block';
+                        document.getElementById('spinBtn').disabled = true;
+                    }
+                }
+            }
+            
+            // Добавляем финальное сообщение
+            const container = document.querySelector('.container');
+            const finalNote = document.createElement('div');
+            finalNote.style.marginTop = '15px';
+            finalNote.style.color = '#888';
+            finalNote.style.fontSize = '14px';
+            finalNote.style.fontStyle = 'italic';
+            finalNote.id = 'finalNote';
+            container.appendChild(finalNote);
+            document.getElementById('finalNote').textContent = 
+                currentLang === 'ru' ? 'Удачи! 🍀' : 'Let\'s see what you get 🍀';
         });
     </script>
 </body>
