@@ -4,7 +4,6 @@
     <title>301secrets Wheel</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Подключаем Telegram Web App SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
@@ -20,32 +19,27 @@
             align-items: center;
             justify-content: center;
         }
-        
         .container {
             max-width: 500px;
             width: 100%;
             padding: 20px;
         }
-        
         h1 {
             color: #ff7f00;
             margin-bottom: 10px;
             font-size: 28px;
         }
-        
         .subtitle {
             color: #aaa;
             margin-bottom: 30px;
             font-size: 16px;
         }
-        
         .wheel-container {
             position: relative;
             width: 300px;
             height: 300px;
             margin: 0 auto 40px;
         }
-        
         .wheel {
             width: 100%;
             height: 100%;
@@ -63,7 +57,6 @@
             position: relative;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-        
         .pointer {
             position: absolute;
             top: -20px;
@@ -75,7 +68,6 @@
             clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
             z-index: 10;
         }
-        
         .spin-btn {
             background: linear-gradient(135deg, #ff7f00 0%, #ff5500 100%);
             color: white;
@@ -89,39 +81,34 @@
             box-shadow: 0 5px 15px rgba(255, 127, 0, 0.4);
             transition: all 0.3s;
         }
-        
         .spin-btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 20px rgba(255, 127, 0, 0.6);
         }
-        
         .spin-btn:disabled {
             background: #555;
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
         }
-        
         .result {
             background: rgba(255, 255, 255, 0.1);
             border-radius: 15px;
             padding: 20px;
             margin: 20px 0;
             border-left: 4px solid #ff7f00;
+            display: none;
         }
-        
         .prize-name {
             font-size: 22px;
             color: #ff7f00;
             margin: 10px 0;
         }
-        
         .prize-desc {
             color: #ccc;
             font-size: 14px;
             margin: 10px 0 20px;
         }
-        
         .claim-btn {
             background: #2ecc71;
             color: white;
@@ -132,7 +119,6 @@
             font-weight: bold;
             display: none;
         }
-        
         .rules {
             background: rgba(0, 0, 0, 0.3);
             border-radius: 10px;
@@ -156,7 +142,7 @@
         
         <button class="spin-btn" id="spinBtn" onclick="spinWheel()">🎯 КРУТИТЬ КОЛЕСО</button>
         
-        <div class="result" id="result" style="display: none;">
+        <div class="result" id="result">
             <div>🎉 Твой выигрыш:</div>
             <div class="prize-name" id="prizeName"></div>
             <div class="prize-desc" id="prizeDesc"></div>
@@ -173,73 +159,26 @@
     </div>
     
     <script>
-        // Призы колеса (вес в %)
         const prizes = [
-            { 
-                name: "5% Скидка на приватку", 
-                desc: "Действует 7 дней на полный доступ",
-                type: "discount", 
-                value: "5%",
-                weight: 30,
-                color: "#ff7f00"
-            },
-            { 
-                name: "Эксклюзивный FLP", 
-                desc: "Готовый проект для изучения",
-                type: "content", 
-                value: "flp",
-                weight: 25,
-                color: "#3498db"
-            },
-            { 
-                name: "10% Скидка на приватку", 
-                desc: "Действует 7 дней на полный доступ",
-                type: "discount", 
-                value: "10%",
-                weight: 20,
-                color: "#2ecc71"
-            },
-            { 
-                name: "Набор пресетов", 
-                desc: "5 уникальных пресетов для Serum",
-                type: "content", 
-                value: "presets",
-                weight: 15,
-                color: "#e74c3c"
-            },
-            { 
-                name: "Гайд по сведению", 
-                desc: "PDF с 10 профессиональными техниками",
-                type: "guide", 
-                value: "mixing_guide",
-                weight: 5,
-                color: "#9b59b6"
-            },
-            { 
-                name: "Приветственный кик", 
-                desc: "Шутливый приз для настроения",
-                type: "joke", 
-                value: "kick_sample",
-                weight: 5,
-                color: "#f1c40f"
-            }
+            { name: "5% Скидка на приватку", desc: "Действует 7 дней на полный доступ", type: "discount", value: "5%", weight: 30 },
+            { name: "Эксклюзивный FLP", desc: "Готовый проект для изучения", type: "content", value: "flp", weight: 25 },
+            { name: "10% Скидка на приватку", desc: "Действует 7 дней на полный доступ", type: "discount", value: "10%", weight: 20 },
+            { name: "Набор пресетов", desc: "5 уникальных пресетов для Serum", type: "content", value: "presets", weight: 15 },
+            { name: "Гайд по сведению", desc: "PDF с 10 профессиональными техниками", type: "guide", value: "mixing_guide", weight: 5 },
+            { name: "Приветственный кик", desc: "Шутливый приз для настроения", type: "joke", value: "kick_sample", weight: 5 }
         ];
         
         let isSpinning = false;
         let currentPrize = null;
         
-        // Функция кручения колеса
         function spinWheel() {
             if (isSpinning) return;
-            
             isSpinning = true;
             document.getElementById("spinBtn").disabled = true;
             document.getElementById("result").style.display = "none";
             
-            // Выбираем случайный приз с учетом веса
             const random = Math.random() * 100;
             let currentWeight = 0;
-            
             for (const prize of prizes) {
                 currentWeight += prize.weight;
                 if (random <= currentWeight) {
@@ -248,16 +187,12 @@
                 }
             }
             
-            // Вычисляем угол вращения (3600° + позиция приза)
             const prizeIndex = prizes.indexOf(currentPrize);
             const segmentAngle = 360 / prizes.length;
             const targetAngle = 3600 + (prizeIndex * segmentAngle) + (Math.random() * segmentAngle * 0.5);
             
-            // Вращаем колесо
-            const wheel = document.getElementById("wheel");
-            wheel.style.transform = `rotate(${targetAngle}deg)`;
+            document.getElementById("wheel").style.transform = `rotate(${targetAngle}deg)`;
             
-            // Показываем результат через 4 секунды
             setTimeout(() => {
                 showPrize();
                 isSpinning = false;
@@ -265,18 +200,15 @@
             }, 4000);
         }
         
-        // Показать выигранный приз
         function showPrize() {
             document.getElementById("prizeName").textContent = currentPrize.name;
             document.getElementById("prizeDesc").textContent = currentPrize.desc;
             document.getElementById("result").style.display = "block";
             document.getElementById("claimBtn").style.display = "block";
             
-            // Анимация появления
             const resultDiv = document.getElementById("result");
             resultDiv.style.opacity = "0";
             resultDiv.style.transform = "translateY(20px)";
-            
             setTimeout(() => {
                 resultDiv.style.transition = "all 0.5s";
                 resultDiv.style.opacity = "1";
@@ -284,53 +216,36 @@
             }, 10);
         }
         
-        // Забрать приз (отправить данные в бота)
         function claimPrize() {
             if (!currentPrize) return;
-            
             document.getElementById("claimBtn").textContent = "⌛ Отправляем...";
             document.getElementById("claimBtn").disabled = true;
             
-            // Если мы в Telegram Mini App
             if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
-                // Отправляем данные о призе обратно в бота
                 Telegram.WebApp.sendData(JSON.stringify({
                     action: "wheel_prize",
                     prize: currentPrize,
                     user_id: Telegram.WebApp.initDataUnsafe.user?.id,
                     time: new Date().toISOString()
                 }));
-                
-                // Закрываем Mini App через 2 секунды
-                setTimeout(() => {
-                    Telegram.WebApp.close();
-                }, 2000);
-                
+                setTimeout(() => { Telegram.WebApp.close(); }, 2000);
                 document.getElementById("claimBtn").textContent = "✅ Приз отправлен!";
             } else {
-                // Если тестируем в браузере
                 document.getElementById("claimBtn").textContent = "✅ Приз записан!";
                 console.log("Выигранный приз:", currentPrize);
-                
-                // Имитация отправки в бота
                 setTimeout(() => {
                     alert(`🎉 Вы выиграли: ${currentPrize.name}\nБот пришлёт приз в ближайшее время!`);
                 }, 500);
             }
         }
         
-        // Инициализация Telegram Web App
         document.addEventListener('DOMContentLoaded', function() {
             if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
                 Telegram.WebApp.ready();
-                Telegram.WebApp.expand(); // Раскрыть на весь экран
-                
-                // Меняем тему под Telegram
+                Telegram.WebApp.expand();
                 if (Telegram.WebApp.colorScheme === 'dark') {
                     document.body.style.background = '#1a1a1a';
                 }
-                
-                // Показываем кнопку "Забрать приз" сразу
                 document.getElementById("claimBtn").style.display = "block";
             }
         });
