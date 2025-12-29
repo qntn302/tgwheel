@@ -577,8 +577,9 @@
         let tickSound = null;
         let spinStartSound = null;
         let winSound = null;
-        let tickInterval = null;
+        let animationFrameId = null;
         let cellWidth = 150; // Ширина ячейки с отступами
+        let lastCellIndex = null; // Индекс последней ячейки, центр которой был под указателем
         
         // ==================== ПЕРЕВОДЫ ====================
         const translations = {
@@ -981,43 +982,75 @@
                 spinStartSound.play().catch(() => {});
             }
             
-            // Запускаем звук тика (примерно каждые 275ms для 5.5 секунд = 20 тиков)
-            let tickCount = 0;
-            const maxTicks = 20;
-            const tickDelay = 275;
-            tickInterval = setInterval(() => {
-                if (tickCount < maxTicks) {
-                    playTick();
-                    tickCount++;
-                } else {
-                    clearInterval(tickInterval);
-                }
-            }, tickDelay);
+            // Сбрасываем отслеживание ячеек
+            lastCellIndex = null;
             
             // Анимация
             track.style.transition = 'none';
             track.style.transform = 'translateX(0px)';
             
+            // Получаем начальную позицию
+            const startPosition = 0;
+            const startTime = Date.now();
+            const duration = 5500; // 5.5 секунд
+            
             setTimeout(() => {
                 track.style.transition = 'transform 5.5s cubic-bezier(0.2, 0.8, 0.3, 0.99)';
                 track.style.transform = `translateX(${finalPosition}px)`;
                 
-                setTimeout(() => {
-                    // Воспроизводим звук победы
-                    if (winSound) {
-                        winSound.currentTime = 0;
-                        winSound.play().catch(() => {});
-                    }
+                // Получаем контейнер и его позицию
+                const container = document.querySelector('.roulette-container');
+                const containerRect = container.getBoundingClientRect();
+                const pointerX = containerRect.left + containerRect.width / 2;
+                
+                // Отслеживаем позицию рулетки и воспроизводим звук при прохождении ячеек
+                function trackRoulettePosition() {
+                    const currentTime = Date.now();
+                    const elapsed = currentTime - startTime;
                     
-                    if (tickInterval) {
-                        clearInterval(tickInterval);
+                    if (elapsed < duration) {
+                        // Получаем реальную позицию трека
+                        const trackRect = track.getBoundingClientRect();
+                        const trackLeft = trackRect.left;
+                        
+                        // Вычисляем позицию относительно трека
+                        const relativeX = pointerX - trackLeft;
+                        
+                        // Вычисляем индекс ячейки, центр которой находится под указателем
+                        // Центр ячейки = индекс * cellWidth + cellWidth / 2
+                        // Указатель находится в relativeX
+                        // Находим индекс: (relativeX - cellWidth/2) / cellWidth, округляем
+                        const currentCellIndex = Math.round((relativeX - cellWidth / 2) / cellWidth);
+                        
+                        // Если индекс изменился и находится в допустимых пределах - воспроизводим звук
+                        if (lastCellIndex !== null && currentCellIndex !== lastCellIndex && 
+                            currentCellIndex >= 0 && currentCellIndex < 50) {
+                            playTick();
+                        }
+                        
+                        lastCellIndex = currentCellIndex;
+                        animationFrameId = requestAnimationFrame(trackRoulettePosition);
+                    } else {
+                        // Анимация завершена
+                        // Воспроизводим звук победы
+                        if (winSound) {
+                            winSound.currentTime = 0;
+                            winSound.play().catch(() => {});
+                        }
+                        
+                        if (animationFrameId) {
+                            cancelAnimationFrame(animationFrameId);
+                        }
+                        
+                        showPrize();
+                        isSpinning = false;
+                        spinBtn.disabled = false;
+                        userData.lastSpinTime = Date.now();
                     }
-                    
-                    showPrize();
-                    isSpinning = false;
-                    spinBtn.disabled = false;
-                    userData.lastSpinTime = Date.now();
-                }, 5500);
+                }
+                
+                // Запускаем отслеживание
+                animationFrameId = requestAnimationFrame(trackRoulettePosition);
             }, 10);
         }
         
