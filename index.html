@@ -3,49 +3,55 @@
 <head>
     <title>301secrets Wheel of Drops</title>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+        
         body {
             background: linear-gradient(135deg, #1a1a1a 0%, #2d1b69 100%);
             color: white;
             text-align: center;
-            padding: 20px;
+            padding: 10px;
             font-family: 'Segoe UI', Arial, sans-serif;
             min-height: 100vh;
             margin: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             position: relative;
+            overflow-x: hidden;
         }
+        
         .container {
-            max-width: 500px;
+            max-width: 100%;
             width: 100%;
-            padding: 20px;
+            padding: 10px;
         }
         
         /* Переключатель языка */
         .language-switcher {
-            position: absolute;
-            top: 20px;
-            right: 20px;
+            position: fixed;
+            top: 10px;
+            right: 10px;
             display: flex;
-            gap: 10px;
-            z-index: 100;
+            gap: 8px;
+            z-index: 1000;
         }
         .lang-btn {
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.3);
             color: white;
-            padding: 8px 20px;
+            padding: 6px 16px;
             border-radius: 20px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
             transition: all 0.3s;
-            min-width: 60px;
+            min-width: 50px;
         }
         .lang-btn:hover {
             background: rgba(255, 255, 255, 0.2);
@@ -57,31 +63,31 @@
         
         h1 {
             color: #ff7f00;
-            margin-bottom: 10px;
-            font-size: 28px;
-            margin-top: 40px;
+            margin-bottom: 8px;
+            font-size: 24px;
+            margin-top: 50px;
         }
         .subtitle {
             color: #aaa;
-            margin-bottom: 30px;
-            font-size: 16px;
+            margin-bottom: 20px;
+            font-size: 14px;
         }
         
         /* Drop Pace индикатор */
         .drop-pace-indicator {
             background: rgba(255, 255, 255, 0.1);
             border-radius: 12px;
-            padding: 15px;
-            margin: 20px 0;
+            padding: 12px;
+            margin: 15px 0;
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
         .drop-pace-label {
             color: #aaa;
-            font-size: 14px;
-            margin-bottom: 8px;
+            font-size: 12px;
+            margin-bottom: 6px;
         }
         .drop-pace-status {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
             color: #ff7f00;
         }
@@ -93,59 +99,123 @@
             background: rgba(255, 255, 255, 0.1);
             border: none;
             color: white;
-            padding: 5px 10px;
+            padding: 4px 8px;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 16px;
-            margin-left: 10px;
-            width: 28px;
-            height: 28px;
+            font-size: 14px;
+            margin-left: 8px;
+            width: 24px;
+            height: 24px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
         }
         
-        /* Колесо */
-        .wheel-container {
+        /* Горизонтальная рулетка */
+        .roulette-container {
             position: relative;
-            width: 320px;
-            height: 320px;
-            margin: 0 auto 40px;
-        }
-        .wheel {
             width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: conic-gradient(
-                from 0deg,
-                #ff7f00 0deg 36deg,
-                #3498db 36deg 54deg,
-                #2ecc71 54deg 72deg,
-                #9b59b6 72deg 84deg,
-                #e74c3c 84deg 90deg,
-                #f1c40f 90deg 104.4deg,
-                #1abc9c 104.4deg 115.2deg,
-                #e67e22 115.2deg 118.8deg,
-                #34495e 118.8deg 122.4deg,
-                #d35400 122.4deg 123.6deg,
-                #1a1a1a 123.6deg 360deg
-            );
-            transition: transform 5.5s cubic-bezier(0.2, 0.8, 0.3, 0.99);
-            position: relative;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            border: 8px solid #2d1b69;
+            height: 200px;
+            margin: 20px auto;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px 0;
         }
-        .pointer {
+        
+        .roulette-track {
+            position: relative;
+            height: 100%;
+            display: flex;
+            transition: transform 5.5s cubic-bezier(0.2, 0.8, 0.3, 0.99);
+            will-change: transform;
+        }
+        
+        .roulette-cell {
+            flex-shrink: 0;
+            width: 140px;
+            height: 160px;
+            margin: 0 5px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            position: relative;
+        }
+        
+        .roulette-cell img {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            margin-bottom: 8px;
+        }
+        
+        .roulette-cell-name {
+            font-size: 11px;
+            font-weight: bold;
+            text-align: center;
+            color: white;
+            margin-bottom: 8px;
+            line-height: 1.2;
+            min-height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .roulette-cell-bar {
             position: absolute;
-            top: -25px;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            border-radius: 0 0 10px 10px;
+        }
+        
+        .roulette-cell-bar.empty { background: #7f8c8d; }
+        .roulette-cell-bar.content { background: #2ecc71; }
+        .roulette-cell-bar.discount { background: #e74c3c; }
+        .roulette-cell-bar.access { background: #f1c40f; }
+        
+        /* Fade эффект по краям */
+        .roulette-container::before,
+        .roulette-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 80px;
+            z-index: 10;
+            pointer-events: none;
+        }
+        
+        .roulette-container::before {
+            left: 0;
+            background: linear-gradient(to right, rgba(26, 26, 26, 1), rgba(26, 26, 26, 0));
+        }
+        
+        .roulette-container::after {
+            right: 0;
+            background: linear-gradient(to left, rgba(26, 26, 26, 1), rgba(26, 26, 26, 0));
+        }
+        
+        /* Указатель */
+        .roulette-pointer {
+            position: absolute;
+            top: 0;
             left: 50%;
             transform: translateX(-50%);
-            width: 35px;
-            height: 50px;
-            background: #ff7f00;
-            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-            z-index: 10;
-            filter: drop-shadow(0 3px 5px rgba(0,0,0,0.5));
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 20px solid #ff7f00;
+            z-index: 20;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
         }
         
         /* Кнопка спина */
@@ -153,18 +223,20 @@
             background: linear-gradient(135deg, #ff7f00 0%, #ff5500 100%);
             color: white;
             border: none;
-            padding: 18px 50px;
-            font-size: 22px;
+            padding: 16px 40px;
+            font-size: 20px;
             font-weight: bold;
             border-radius: 50px;
             cursor: pointer;
-            margin: 25px 0;
+            margin: 20px 0;
             box-shadow: 0 8px 20px rgba(255, 127, 0, 0.4);
             transition: all 0.3s;
             letter-spacing: 1px;
+            width: 90%;
+            max-width: 300px;
         }
         .spin-btn:hover {
-            transform: translateY(-5px);
+            transform: translateY(-3px);
             box-shadow: 0 12px 25px rgba(255, 127, 0, 0.6);
         }
         .spin-btn:disabled {
@@ -172,46 +244,6 @@
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
-        }
-        
-        /* Результат */
-        .result {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 25px;
-            margin: 20px 0;
-            border-left: 5px solid #ff7f00;
-            display: none;
-            backdrop-filter: blur(10px);
-        }
-        .prize-name {
-            font-size: 24px;
-            color: #ff7f00;
-            margin: 15px 0;
-            font-weight: bold;
-        }
-        .prize-desc {
-            color: #ccc;
-            font-size: 15px;
-            margin: 15px 0 25px;
-            line-height: 1.5;
-        }
-        .claim-btn, .subscribe-btn {
-            background: #2ecc71;
-            color: white;
-            border: none;
-            padding: 14px 30px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 16px;
-            display: none;
-            transition: all 0.3s;
-            margin: 5px;
-        }
-        .claim-btn:hover, .subscribe-btn:hover {
-            background: #27ae60;
-            transform: translateY(-2px);
         }
         
         .cooldown-info {
@@ -222,6 +254,91 @@
             font-weight: bold;
         }
         
+        /* Результат */
+        .result {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid #ff7f00;
+            display: none;
+            backdrop-filter: blur(10px);
+        }
+        .prize-name {
+            font-size: 22px;
+            color: #ff7f00;
+            margin: 12px 0;
+            font-weight: bold;
+        }
+        .prize-desc {
+            color: #ccc;
+            font-size: 14px;
+            margin: 12px 0 20px;
+            line-height: 1.5;
+        }
+        .claim-btn, .subscribe-btn {
+            background: #2ecc71;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 15px;
+            display: none;
+            transition: all 0.3s;
+            margin: 5px;
+            width: 90%;
+            max-width: 250px;
+        }
+        .claim-btn:hover, .subscribe-btn:hover {
+            background: #27ae60;
+            transform: translateY(-2px);
+        }
+        
+        /* Блок с призами */
+        .prizes-info {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .prizes-title {
+            color: #ff7f00;
+            font-size: 16px;
+            margin-bottom: 12px;
+            font-weight: bold;
+        }
+        .prizes-list {
+            text-align: left;
+            color: #ddd;
+            font-size: 13px;
+            line-height: 1.8;
+            padding-left: 10px;
+        }
+        .prizes-list div {
+            margin-bottom: 6px;
+        }
+        .prizes-note {
+            color: #aaa;
+            font-size: 12px;
+            margin-top: 12px;
+            font-style: italic;
+        }
+        
+        /* Правила */
+        .rules {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #aaa;
+            text-align: left;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
         /* Анимации */
         @keyframes glow {
             0%, 100% { box-shadow: 0 0 20px rgba(255, 127, 0, 0.5); }
@@ -229,6 +346,32 @@
         }
         .spin-btn:not(:disabled) {
             animation: glow 2s infinite;
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 20px;
+                margin-top: 45px;
+            }
+            .subtitle {
+                font-size: 12px;
+            }
+            .roulette-cell {
+                width: 120px;
+                height: 140px;
+            }
+            .roulette-cell img {
+                width: 50px;
+                height: 50px;
+            }
+            .roulette-cell-name {
+                font-size: 10px;
+            }
+            .spin-btn {
+                font-size: 18px;
+                padding: 14px 30px;
+            }
         }
     </style>
 </head>
@@ -251,9 +394,10 @@
             <div class="drop-pace-status" id="dropPaceStatus">Stable</div>
         </div>
         
-        <div class="wheel-container">
-            <div class="pointer"></div>
-            <div class="wheel" id="wheel"></div>
+        <!-- Горизонтальная рулетка -->
+        <div class="roulette-container">
+            <div class="roulette-pointer"></div>
+            <div class="roulette-track" id="rouletteTrack"></div>
         </div>
         
         <button class="spin-btn" id="spinBtn" onclick="checkSpinAvailability()">🎡 Spin the wheel</button>
@@ -266,22 +410,120 @@
             <button class="claim-btn" id="claimBtn" onclick="claimPrize()" style="display: none;"></button>
             <button class="subscribe-btn" id="subscribeBtn" onclick="openSubscribeChannels()" style="display: none;"></button>
         </div>
+        
+        <!-- Блок с призами -->
+        <div class="prizes-info" id="prizesInfo">
+            <div class="prizes-title" id="prizesTitle">Что можно выиграть?</div>
+            <div class="prizes-list" id="prizesList">
+                <div>• Мои эксклюзивные лупы, MIDI, FLP</div>
+                <div>• Ограниченный контент из 301secrets</div>
+                <div>• Скидки на полный доступ</div>
+                <div>• Бесплатные 7 / 30 дней доступа в 301secrets</div>
+            </div>
+            <div class="prizes-note" id="prizesNote">
+                Некоторые награды редкие • Есть пустые слоты • Повторный спин через 24 часа
+            </div>
+        </div>
+        
+        <!-- Правила -->
+        <div class="rules" id="rules">
+            <strong>📜 Правила:</strong><br>
+            1. Одна попытка в 24 часа<br>
+            2. Скидки действуют 7 дней<br>
+            3. Доступ к привату — одноразово<br>
+            4. Файлы приходят в личку от бота
+        </div>
     </div>
     
     <script>
         // ==================== КОНФИГУРАЦИЯ ====================
         const CHANNELS = ["@quanteen", "@quanteenhub301"];
+        const IMAGES_BASE = "https://qntn302.github.io/tgwheel/images/";
+        const SOUNDS_BASE = "https://qntn302.github.io/tgwheel/sounds/";
         
-        // ==================== ПРИЗЫ ====================
-        const prizeTypes = {
-            empty: { name: "Nothing this time", name_ru: "Пока не сегодня" },
-            content: { name: "Content reward", name_ru: "Контент" },
-            discount_10: { name: "10% discount", name_ru: "Скидка 10%" },
-            discount_15: { name: "15% discount", name_ru: "Скидка 15%" },
-            discount_20: { name: "20% discount", name_ru: "Скидка 20%" },
-            access_7: { name: "7 days full access", name_ru: "7 дней доступа" },
-            access_30: { name: "30 days full access", name_ru: "30 дней доступа" }
-        };
+        // ==================== ПРИЗЫ С МЕТАДАННЫМИ ====================
+        const prizesConfig = [
+            { 
+                type: "empty", 
+                value: null,
+                icon: "icon_empty.png",
+                name: "Nothing this time", 
+                name_ru: "Пока не сегодня",
+                barColor: "empty"
+            },
+            { 
+                type: "content", 
+                value: "mini_breakdown",
+                icon: "icon_tutorial.png",
+                name: "Mini breakdown", 
+                name_ru: "Мини-разбор",
+                barColor: "content"
+            },
+            { 
+                type: "content", 
+                value: "loops_midi",
+                icon: "icon_loops.png",
+                name: "Loops / MIDI / FLP", 
+                name_ru: "Лупы / MIDI / FLP",
+                barColor: "content"
+            },
+            { 
+                type: "content", 
+                value: "sound_pack",
+                icon: "icon_soundpacks.png",
+                name: "Sound pack", 
+                name_ru: "Звуковой пак",
+                barColor: "content"
+            },
+            { 
+                type: "content", 
+                value: "old_drop",
+                icon: "icon_exclusive_content.png",
+                name: "Old private drop", 
+                name_ru: "Старый приватный дроп",
+                barColor: "content"
+            },
+            { 
+                type: "discount", 
+                value: "10",
+                icon: "icon_10.png",
+                name: "10% discount", 
+                name_ru: "Скидка 10%",
+                barColor: "discount"
+            },
+            { 
+                type: "discount", 
+                value: "15",
+                icon: "icon_15.png",
+                name: "15% discount", 
+                name_ru: "Скидка 15%",
+                barColor: "discount"
+            },
+            { 
+                type: "discount", 
+                value: "20",
+                icon: "icon_20.png",
+                name: "20% discount", 
+                name_ru: "Скидка 20%",
+                barColor: "discount"
+            },
+            { 
+                type: "access", 
+                value: "7",
+                icon: "icon_key7.png",
+                name: "7 days full access", 
+                name_ru: "7 дней доступа",
+                barColor: "access"
+            },
+            { 
+                type: "access", 
+                value: "30",
+                icon: "icon_key30.png",
+                name: "30 days full access", 
+                name_ru: "30 дней доступа",
+                barColor: "access"
+            }
+        ];
         
         // ==================== ВЕРОЯТНОСТИ ПО DROP PACE ====================
         function getProbabilities(dropPace) {
@@ -297,7 +539,7 @@
                     access_30: 2
                 };
             } else if (dropPace >= 3 && dropPace <= 8) {
-                // STABLE (3-5) и промежуточные (6-8)
+                // STABLE
                 return {
                     empty: 50,
                     content: 30,
@@ -332,6 +574,11 @@
             hasWonFullAccess: false,
             pendingReward: null
         };
+        let tickSound = null;
+        let spinStartSound = null;
+        let winSound = null;
+        let tickInterval = null;
+        let cellWidth = 150; // Ширина ячейки с отступами
         
         // ==================== ПЕРЕВОДЫ ====================
         const translations = {
@@ -345,7 +592,6 @@
                 dropPaceHigh: "High",
                 dropPacePeak: "Peak",
                 dropPaceInfo: "Drop Pace отражает твою активность\n\nБудь последовательным, чтобы увеличить шансы\n\nРедкие награды сбрасывают темп",
-                // Сообщения для наград
                 emptyMsg: "Пока не сегодня\n\nТвой Drop Pace продолжает расти — возвращайся завтра",
                 contentMsg: "Награда разблокирована\n\nЭксклюзивный контент только что выпал 👇\n\nТакие вещи выпадают намного чаще внутри приватной группы",
                 discountMsg: "Ты получил скидку {discount}%\n\nИспользуй её для вступления в приватную группу\n\nКод действителен ограниченное время",
@@ -353,7 +599,22 @@
                 access30Msg: "Редкий дроп\n\nТы получил 30 дней полного доступа\n\nИспользуй это время с умом",
                 lockedMsg: "Ты получил награду — но она заблокирована\n\nПодпишись на обязательные каналы, чтобы разблокировать",
                 subscribeBtn: "⬇️ Подписаться и разблокировать",
-                claimBtn: "🪇 Забрать приз"
+                claimBtn: "🪇 Забрать приз",
+                prizesTitle: "Что можно выиграть?",
+                prizesList: [
+                    "• Мои эксклюзивные лупы, MIDI, FLP",
+                    "• Ограниченный контент из 301secrets",
+                    "• Скидки на полный доступ",
+                    "• Бесплатные 7 / 30 дней доступа в 301secrets"
+                ],
+                prizesNote: "Некоторые награды редкие • Есть пустые слоты • Повторный спин через 24 часа",
+                rulesTitle: "📜 Правила:",
+                rules: [
+                    "1. Одна попытка в 24 часа",
+                    "2. Скидки действуют 7 дней",
+                    "3. Доступ к привату — одноразово",
+                    "4. Файлы приходят в личку от бота"
+                ]
             },
             en: {
                 title: "🎡 Wheel of Drops",
@@ -365,7 +626,6 @@
                 dropPaceHigh: "High",
                 dropPacePeak: "Peak",
                 dropPaceInfo: "Drop Pace reflects your activity\n\nStay consistent to increase your chances\n\nRare rewards reset the pace",
-                // Сообщения для наград
                 emptyMsg: "Nothing this time\n\nYour Drop Pace keeps building — come back tomorrow",
                 contentMsg: "Drop unlocked\n\nExclusive content just landed 👇\n\nThis kind of stuff drops way more often inside the private group",
                 discountMsg: "You unlocked a {discount}% discount\n\nUse it to join the private group\n\nThe code is valid for a limited time",
@@ -373,14 +633,89 @@
                 access30Msg: "Rare drop\n\nYou unlocked 30 days of full access\n\nUse this time wisely",
                 lockedMsg: "You got a reward — but it's locked\n\nSubscribe to the required channels to unlock it",
                 subscribeBtn: "⬇️ Subscribe & unlock",
-                claimBtn: "🪇 Claim prize"
+                claimBtn: "🪇 Claim prize",
+                prizesTitle: "What you can unlock?",
+                prizesList: [
+                    "• My exclusive loops, midi, flps",
+                    "• Limited content from 301secrets",
+                    "• Discounts on full access",
+                    "• Free 7 / 30 days of full access to 301secrets"
+                ],
+                prizesNote: "Some rewards are rare • There are also empty slots • You can spin again in 24 hours",
+                rulesTitle: "📜 Rules:",
+                rules: [
+                    "1. One try every 24 hours",
+                    "2. Discounts valid for 7 days",
+                    "3. Private access is one-time",
+                    "4. Files arrive via bot DM"
+                ]
             }
         };
+        
+        // ==================== ИНИЦИАЛИЗАЦИЯ РУЛЕТКИ ====================
+        function initRoulette() {
+            const track = document.getElementById('rouletteTrack');
+            track.innerHTML = '';
+            
+            // Создаем множество ячеек для бесконечной прокрутки
+            // Дублируем призы несколько раз
+            const totalCells = 50; // Достаточно для плавной анимации
+            
+            for (let i = 0; i < totalCells; i++) {
+                const prizeIndex = i % prizesConfig.length;
+                const prize = prizesConfig[prizeIndex];
+                const cell = createCell(prize);
+                track.appendChild(cell);
+            }
+        }
+        
+        function createCell(prize) {
+            const cell = document.createElement('div');
+            cell.className = 'roulette-cell';
+            
+            const img = document.createElement('img');
+            img.src = IMAGES_BASE + prize.icon;
+            img.alt = prize.name;
+            img.onerror = function() {
+                this.style.display = 'none';
+            };
+            
+            const name = document.createElement('div');
+            name.className = 'roulette-cell-name';
+            name.textContent = currentLang === 'ru' ? prize.name_ru : prize.name;
+            
+            const bar = document.createElement('div');
+            bar.className = 'roulette-cell-bar ' + prize.barColor;
+            
+            cell.appendChild(img);
+            cell.appendChild(name);
+            cell.appendChild(bar);
+            
+            return cell;
+        }
+        
+        // ==================== ЗВУКИ ====================
+        function initSounds() {
+            tickSound = new Audio(SOUNDS_BASE + 'tick.mp3');
+            tickSound.volume = 0.3;
+            spinStartSound = new Audio(SOUNDS_BASE + 'spin_start.mp3');
+            spinStartSound.volume = 0.5;
+            winSound = new Audio(SOUNDS_BASE + 'win.mp3');
+            winSound.volume = 0.6;
+        }
+        
+        function playTick() {
+            if (tickSound) {
+                tickSound.currentTime = 0;
+                tickSound.play().catch(() => {});
+            }
+        }
         
         // ==================== ФУНКЦИИ ЯЗЫКА ====================
         function setLanguage(lang) {
             currentLang = lang;
             updateTexts();
+            updateRouletteCells();
             
             document.querySelectorAll('.lang-btn').forEach(btn => {
                 btn.classList.remove('active');
@@ -397,7 +732,25 @@
             document.getElementById('title').textContent = t.title;
             document.getElementById('subtitle').textContent = t.subtitle;
             document.getElementById('spinBtn').textContent = t.spinBtn;
+            document.getElementById('prizesTitle').textContent = t.prizesTitle;
+            document.getElementById('prizesNote').textContent = t.prizesNote;
+            
+            const prizesList = document.getElementById('prizesList');
+            prizesList.innerHTML = t.prizesList.map(item => `<div>${item}</div>`).join('');
+            
+            const rulesElement = document.getElementById('rules');
+            rulesElement.innerHTML = `<strong>${t.rulesTitle}</strong><br>${t.rules.join('<br>')}`;
+            
             updateDropPaceDisplay();
+        }
+        
+        function updateRouletteCells() {
+            const cells = document.querySelectorAll('.roulette-cell-name');
+            cells.forEach((cell, index) => {
+                const prizeIndex = index % prizesConfig.length;
+                const prize = prizesConfig[prizeIndex];
+                cell.textContent = currentLang === 'ru' ? prize.name_ru : prize.name;
+            });
         }
         
         function updateDropPaceDisplay() {
@@ -429,7 +782,6 @@
         // ==================== ЗАГРУЗКА ДАННЫХ ПОЛЬЗОВАТЕЛЯ ====================
         async function loadUserData() {
             if (typeof Telegram === 'undefined' || !Telegram.WebApp) {
-                // Для теста
                 userData = {
                     dropPace: 5,
                     lastSpinTime: null,
@@ -442,18 +794,13 @@
             }
             
             try {
-                // Запрашиваем данные у бота
                 const user = Telegram.WebApp.initDataUnsafe.user;
                 if (user) {
-                    // Отправляем запрос на получение данных
                     Telegram.WebApp.sendData(JSON.stringify({
                         action: "get_user_data",
                         user_id: user.id
                     }));
                     
-                    // Пока используем значения по умолчанию
-                    // В реальности бот должен отправить данные через сообщение или другой механизм
-                    // Для упрощения используем localStorage как кэш
                     const cached = localStorage.getItem('wheel_user_data');
                     if (cached) {
                         try {
@@ -490,28 +837,15 @@
             }
         }
         
-        // ==================== ПРОВЕРКА ПОДПИСКИ ====================
-        async function checkSubscriptions() {
-            if (typeof Telegram === 'undefined' || !Telegram.WebApp) {
-                return true; // Для теста
-            }
-            
-            // Проверка будет на стороне бота при отправке приза
-            // Здесь просто возвращаем true, реальная проверка в handle_web_app_data
-            return true;
-        }
-        
-        // ==================== ФУНКЦИИ КОЛЕСА ====================
+        // ==================== ФУНКЦИИ РУЛЕТКИ ====================
         function checkSpinAvailability() {
             if (isSpinning) return;
             
-            // Проверяем pending reward
             if (userData.pendingReward) {
                 showPendingReward();
                 return;
             }
             
-            // Проверяем кулдаун (24 часа)
             if (userData.lastSpinTime) {
                 const hoursPassed = (Date.now() - userData.lastSpinTime) / (1000 * 60 * 60);
                 if (hoursPassed < 24) {
@@ -525,89 +859,166 @@
             }
             
             document.getElementById('cooldownInfo').style.display = 'none';
-            spinWheel();
+            spinRoulette();
         }
         
-        function spinWheel() {
+        function spinRoulette() {
             if (isSpinning) return;
             isSpinning = true;
             
             const spinBtn = document.getElementById("spinBtn");
-            const wheel = document.getElementById("wheel");
+            const track = document.getElementById("rouletteTrack");
             
             spinBtn.disabled = true;
             document.getElementById("result").style.display = "none";
             
-            // Получаем вероятности на основе текущего Drop Pace
+            // Получаем вероятности
             const probs = getProbabilities(userData.dropPace);
             
             // Проверяем кулдаун на full access
             if (userData.hasWonFullAccess && userData.fullAccessCooldown) {
                 const cooldownEnd = new Date(userData.fullAccessCooldown).getTime();
                 if (Date.now() < cooldownEnd) {
-                    // Исключаем full access из вероятностей
                     probs.access_7 = 0;
                     probs.access_30 = 0;
                 }
             }
             
-            // Выбираем приз по вероятностям
+            // Выбираем приз
             const random = Math.random() * 100;
             let cumulative = 0;
             let selectedType = 'empty';
+            let selectedValue = null;
             
             for (const [type, prob] of Object.entries(probs)) {
                 cumulative += prob;
                 if (random <= cumulative) {
-                    selectedType = type;
+                    if (type.startsWith('discount_')) {
+                        selectedType = 'discount';
+                        selectedValue = type.split('_')[1];
+                    } else if (type.startsWith('access_')) {
+                        selectedType = 'access';
+                        selectedValue = type.split('_')[1];
+                    } else {
+                        selectedType = type;
+                    }
                     break;
                 }
             }
             
-            // Определяем конкретный приз
-            if (selectedType.startsWith('discount_')) {
-                currentPrize = {
-                    type: 'discount',
-                    value: selectedType.split('_')[1],
-                    name: prizeTypes[selectedType].name,
-                    name_ru: prizeTypes[selectedType].name_ru
-                };
-            } else if (selectedType.startsWith('access_')) {
-                currentPrize = {
-                    type: 'access',
-                    value: selectedType.split('_')[1],
-                    name: prizeTypes[selectedType].name,
-                    name_ru: prizeTypes[selectedType].name_ru
-                };
-            } else {
-                currentPrize = {
-                    type: selectedType,
-                    value: null,
-                    name: prizeTypes[selectedType].name,
-                    name_ru: prizeTypes[selectedType].name_ru
-                };
+            // Находим индекс приза в конфиге
+            let prizeIndex = -1;
+            
+            if (selectedType === 'empty') {
+                // Ищем empty
+                for (let i = 0; i < prizesConfig.length; i++) {
+                    if (prizesConfig[i].type === 'empty') {
+                        prizeIndex = i;
+                        break;
+                    }
+                }
+            } else if (selectedType === 'content') {
+                // Для контента выбираем случайный из доступных
+                const contentPrizes = prizesConfig.filter(p => p.type === 'content');
+                if (contentPrizes.length > 0) {
+                    const randomContent = contentPrizes[Math.floor(Math.random() * contentPrizes.length)];
+                    prizeIndex = prizesConfig.indexOf(randomContent);
+                }
+            } else if (selectedType === 'discount') {
+                // Ищем конкретную скидку
+                for (let i = 0; i < prizesConfig.length; i++) {
+                    if (prizesConfig[i].type === 'discount' && prizesConfig[i].value === selectedValue) {
+                        prizeIndex = i;
+                        break;
+                    }
+                }
+            } else if (selectedType === 'access') {
+                // Ищем конкретный доступ
+                for (let i = 0; i < prizesConfig.length; i++) {
+                    if (prizesConfig[i].type === 'access' && prizesConfig[i].value === selectedValue) {
+                        prizeIndex = i;
+                        break;
+                    }
+                }
             }
             
-            // Анимация колеса (упрощенная версия)
-            const baseRotation = 1080;
-            const prizeIndex = Object.keys(prizeTypes).indexOf(selectedType);
-            const segmentAngle = 360 / Object.keys(prizeTypes).length;
-            const targetAngle = baseRotation + (prizeIndex * segmentAngle) + (Math.random() * segmentAngle * 0.7);
+            if (prizeIndex === -1) {
+                prizeIndex = 0; // Fallback на empty
+            }
             
-            wheel.style.transition = 'transform 0.1s ease-out';
-            wheel.style.transform = 'rotate(0deg)';
+            // Сохраняем выбранный приз
+            const selectedPrize = prizesConfig[prizeIndex];
+            currentPrize = {
+                type: selectedPrize.type,
+                value: selectedPrize.value,
+                name: selectedPrize.name,
+                name_ru: selectedPrize.name_ru
+            };
+            
+            // Для контента сохраняем конкретный тип
+            if (selectedPrize.type === 'content' && selectedPrize.value) {
+                currentPrize.value = selectedPrize.value;
+            }
+            
+            // Вычисляем позицию для остановки
+            // Начинаем с позиции, где видно несколько ячеек слева
+            const containerWidth = document.querySelector('.roulette-container').offsetWidth;
+            const centerOffset = containerWidth / 2 - cellWidth / 2;
+            
+            // Находим позицию выбранного приза в треке
+            // Учитываем, что трек содержит 50 ячеек (несколько циклов)
+            const cyclesBefore = Math.floor(25 / prizesConfig.length);
+            const targetCellIndex = cyclesBefore * prizesConfig.length + prizeIndex;
+            const targetPosition = -(targetCellIndex * cellWidth) + centerOffset;
+            
+            // Добавляем случайное смещение для реалистичности (небольшое)
+            const randomOffset = (Math.random() - 0.5) * cellWidth * 0.2;
+            const finalPosition = targetPosition + randomOffset;
+            
+            // Воспроизводим звук старта
+            if (spinStartSound) {
+                spinStartSound.currentTime = 0;
+                spinStartSound.play().catch(() => {});
+            }
+            
+            // Запускаем звук тика (примерно каждые 275ms для 5.5 секунд = 20 тиков)
+            let tickCount = 0;
+            const maxTicks = 20;
+            const tickDelay = 275;
+            tickInterval = setInterval(() => {
+                if (tickCount < maxTicks) {
+                    playTick();
+                    tickCount++;
+                } else {
+                    clearInterval(tickInterval);
+                }
+            }, tickDelay);
+            
+            // Анимация
+            track.style.transition = 'none';
+            track.style.transform = 'translateX(0px)';
             
             setTimeout(() => {
-                wheel.style.transition = 'transform 5.5s cubic-bezier(0.2, 0.8, 0.3, 0.99)';
-                wheel.style.transform = `rotate(${targetAngle}deg)`;
+                track.style.transition = 'transform 5.5s cubic-bezier(0.2, 0.8, 0.3, 0.99)';
+                track.style.transform = `translateX(${finalPosition}px)`;
                 
                 setTimeout(() => {
+                    // Воспроизводим звук победы
+                    if (winSound) {
+                        winSound.currentTime = 0;
+                        winSound.play().catch(() => {});
+                    }
+                    
+                    if (tickInterval) {
+                        clearInterval(tickInterval);
+                    }
+                    
                     showPrize();
                     isSpinning = false;
                     spinBtn.disabled = false;
                     userData.lastSpinTime = Date.now();
-                }, 5800);
-            }, 50);
+                }, 5500);
+            }, 10);
         }
         
         function showPrize() {
@@ -620,7 +1031,6 @@
             
             prizeName.textContent = currentLang === 'ru' ? currentPrize.name_ru : currentPrize.name;
             
-            // Формируем описание в зависимости от типа приза
             let desc = '';
             if (currentPrize.type === 'empty') {
                 desc = t.emptyMsg;
@@ -637,20 +1047,15 @@
             }
             
             prizeDesc.textContent = desc;
-            
             resultDiv.style.display = "block";
             
-            // Для empty всегда показываем кнопку claim
-            // Для остальных - проверка будет на стороне бота
             if (currentPrize.type === 'empty') {
                 claimBtn.textContent = t.claimBtn;
                 claimBtn.style.display = "block";
                 subscribeBtn.style.display = "none";
             } else {
-                // Показываем обе кнопки - бот проверит подписки
                 claimBtn.textContent = t.claimBtn;
                 claimBtn.style.display = "block";
-                // Бот проверит подписки и если нужно - покажет сообщение о подписке
             }
         }
         
@@ -664,24 +1069,25 @@
                 window.open(`https://t.me/${channel.replace('@', '')}`, '_blank');
             });
             
-            // После подписки пользователь должен нажать кнопку проверки
-            // В реальности это будет обрабатываться ботом автоматически
             setTimeout(() => {
                 checkSubscriptions().then(isSubscribed => {
                     if (isSubscribed) {
-                        // Выдаем награду
                         claimPrize();
                     }
                 });
             }, 2000);
         }
         
+        async function checkSubscriptions() {
+            if (typeof Telegram === 'undefined' || !Telegram.WebApp) {
+                return true;
+            }
+            return true;
+        }
+        
         function claimPrize() {
             if (!currentPrize) return;
             
-            const t = translations[currentLang];
-            
-            // Отправляем данные в бота
             if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
                 const user = Telegram.WebApp.initDataUnsafe.user;
                 Telegram.WebApp.sendData(JSON.stringify({
@@ -694,7 +1100,6 @@
                     time: new Date().toISOString()
                 }));
                 
-                // Очищаем pending reward
                 userData.pendingReward = null;
                 localStorage.removeItem('wheel_user_data');
                 
@@ -709,6 +1114,9 @@
         
         // ==================== ИНИЦИАЛИЗАЦИЯ ====================
         document.addEventListener('DOMContentLoaded', function() {
+            initSounds();
+            initRoulette();
+            
             if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
                 Telegram.WebApp.ready();
                 Telegram.WebApp.expand();
@@ -722,6 +1130,11 @@
             }
             
             loadUserData();
+            
+            // Адаптивная ширина ячейки
+            if (window.innerWidth <= 480) {
+                cellWidth = 130;
+            }
         });
     </script>
 </body>
