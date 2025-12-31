@@ -1150,9 +1150,31 @@
                     timestamp: Date.now()
                 };
                 
-                // Отправляем данные через sendData (сработает при закрытии приложения)
+                // КРИТИЧНО: Используем MainButton для НЕМЕДЛЕННОЙ отправки данных
+                // MainButton отправляет данные СРАЗУ при нажатии
+                Telegram.WebApp.MainButton.setText(currentLang === 'ru' ? 'Проверка...' : 'Checking...');
+                Telegram.WebApp.MainButton.show();
+                Telegram.WebApp.MainButton.enable();
+                
+                // Удаляем старый обработчик, если есть
+                Telegram.WebApp.MainButton.offClick();
+                
+                // Устанавливаем обработчик для отправки данных
+                Telegram.WebApp.MainButton.onClick(function() {
+                    console.log("✅ MainButton clicked - sending spin_started NOW");
+                    Telegram.WebApp.sendData(JSON.stringify(spinData));
+                    Telegram.WebApp.MainButton.hide();
+                });
+                
+                // Автоматически нажимаем MainButton через небольшую задержку
+                setTimeout(() => {
+                    console.log("✅ Auto-clicking MainButton to send spin_started");
+                    Telegram.WebApp.MainButton.click();
+                }, 100);
+                
+                // Также отправляем через sendData (резервный способ)
                 Telegram.WebApp.sendData(JSON.stringify(spinData));
-                console.log("✅ Spin start data queued via sendData - will send when app closes");
+                console.log("✅ Spin start data sent via sendData (backup)");
                 
                 // Сохраняем в localStorage для надежности
                 localStorage.setItem('wheel_spin_started', JSON.stringify({
@@ -1523,15 +1545,28 @@
                     language: currentLang,
                     time: spinTime,
                     spin_id: spinId,
-                    timestamp: Date.now()
+                    timestamp: Date.now(),
+                    // ВАЖНО: Включаем spin_started в данные приза для защиты от абуза
+                    spin_started: true
                 };
                 
                 console.log("🎁 Sending prize data:", prizeData);
                 
                 try {
-                    // Отправляем данные через sendData (сработает при закрытии приложения)
+                    // КРИТИЧНО: Отправляем данные и ЗАКРЫВАЕМ приложение СРАЗУ
+                    // sendData работает ТОЛЬКО при закрытии приложения
                     Telegram.WebApp.sendData(JSON.stringify(prizeData));
-                    console.log("✅ Prize data queued via sendData - will send when app closes");
+                    console.log("✅ Prize data sent via sendData - closing app NOW");
+                    
+                    // ЗАКРЫВАЕМ приложение СРАЗУ для отправки данных
+                    setTimeout(() => {
+                        try {
+                            Telegram.WebApp.close();
+                            console.log("✅ App closed - data should be sent to bot");
+                        } catch (e) {
+                            console.error("Error closing WebApp:", e);
+                        }
+                    }, 100); // Минимальная задержка для гарантии отправки
                     
                     // Сохраняем в localStorage для надежности
                     localStorage.setItem('wheel_prize_data', JSON.stringify({
@@ -1545,8 +1580,8 @@
                         const prizeDesc = document.getElementById("prizeDesc");
                         if (prizeDesc) {
                             prizeDesc.textContent = currentLang === 'ru' 
-                                ? "✅ Приз отправлен! Проверь личные сообщения от бота. Закрой приложение для завершения."
-                                : "✅ Prize sent! Check your private messages from the bot. Close the app to finish.";
+                                ? "✅ Приз отправлен! Проверь личные сообщения от бота."
+                                : "✅ Prize sent! Check your private messages from the bot.";
                         }
                     }
                     
@@ -1554,16 +1589,15 @@
                     userData.pendingReward = null;
                     localStorage.removeItem('wheel_user_data');
                     
-                    // ВАЖНО: Закрываем приложение СРАЗУ, чтобы sendData сработал
-                    // sendData отправляет данные ТОЛЬКО при закрытии приложения
+                    // Закрываем приложение через 2 секунды
                     setTimeout(() => {
                         try {
                             Telegram.WebApp.close();
-                            console.log("✅ App closing - sendData will send data to bot NOW");
+                            console.log("✅ App closing");
                         } catch (e) {
                             console.error("Error closing WebApp:", e);
                         }
-                    }, 500); // Быстрое закрытие для немедленной отправки данных
+                    }, 2000);
                     
                 } catch (error) {
                     console.error("❌ Error sending data:", error);
