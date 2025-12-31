@@ -1117,7 +1117,7 @@
         }
         
         // ==================== ФУНКЦИИ РУЛЕТКИ ====================
-        function checkSpinAvailability() {
+        async function checkSpinAvailability() {
             if (isSpinning) return;
             
             if (userData.pendingReward) {
@@ -1125,6 +1125,7 @@
                 return;
             }
             
+            // Проверка кулдауна на клиенте (для UX)
             if (userData.lastSpinTime) {
                 const hoursPassed = (Date.now() - userData.lastSpinTime) / (1000 * 60 * 60);
                 if (hoursPassed < 24) {
@@ -1134,6 +1135,23 @@
                         t.cooldown.replace('{hours}', hoursLeft);
                     document.getElementById('cooldownInfo').style.display = 'block';
                     return;
+                }
+            }
+            
+            // ВАЖНО: Проверяем кулдаун на сервере перед спином (защита от абуза)
+            if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
+                try {
+                    // Отправляем запрос на проверку кулдауна
+                    Telegram.WebApp.sendData(JSON.stringify({
+                        action: "check_cooldown",
+                        user_id: Telegram.WebApp.initDataUnsafe?.user?.id,
+                        time: new Date().toISOString()
+                    }));
+                    
+                    // Ждём немного для обработки на сервере
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                } catch (e) {
+                    console.error("Error checking cooldown:", e);
                 }
             }
             
@@ -1430,8 +1448,18 @@
         function claimPrize() {
             if (!currentPrize) return;
             
+            // Блокируем повторные нажатия
+            const claimBtn = document.getElementById("claimBtn");
+            if (claimBtn) {
+                claimBtn.disabled = true;
+                claimBtn.textContent = currentLang === 'ru' ? 'Отправка...' : 'Sending...';
+            }
+            
             if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
                 const user = Telegram.WebApp.initDataUnsafe.user;
+                const spinTime = new Date().toISOString();
+                
+                // Отправляем данные с уникальным временем
                 Telegram.WebApp.sendData(JSON.stringify({
                     action: "wheel_prize",
                     prize: currentPrize,
@@ -1439,15 +1467,31 @@
                     user_id: user?.id,
                     username: user?.username,
                     language: currentLang,
-                    time: new Date().toISOString()
+                    time: spinTime,
+                    spin_id: `${user?.id}_${Date.now()}` // Уникальный ID спина
                 }));
+                
+                // Логируем для отладки
+                console.log("Prize claimed and sent:", currentPrize, "at", spinTime);
                 
                 userData.pendingReward = null;
                 localStorage.removeItem('wheel_user_data');
                 
+                // Показываем сообщение об успехе
+                const resultDiv = document.getElementById("result");
+                if (resultDiv) {
+                    const prizeDesc = document.getElementById("prizeDesc");
+                    if (prizeDesc) {
+                        const t = translations[currentLang];
+                        prizeDesc.textContent = currentLang === 'ru' 
+                            ? "✅ Приз отправлен! Проверь личные сообщения от бота."
+                            : "✅ Prize sent! Check your private messages from the bot.";
+                    }
+                }
+                
                 setTimeout(() => {
                     Telegram.WebApp.close();
-                }, 2000);
+                }, 3000);
             } else {
                 console.log("Prize claimed:", currentPrize);
                 userData.pendingReward = null;
