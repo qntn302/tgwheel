@@ -1169,6 +1169,19 @@
             spinBtn.disabled = true;
             document.getElementById("result").style.display = "none";
             
+            // КРИТИЧНО: Отмечаем начало спина на сервере СРАЗУ (защита от абуза)
+            if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
+                const user = Telegram.WebApp.initDataUnsafe?.user;
+                if (user) {
+                    Telegram.WebApp.sendData(JSON.stringify({
+                        action: "spin_started",
+                        user_id: user.id,
+                        time: new Date().toISOString()
+                    }));
+                    console.log("Spin started - marked on server");
+                }
+            }
+            
             // Получаем вероятности
             const probs = getProbabilities(userData.dropPace);
             
@@ -1446,7 +1459,10 @@
         }
         
         function claimPrize() {
-            if (!currentPrize) return;
+            if (!currentPrize) {
+                console.error("No prize to claim!");
+                return;
+            }
             
             // Блокируем повторные нажатия
             const claimBtn = document.getElementById("claimBtn");
@@ -1456,45 +1472,79 @@
             }
             
             if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
-                const user = Telegram.WebApp.initDataUnsafe.user;
-                const spinTime = new Date().toISOString();
+                const user = Telegram.WebApp.initDataUnsafe?.user;
+                if (!user || !user.id) {
+                    console.error("User data not available!");
+                    alert(currentLang === 'ru' 
+                        ? "Ошибка: данные пользователя не найдены. Перезагрузи приложение."
+                        : "Error: user data not found. Reload the app.");
+                    return;
+                }
                 
-                // Отправляем данные с уникальным временем
-                Telegram.WebApp.sendData(JSON.stringify({
+                const spinTime = new Date().toISOString();
+                const spinId = `${user.id}_${Date.now()}`;
+                
+                const prizeData = {
                     action: "wheel_prize",
                     prize: currentPrize,
                     drop_pace: userData.dropPace,
-                    user_id: user?.id,
-                    username: user?.username,
+                    user_id: user.id,
+                    username: user.username || "unknown",
                     language: currentLang,
                     time: spinTime,
-                    spin_id: `${user?.id}_${Date.now()}` // Уникальный ID спина
-                }));
+                    spin_id: spinId
+                };
                 
-                // Логируем для отладки
-                console.log("Prize claimed and sent:", currentPrize, "at", spinTime);
+                console.log("Sending prize data:", prizeData);
                 
-                userData.pendingReward = null;
-                localStorage.removeItem('wheel_user_data');
-                
-                // Показываем сообщение об успехе
-                const resultDiv = document.getElementById("result");
-                if (resultDiv) {
-                    const prizeDesc = document.getElementById("prizeDesc");
-                    if (prizeDesc) {
-                        const t = translations[currentLang];
-                        prizeDesc.textContent = currentLang === 'ru' 
-                            ? "✅ Приз отправлен! Проверь личные сообщения от бота."
-                            : "✅ Prize sent! Check your private messages from the bot.";
+                try {
+                    // Отправляем данные
+                    Telegram.WebApp.sendData(JSON.stringify(prizeData));
+                    console.log("✅ Data sent via sendData");
+                    
+                    // Также пытаемся закрыть приложение, чтобы гарантировать отправку
+                    // Telegram отправляет данные при закрытии приложения
+                    
+                    // Показываем сообщение об успехе
+                    const resultDiv = document.getElementById("result");
+                    if (resultDiv) {
+                        const prizeDesc = document.getElementById("prizeDesc");
+                        if (prizeDesc) {
+                            prizeDesc.textContent = currentLang === 'ru' 
+                                ? "✅ Приз отправлен! Проверь личные сообщения от бота. Приложение закроется через 2 секунды..."
+                                : "✅ Prize sent! Check your private messages from the bot. App will close in 2 seconds...";
+                        }
+                    }
+                    
+                    // Закрываем приложение через 2 секунды (это гарантирует отправку данных)
+                    setTimeout(() => {
+                        try {
+                            Telegram.WebApp.close();
+                        } catch (e) {
+                            console.error("Error closing WebApp:", e);
+                        }
+                    }, 2000);
+                    
+                    // Очищаем данные
+                    userData.pendingReward = null;
+                    localStorage.removeItem('wheel_user_data');
+                    
+                } catch (error) {
+                    console.error("Error sending data:", error);
+                    alert(currentLang === 'ru' 
+                        ? "Ошибка отправки данных. Попробуй ещё раз или обратись к администратору."
+                        : "Error sending data. Try again or contact administrator.");
+                    
+                    if (claimBtn) {
+                        claimBtn.disabled = false;
+                        claimBtn.textContent = currentLang === 'ru' ? 'Забрать приз' : 'Claim Prize';
                     }
                 }
-                
-                setTimeout(() => {
-                    Telegram.WebApp.close();
-                }, 3000);
             } else {
-                console.log("Prize claimed:", currentPrize);
-                userData.pendingReward = null;
+                console.error("Telegram WebApp not available!");
+                alert(currentLang === 'ru' 
+                    ? "Ошибка: Telegram WebApp недоступен. Открой приложение через бота."
+                    : "Error: Telegram WebApp not available. Open the app through the bot.");
             }
         }
         
