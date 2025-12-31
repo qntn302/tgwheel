@@ -1540,20 +1540,19 @@
                     Telegram.WebApp.sendData(JSON.stringify(prizeData));
                     console.log("✅ Prize data queued in sendData");
                     
-                    // Способ 2: Отправка через текстовое сообщение боту (РАБОТАЕТ СРАЗУ)
-                    // Используем openTelegramLink для отправки сообщения боту
+                    // Способ 2: Отправка через /start параметр (РАБОТАЕТ СРАЗУ)
+                    // Используем openTelegramLink для отправки данных через /start
                     const dataStr = JSON.stringify(prizeData);
                     const encodedData = encodeURIComponent(dataStr);
                     const botUsername = "quanteen_bot";
                     
-                    // Отправляем данные через текстовое сообщение
-                    // Формат: WHEEL_DATA: {...}
-                    const messageText = `WHEEL_DATA:${dataStr}`;
-                    const telegramLink = `https://t.me/${botUsername}?text=${encodeURIComponent(messageText)}`;
+                    // Отправляем данные через /start параметр
+                    const telegramLink = `https://t.me/${botUsername}?start=wheel_${encodedData}`;
                     
-                    console.log("📤 Sending prize data via Telegram link...");
+                    console.log("📤 Sending prize data via /start link...");
+                    console.log("📤 Link:", telegramLink.substring(0, 100) + "...");
                     Telegram.WebApp.openTelegramLink(telegramLink);
-                    console.log("✅ Prize data sent via Telegram link");
+                    console.log("✅ Prize data sent via /start link");
                     
                     // ЗАКРЫВАЕМ приложение через 1 секунду
                     setTimeout(() => {
