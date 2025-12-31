@@ -1150,31 +1150,18 @@
                     timestamp: Date.now()
                 };
                 
-                // КРИТИЧНО: Используем MainButton для НЕМЕДЛЕННОЙ отправки данных
-                // MainButton отправляет данные СРАЗУ при нажатии
-                Telegram.WebApp.MainButton.setText(currentLang === 'ru' ? 'Проверка...' : 'Checking...');
-                Telegram.WebApp.MainButton.show();
-                Telegram.WebApp.MainButton.enable();
+                // КРИТИЧНО: Отправляем данные через openTelegramLink (РАБОТАЕТ СРАЗУ)
+                const dataStr = JSON.stringify(spinData);
+                const encodedData = encodeURIComponent(dataStr);
+                const botUsername = "quanteen_bot";
                 
-                // Удаляем старый обработчик, если есть
-                Telegram.WebApp.MainButton.offClick();
-                
-                // Устанавливаем обработчик для отправки данных
-                Telegram.WebApp.MainButton.onClick(function() {
-                    console.log("✅ MainButton clicked - sending spin_started NOW");
-                    Telegram.WebApp.sendData(JSON.stringify(spinData));
-                    Telegram.WebApp.MainButton.hide();
-                });
-                
-                // Автоматически нажимаем MainButton через небольшую задержку
-                setTimeout(() => {
-                    console.log("✅ Auto-clicking MainButton to send spin_started");
-                    Telegram.WebApp.MainButton.click();
-                }, 100);
+                // Отправляем данные через /start параметр
+                Telegram.WebApp.openTelegramLink(`https://t.me/${botUsername}?start=wheel_${encodedData}`);
+                console.log("✅ Spin start data sent via openTelegramLink - should work immediately");
                 
                 // Также отправляем через sendData (резервный способ)
-                Telegram.WebApp.sendData(JSON.stringify(spinData));
-                console.log("✅ Spin start data sent via sendData (backup)");
+                Telegram.WebApp.sendData(dataStr);
+                console.log("✅ Spin start data also sent via sendData (backup)");
                 
                 // Сохраняем в localStorage для надежности
                 localStorage.setItem('wheel_spin_started', JSON.stringify({
@@ -1553,20 +1540,29 @@
                 console.log("🎁 Sending prize data:", prizeData);
                 
                 try {
-                    // КРИТИЧНО: Отправляем данные и ЗАКРЫВАЕМ приложение СРАЗУ
-                    // sendData работает ТОЛЬКО при закрытии приложения
-                    Telegram.WebApp.sendData(JSON.stringify(prizeData));
-                    console.log("✅ Prize data sent via sendData - closing app NOW");
+                    // КРИТИЧНО: Отправляем данные через openTelegramLink (РАБОТАЕТ СРАЗУ)
+                    // Это более надежный способ, чем sendData
+                    const dataStr = JSON.stringify(prizeData);
+                    const encodedData = encodeURIComponent(dataStr);
+                    const botUsername = "quanteen_bot";
                     
-                    // ЗАКРЫВАЕМ приложение СРАЗУ для отправки данных
+                    // Отправляем данные через /start параметр
+                    Telegram.WebApp.openTelegramLink(`https://t.me/${botUsername}?start=wheel_${encodedData}`);
+                    console.log("✅ Prize data sent via openTelegramLink - should work immediately");
+                    
+                    // Также отправляем через sendData (резервный способ)
+                    Telegram.WebApp.sendData(dataStr);
+                    console.log("✅ Prize data also sent via sendData (backup)");
+                    
+                    // ЗАКРЫВАЕМ приложение через 1 секунду
                     setTimeout(() => {
                         try {
                             Telegram.WebApp.close();
-                            console.log("✅ App closed - data should be sent to bot");
+                            console.log("✅ App closed");
                         } catch (e) {
                             console.error("Error closing WebApp:", e);
                         }
-                    }, 100); // Минимальная задержка для гарантии отправки
+                    }, 1000);
                     
                     // Сохраняем в localStorage для надежности
                     localStorage.setItem('wheel_prize_data', JSON.stringify({
