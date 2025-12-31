@@ -1142,15 +1142,24 @@
                 spinBtn.textContent = currentLang === 'ru' ? 'Проверка...' : 'Checking...';
                 
                 // Отправляем запрос на проверку и начало спина на сервере
-                // Сервер проверит кулдаун и отметит начало спина СРАЗУ
-                Telegram.WebApp.sendData(JSON.stringify({
+                // Используем ОБА способа: sendData (при закрытии) и текстовое сообщение (сразу)
+                const spinData = {
                     action: "spin_started",
                     user_id: user.id,
                     time: new Date().toISOString(),
                     timestamp: Date.now()
-                }));
+                };
                 
-                console.log("✅ Spin start request sent to server - server will check cooldown");
+                // Способ 1: sendData (сработает при закрытии) - резервный
+                Telegram.WebApp.sendData(JSON.stringify(spinData));
+                
+                // Способ 2: Отправка через Telegram link (сработает СРАЗУ)
+                const dataStr = JSON.stringify(spinData);
+                const botUsername = "quanteenhub301_bot"; // Замените на имя вашего бота
+                const encodedData = encodeURIComponent(dataStr);
+                Telegram.WebApp.openTelegramLink(`https://t.me/${botUsername}?start=wheel_${encodedData}`);
+                
+                console.log("✅ Spin start request sent via Telegram link (immediate) and sendData (backup)");
                 
                 // Проверяем кулдаун на клиенте для UX (но серверная проверка важнее)
                 if (userData.lastSpinTime) {
@@ -1521,9 +1530,17 @@
                 console.log("🎁 Sending prize data:", prizeData);
                 
                 try {
-                    // ОТПРАВЛЯЕМ ДАННЫЕ ЧЕРЕЗ sendData (сработает при закрытии)
+                    // ОТПРАВЛЯЕМ ДАННЫЕ ДВУМЯ СПОСОБАМИ для надежности
+                    // Способ 1: sendData (сработает при закрытии) - резервный
                     Telegram.WebApp.sendData(JSON.stringify(prizeData));
-                    console.log("✅ Data sent via sendData - will be received when app closes");
+                    console.log("✅ Data sent via sendData (backup - will work when app closes)");
+                    
+                    // Способ 2: Отправка через Telegram link (сработает СРАЗУ)
+                    const botUsername = "quanteenhub301_bot"; // Замените на имя вашего бота
+                    const dataStr = JSON.stringify(prizeData);
+                    const encodedData = encodeURIComponent(dataStr);
+                    Telegram.WebApp.openTelegramLink(`https://t.me/${botUsername}?start=wheel_${encodedData}`);
+                    console.log("✅ Data sent via Telegram link (immediate processing)");
                     
                     // Показываем сообщение об успехе
                     const resultDiv = document.getElementById("result");
