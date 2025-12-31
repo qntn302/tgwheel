@@ -1534,22 +1534,36 @@
                 console.log("🎁 Sending prize data:", prizeData);
                 
                 try {
-                    // КРИТИЧНО: sendData работает ТОЛЬКО при закрытии приложения
-                    // Отправляем данные и ЗАКРЫВАЕМ приложение СРАЗУ
+                    // КРИТИЧНО: Используем ОБА способа для надежности
+                    // Способ 1: sendData (работает при закрытии)
                     console.log("📤 Sending prize data via sendData...");
                     Telegram.WebApp.sendData(JSON.stringify(prizeData));
                     console.log("✅ Prize data queued in sendData");
                     
-                    // ВАЖНО: ЗАКРЫВАЕМ приложение СРАЗУ - sendData отправит данные при закрытии
-                    console.log("🔒 Closing app to trigger sendData...");
+                    // Способ 2: Отправка через текстовое сообщение боту (РАБОТАЕТ СРАЗУ)
+                    // Используем openTelegramLink для отправки сообщения боту
+                    const dataStr = JSON.stringify(prizeData);
+                    const encodedData = encodeURIComponent(dataStr);
+                    const botUsername = "quanteen_bot";
+                    
+                    // Отправляем данные через текстовое сообщение
+                    // Формат: WHEEL_DATA: {...}
+                    const messageText = `WHEEL_DATA:${dataStr}`;
+                    const telegramLink = `https://t.me/${botUsername}?text=${encodeURIComponent(messageText)}`;
+                    
+                    console.log("📤 Sending prize data via Telegram link...");
+                    Telegram.WebApp.openTelegramLink(telegramLink);
+                    console.log("✅ Prize data sent via Telegram link");
+                    
+                    // ЗАКРЫВАЕМ приложение через 1 секунду
                     setTimeout(() => {
                         try {
                             Telegram.WebApp.close();
-                            console.log("✅ App closed - sendData should send data now");
+                            console.log("✅ App closed");
                         } catch (e) {
                             console.error("❌ Error closing app:", e);
                         }
-                    }, 100); // Минимальная задержка
+                    }, 1000);
                     
                     // Сохраняем в localStorage для надежности
                     localStorage.setItem('wheel_prize_data', JSON.stringify({
