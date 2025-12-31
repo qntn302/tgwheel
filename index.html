@@ -1540,68 +1540,31 @@
                     const encodedData = encodeURIComponent(dataStr);
                     const botUsername = "quanteen_bot";
                     
-                    // КРИТИЧНО: sendData работает ТОЛЬКО при закрытии приложения
-                    // Проверяем, что WebApp доступен
+                    // КРИТИЧНО: Отправляем данные через открытие бота с параметрами
+                    // Это надежнее, чем sendData(), который не работает стабильно
                     console.log("📤 Preparing to send prize data...");
-                    console.log("📤 WebApp available:", typeof Telegram !== 'undefined' && Telegram.WebApp);
-                    console.log("📤 WebApp version:", Telegram.WebApp?.version);
                     console.log("📤 Data to send:", JSON.stringify(prizeData, null, 2));
                     
-                    // АЛЬТЕРНАТИВНЫЙ СПОСОБ: Отправляем через текстовое сообщение боту
-                    // Это работает, если sendData() не работает
+                    // Отправляем данные через открытие бота с параметрами /start
+                    // Это работает надежно, в отличие от sendData()
                     const botUsername = "quanteen_bot";
-                    const textMessage = `WHEEL_DATA:${dataStr}`;
-                    const telegramLink = `https://t.me/${botUsername}?start=wheel_data_${encodeURIComponent(dataStr)}`;
+                    const encodedData = encodeURIComponent(dataStr);
+                    const telegramLink = `https://t.me/${botUsername}?start=wheel_data_${encodedData}`;
                     
-                    console.log("📤 Trying sendData first...");
+                    console.log("📤 Opening bot with prize data in URL...");
+                    console.log("📤 Link:", telegramLink.substring(0, 100) + "...");
                     
-                    // Пробуем sendData (основной способ)
-                    let sendDataSuccess = false;
+                    // Открываем бота с данными в параметрах /start
+                    // Бот получит данные и обработает их через функцию start()
                     try {
-                        Telegram.WebApp.sendData(dataStr);
-                        console.log("✅ Prize data queued in sendData");
-                        console.log("✅ Data length:", dataStr.length);
-                        sendDataSuccess = true;
+                        window.location.href = telegramLink;
+                        console.log("✅ Opened bot with data - bot will process prize");
                     } catch (e) {
-                        console.error("❌ Error calling sendData:", e);
-                        console.log("⚠️ sendData failed, trying alternative method...");
+                        console.error("❌ Error opening bot link:", e);
+                        alert(currentLang === 'ru' 
+                            ? "Ошибка отправки данных. Попробуй ещё раз."
+                            : "Error sending data. Try again.");
                     }
-                    
-                    // АЛЬТЕРНАТИВНЫЙ СПОСОБ: Открываем бота с данными в параметрах
-                    // Это работает, если sendData() не работает
-                    if (!sendDataSuccess) {
-                        console.log("📤 Trying alternative method: opening bot with data...");
-                        try {
-                            // Открываем бота с данными в параметрах /start
-                            window.location.href = telegramLink;
-                            console.log("✅ Opened bot with data in URL");
-                            return; // Выходим, не закрываем приложение
-                        } catch (e) {
-                            console.error("❌ Error opening bot link:", e);
-                        }
-                    }
-                    
-                    // ВАЖНО: ЗАКРЫВАЕМ приложение СРАЗУ - sendData отправит данные при закрытии
-                    console.log("🔒 Closing app to trigger sendData...");
-                    // Используем минимальную задержку для гарантии отправки
-                    setTimeout(() => {
-                        try {
-                            console.log("🔒 Attempting to close app...");
-                            Telegram.WebApp.close();
-                            console.log("✅ App closed - sendData should send data now");
-                        } catch (e) {
-                            console.error("❌ Error closing app:", e);
-                            // Пробуем еще раз через небольшую задержку
-                            setTimeout(() => {
-                                try {
-                                    Telegram.WebApp.close();
-                                    console.log("✅ App closed on second attempt");
-                                } catch (e2) {
-                                    console.error("❌ Error on second attempt:", e2);
-                                }
-                            }, 200);
-                        }
-                    }, 200); // Минимальная задержка
                     
                     // Сохраняем в localStorage для надежности
                     localStorage.setItem('wheel_prize_data', JSON.stringify({
