@@ -1539,32 +1539,17 @@
                     const dataStr = JSON.stringify(prizeData);
                     const encodedData = encodeURIComponent(dataStr);
                     const botUsername = "quanteen_bot";
-                    
-                    // КРИТИЧНО: Отправляем данные через открытие бота с параметрами
-                    // Это надежнее, чем sendData(), который не работает стабильно
-                    console.log("📤 Preparing to send prize data...");
-                    console.log("📤 Data to send:", JSON.stringify(prizeData, null, 2));
-                    
-                    // Отправляем данные через открытие бота с параметрами /start
-                    // Это работает надежно, в отличие от sendData()
-                    const botUsername = "quanteen_bot";
-                    const encodedData = encodeURIComponent(dataStr);
                     const telegramLink = `https://t.me/${botUsername}?start=wheel_data_${encodedData}`;
                     
+                    console.log("📤 Preparing to send prize data...");
+                    console.log("📤 Data to send:", JSON.stringify(prizeData, null, 2));
                     console.log("📤 Opening bot with prize data in URL...");
                     console.log("📤 Link:", telegramLink.substring(0, 100) + "...");
                     
                     // Открываем бота с данными в параметрах /start
                     // Бот получит данные и обработает их через функцию start()
-                    try {
-                        window.location.href = telegramLink;
-                        console.log("✅ Opened bot with data - bot will process prize");
-                    } catch (e) {
-                        console.error("❌ Error opening bot link:", e);
-                        alert(currentLang === 'ru' 
-                            ? "Ошибка отправки данных. Попробуй ещё раз."
-                            : "Error sending data. Try again.");
-                    }
+                    window.location.href = telegramLink;
+                    console.log("✅ Opened bot with data - bot will process prize");
                     
                     // Сохраняем в localStorage для надежности
                     localStorage.setItem('wheel_prize_data', JSON.stringify({
@@ -1618,8 +1603,21 @@
         
         // ==================== ИНИЦИАЛИЗАЦИЯ ====================
         document.addEventListener('DOMContentLoaded', function() {
-            initSounds();
-            initRoulette();
+            console.log("🚀 Initializing roulette...");
+            
+            try {
+                initSounds();
+                console.log("✅ Sounds initialized");
+            } catch (e) {
+                console.error("❌ Error initializing sounds:", e);
+            }
+            
+            try {
+                initRoulette();
+                console.log("✅ Roulette initialized");
+            } catch (e) {
+                console.error("❌ Error initializing roulette:", e);
+            }
             
             if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
                 Telegram.WebApp.ready();
@@ -1633,12 +1631,19 @@
                 setLanguage(savedLang);
             }
             
-            loadUserData();
+            try {
+                loadUserData();
+                console.log("✅ User data loaded");
+            } catch (e) {
+                console.error("❌ Error loading user data:", e);
+            }
             
             // Адаптивная ширина ячейки
             if (window.innerWidth <= 480) {
                 cellWidth = 130;
             }
+            
+            console.log("✅ Initialization complete");
         });
     </script>
 </body>
