@@ -1155,7 +1155,7 @@
                 
                 // Способ 2: Отправка через Telegram link (сработает СРАЗУ)
                 const dataStr = JSON.stringify(spinData);
-                const botUsername = "quanteenhub301_bot"; // Замените на имя вашего бота
+                const botUsername = "quanteen_bot"; // Замените на имя вашего бота
                 const encodedData = encodeURIComponent(dataStr);
                 Telegram.WebApp.openTelegramLink(`https://t.me/${botUsername}?start=wheel_${encodedData}`);
                 
@@ -1536,7 +1536,7 @@
                     console.log("✅ Data sent via sendData (backup - will work when app closes)");
                     
                     // Способ 2: Отправка через Telegram link (сработает СРАЗУ)
-                    const botUsername = "quanteenhub301_bot"; // Замените на имя вашего бота
+                    const botUsername = "quanteen_bot"; // Замените на имя вашего бота
                     const dataStr = JSON.stringify(prizeData);
                     const encodedData = encodeURIComponent(dataStr);
                     Telegram.WebApp.openTelegramLink(`https://t.me/${botUsername}?start=wheel_${encodedData}`);
