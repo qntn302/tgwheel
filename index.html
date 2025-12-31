@@ -10,12 +10,24 @@
             box-sizing: border-box;
         }
         
+        /* Базовый glassmorphism микс */
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+        
         body {
             background: linear-gradient(135deg, #1a1a1a 0%, #2d1b69 100%);
+            background-attachment: fixed;
             color: white;
             text-align: center;
             padding: 10px;
-            font-family: 'Segoe UI', Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
             min-height: 100vh;
             margin: 0;
             display: flex;
@@ -30,9 +42,10 @@
             max-width: 100%;
             width: 100%;
             padding: 10px;
+            animation: fadeInScale 0.6s cubic-bezier(0.2, 0.8, 0.3, 1);
         }
         
-        /* Переключатель языка */
+        /* Переключатель языка - Glass */
         .language-switcher {
             position: fixed;
             top: 10px;
@@ -40,25 +53,41 @@
             display: flex;
             gap: 8px;
             z-index: 1000;
+            animation: fadeIn 0.5s ease-out;
         }
         .lang-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             color: white;
-            padding: 6px 16px;
+            padding: 8px 18px;
             border-radius: 20px;
             cursor: pointer;
             font-size: 14px;
-            font-weight: bold;
-            transition: all 0.3s;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.3, 1);
             min-width: 50px;
+            box-shadow: 
+                0 4px 16px rgba(0, 0, 0, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
         }
         .lang-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 
+                0 6px 20px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
         }
         .lang-btn.active {
-            background: #ff7f00;
-            border-color: #ff7f00;
+            background: rgba(255, 127, 0, 0.3);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-color: rgba(255, 127, 0, 0.5);
+            box-shadow: 
+                0 4px 16px rgba(255, 127, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
         
         h1 {
@@ -66,61 +95,119 @@
             margin-bottom: 8px;
             font-size: 24px;
             margin-top: 50px;
+            text-shadow: 0 2px 8px rgba(255, 127, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+            font-weight: 700;
+            animation: fadeIn 0.6s ease-out 0.1s both;
         }
         .subtitle {
-            color: #aaa;
+            color: rgba(255, 255, 255, 0.8);
             margin-bottom: 20px;
             font-size: 14px;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.6s ease-out 0.2s both;
         }
         
-        /* Drop Pace индикатор */
+        /* Drop Pace индикатор - Glass */
         .drop-pace-indicator {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 12px;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 16px;
+            padding: 16px;
             margin: 15px 0;
             border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            animation: fadeInScale 0.6s ease-out 0.3s both;
+        }
+        .drop-pace-indicator::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.3), 
+                transparent);
         }
         .drop-pace-label {
-            color: #aaa;
+            color: rgba(255, 255, 255, 0.9);
             font-size: 12px;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            font-weight: 500;
         }
         .drop-pace-status {
-            font-size: 18px;
-            font-weight: bold;
+            font-size: 20px;
+            font-weight: 700;
             color: #ff7f00;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            transition: color 0.3s ease;
         }
-        .drop-pace-status.low { color: #e74c3c; }
-        .drop-pace-status.stable { color: #f1c40f; }
-        .drop-pace-status.high { color: #2ecc71; }
-        .drop-pace-status.peak { color: #9b59b6; }
+        .drop-pace-status.low { 
+            color: #e74c3c;
+            text-shadow: 0 2px 4px rgba(231, 76, 60, 0.4);
+        }
+        .drop-pace-status.stable { 
+            color: #f1c40f;
+            text-shadow: 0 2px 4px rgba(241, 196, 15, 0.4);
+        }
+        .drop-pace-status.high { 
+            color: #2ecc71;
+            text-shadow: 0 2px 4px rgba(46, 204, 113, 0.4);
+        }
+        .drop-pace-status.peak { 
+            color: #9b59b6;
+            text-shadow: 0 2px 4px rgba(155, 89, 182, 0.4);
+        }
         .info-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             color: white;
             padding: 4px 8px;
             border-radius: 50%;
             cursor: pointer;
             font-size: 14px;
             margin-left: 8px;
-            width: 24px;
-            height: 24px;
+            width: 26px;
+            height: 26px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 
+                0 2px 8px rgba(0, 0, 0, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+        .info-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.1);
         }
         
-        /* Горизонтальная рулетка */
+        /* Горизонтальная рулетка - Glass */
         .roulette-container {
             position: relative;
             width: 100%;
             height: 200px;
             margin: 20px auto;
             overflow: hidden;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 20px;
             padding: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            animation: fadeInScale 0.6s ease-out 0.4s both;
         }
         
         .roulette-track {
@@ -136,15 +223,26 @@
             width: 140px;
             height: 160px;
             margin: 0 5px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            border: 2px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: space-between;
-            padding: 10px;
+            padding: 12px;
             position: relative;
+            box-shadow: 
+                0 4px 16px rgba(0, 0, 0, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .roulette-cell:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-2px);
         }
         
         .roulette-cell img {
@@ -152,11 +250,12 @@
             height: 60px;
             object-fit: contain;
             margin-bottom: 8px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
         }
         
         .roulette-cell-name {
             font-size: 11px;
-            font-weight: bold;
+            font-weight: 600;
             text-align: center;
             color: white;
             margin-bottom: 8px;
@@ -165,6 +264,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
         }
         
         .roulette-cell-bar {
@@ -173,7 +273,8 @@
             left: 0;
             right: 0;
             height: 4px;
-            border-radius: 0 0 10px 10px;
+            border-radius: 0 0 16px 16px;
+            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.2);
         }
         
         .roulette-cell-bar.empty { background: #7f8c8d; }
@@ -195,15 +296,19 @@
         
         .roulette-container::before {
             left: 0;
-            background: linear-gradient(to right, rgba(26, 26, 26, 1), rgba(26, 26, 26, 0));
+            background: linear-gradient(to right, 
+                rgba(26, 26, 26, 0.8), 
+                rgba(26, 26, 26, 0));
         }
         
         .roulette-container::after {
             right: 0;
-            background: linear-gradient(to left, rgba(26, 26, 26, 1), rgba(26, 26, 26, 0));
+            background: linear-gradient(to left, 
+                rgba(26, 26, 26, 0.8), 
+                rgba(26, 26, 26, 0));
         }
         
-        /* Указатель */
+        /* Указатель - Glass с бликом */
         .roulette-pointer {
             position: absolute;
             top: 0;
@@ -211,39 +316,90 @@
             transform: translateX(-50%);
             width: 0;
             height: 0;
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-top: 20px solid #ff7f00;
+            border-left: 18px solid transparent;
+            border-right: 18px solid transparent;
+            border-top: 24px solid rgba(255, 127, 0, 0.9);
             z-index: 20;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+            animation: pointerGlow 2s ease-in-out infinite;
+        }
+        .roulette-pointer::before {
+            content: '';
+            position: absolute;
+            top: -24px;
+            left: -12px;
+            width: 0;
+            height: 0;
+            border-left: 12px solid transparent;
+            border-right: 12px solid transparent;
+            border-top: 16px solid rgba(255, 255, 255, 0.3);
         }
         
-        /* Кнопка спина */
+        /* Кнопка спина - Orange Glass с пульсацией */
         .spin-btn {
-            background: linear-gradient(135deg, #ff7f00 0%, #ff5500 100%);
+            background: rgba(255, 127, 0, 0.25);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             color: white;
-            border: none;
-            padding: 16px 40px;
+            border: 1px solid rgba(255, 127, 0, 0.4);
+            padding: 18px 45px;
             font-size: 20px;
-            font-weight: bold;
+            font-weight: 700;
             border-radius: 50px;
             cursor: pointer;
             margin: 20px 0;
-            box-shadow: 0 8px 20px rgba(255, 127, 0, 0.4);
-            transition: all 0.3s;
+            box-shadow: 
+                0 8px 32px rgba(255, 127, 0, 0.3),
+                0 4px 16px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transition: all 0.4s cubic-bezier(0.2, 0.8, 0.3, 1);
             letter-spacing: 1px;
             width: 90%;
             max-width: 300px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+            animation: fadeInScale 0.6s ease-out 0.5s both, pulseGlow 2s ease-in-out infinite;
+        }
+        .spin-btn::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.1), 
+                transparent);
+            transform: rotate(45deg);
+            transition: all 0.6s;
+        }
+        .spin-btn:hover::before {
+            left: 100%;
         }
         .spin-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 25px rgba(255, 127, 0, 0.6);
+            transform: translateY(-4px) scale(1.02);
+            background: rgba(255, 127, 0, 0.35);
+            box-shadow: 
+                0 12px 40px rgba(255, 127, 0, 0.4),
+                0 6px 20px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.25);
+        }
+        .spin-btn:active {
+            transform: translateY(-2px) scale(0.98);
         }
         .spin-btn:disabled {
-            background: #555;
+            background: rgba(85, 85, 85, 0.2);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-color: rgba(255, 255, 255, 0.1);
             cursor: not-allowed;
             transform: none;
-            box-shadow: none;
+            box-shadow: 
+                0 4px 16px rgba(0, 0, 0, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            animation: none;
         }
         
         .cooldown-info {
@@ -251,101 +407,196 @@
             font-size: 13px;
             margin-top: 8px;
             display: none;
-            font-weight: bold;
+            font-weight: 600;
+            text-shadow: 0 1px 3px rgba(255, 127, 0, 0.5);
         }
         
-        /* Результат */
+        /* Результат - Glass */
         .result {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 20px;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 24px;
             margin: 20px 0;
-            border-left: 5px solid #ff7f00;
+            border: 1px solid rgba(255, 255, 255, 0.2);
             display: none;
-            backdrop-filter: blur(10px);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.25),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15),
+                0 0 0 1px rgba(255, 127, 0, 0.2) inset;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInScale 0.5s cubic-bezier(0.2, 0.8, 0.3, 1);
+        }
+        .result::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255, 127, 0, 0.6), 
+                transparent);
         }
         .prize-name {
-            font-size: 22px;
+            font-size: 24px;
             color: #ff7f00;
             margin: 12px 0;
-            font-weight: bold;
+            font-weight: 700;
+            text-shadow: 0 2px 8px rgba(255, 127, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
         }
         .prize-desc {
-            color: #ccc;
+            color: rgba(255, 255, 255, 0.9);
             font-size: 14px;
             margin: 12px 0 20px;
-            line-height: 1.5;
+            line-height: 1.6;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
         }
+        
+        /* Кнопки - Green Glass */
         .claim-btn, .subscribe-btn {
-            background: #2ecc71;
+            background: rgba(46, 204, 113, 0.25);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             color: white;
-            border: none;
-            padding: 12px 25px;
+            border: 1px solid rgba(46, 204, 113, 0.4);
+            padding: 14px 28px;
             border-radius: 25px;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 700;
             font-size: 15px;
             display: none;
-            transition: all 0.3s;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.3, 1);
             margin: 5px;
             width: 90%;
             max-width: 250px;
+            box-shadow: 
+                0 6px 24px rgba(46, 204, 113, 0.3),
+                0 4px 12px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
         }
         .claim-btn:hover, .subscribe-btn:hover {
-            background: #27ae60;
-            transform: translateY(-2px);
+            background: rgba(46, 204, 113, 0.35);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 
+                0 8px 28px rgba(46, 204, 113, 0.4),
+                0 6px 16px rgba(0, 0, 0, 0.25),
+                inset 0 1px 0 rgba(255, 255, 255, 0.25);
+        }
+        .claim-btn:active, .subscribe-btn:active {
+            transform: translateY(-1px) scale(0.98);
         }
         
-        /* Блок с призами */
+        /* Блок с призами - Glass */
         .prizes-info {
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
-            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 18px;
+            padding: 20px;
             margin: 20px 0;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            animation: fadeInScale 0.6s ease-out 0.6s both;
         }
         .prizes-title {
             color: #ff7f00;
-            font-size: 16px;
-            margin-bottom: 12px;
-            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 14px;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(255, 127, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.3);
         }
         .prizes-list {
             text-align: left;
-            color: #ddd;
+            color: rgba(255, 255, 255, 0.9);
             font-size: 13px;
-            line-height: 1.8;
+            line-height: 1.9;
             padding-left: 10px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
         }
         .prizes-list div {
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
         .prizes-note {
-            color: #aaa;
+            color: rgba(255, 255, 255, 0.7);
             font-size: 12px;
-            margin-top: 12px;
+            margin-top: 14px;
             font-style: italic;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
         }
         
-        /* Правила */
+        /* Правила - Glass */
         .rules {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 12px;
-            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 18px;
+            padding: 18px;
             margin-top: 20px;
             font-size: 13px;
-            color: #aaa;
+            color: rgba(255, 255, 255, 0.85);
             text-align: left;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            animation: fadeInScale 0.6s ease-out 0.7s both;
+        }
+        .rules strong {
+            color: rgba(255, 255, 255, 0.95);
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
         }
         
         /* Анимации */
-        @keyframes glow {
-            0%, 100% { box-shadow: 0 0 20px rgba(255, 127, 0, 0.5); }
-            50% { box-shadow: 0 0 30px rgba(255, 127, 0, 0.8); }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
         }
-        .spin-btn:not(:disabled) {
-            animation: glow 2s infinite;
+        
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        @keyframes pulseGlow {
+            0%, 100% { 
+                box-shadow: 
+                    0 8px 32px rgba(255, 127, 0, 0.3),
+                    0 4px 16px rgba(0, 0, 0, 0.2),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            }
+            50% { 
+                box-shadow: 
+                    0 8px 40px rgba(255, 127, 0, 0.5),
+                    0 4px 20px rgba(0, 0, 0, 0.25),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+            }
+        }
+        
+        @keyframes pointerGlow {
+            0%, 100% {
+                filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+            }
+            50% {
+                filter: drop-shadow(0 4px 12px rgba(255, 127, 0, 0.6));
+            }
         }
         
         /* Адаптивность */
@@ -370,7 +621,34 @@
             }
             .spin-btn {
                 font-size: 18px;
-                padding: 14px 30px;
+                padding: 16px 35px;
+            }
+            /* Уменьшаем blur на слабых устройствах для производительности */
+            .glass,
+            .drop-pace-indicator,
+            .roulette-container,
+            .result,
+            .prizes-info,
+            .rules {
+                backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(8px);
+            }
+        }
+        
+        /* Fallback для браузеров без поддержки backdrop-filter */
+        @supports not (backdrop-filter: blur(10px)) {
+            .glass,
+            .drop-pace-indicator,
+            .roulette-container,
+            .result,
+            .prizes-info,
+            .rules,
+            .lang-btn,
+            .info-btn,
+            .spin-btn,
+            .claim-btn,
+            .subscribe-btn {
+                background: rgba(0, 0, 0, 0.4);
             }
         }
     </style>
@@ -886,10 +1164,16 @@
             }
             
             // Выбираем приз
+            // Используем более качественный генератор случайных чисел
             const random = Math.random() * 100;
             let cumulative = 0;
             let selectedType = 'empty';
             let selectedValue = null;
+            
+            // Логирование для отладки (можно убрать в продакшене)
+            console.log('Drop Pace:', userData.dropPace);
+            console.log('Probabilities:', probs);
+            console.log('Random value:', random);
             
             for (const [type, prob] of Object.entries(probs)) {
                 cumulative += prob;
@@ -903,6 +1187,7 @@
                     } else {
                         selectedType = type;
                     }
+                    console.log('Selected prize:', selectedType, selectedValue);
                     break;
                 }
             }
@@ -1080,15 +1365,39 @@
             }
             
             prizeDesc.textContent = desc;
+            
+            // Анимация появления с glassmorphism эффектом
             resultDiv.style.display = "block";
+            resultDiv.style.opacity = "0";
+            resultDiv.style.transform = "scale(0.9) translateY(20px)";
+            
+            setTimeout(() => {
+                resultDiv.style.transition = "all 0.5s cubic-bezier(0.2, 0.8, 0.3, 1)";
+                resultDiv.style.opacity = "1";
+                resultDiv.style.transform = "scale(1) translateY(0)";
+            }, 50);
             
             if (currentPrize.type === 'empty') {
                 claimBtn.textContent = t.claimBtn;
                 claimBtn.style.display = "block";
+                claimBtn.style.opacity = "0";
+                claimBtn.style.transform = "translateY(10px)";
+                setTimeout(() => {
+                    claimBtn.style.transition = "all 0.4s cubic-bezier(0.2, 0.8, 0.3, 1)";
+                    claimBtn.style.opacity = "1";
+                    claimBtn.style.transform = "translateY(0)";
+                }, 300);
                 subscribeBtn.style.display = "none";
             } else {
                 claimBtn.textContent = t.claimBtn;
                 claimBtn.style.display = "block";
+                claimBtn.style.opacity = "0";
+                claimBtn.style.transform = "translateY(10px)";
+                setTimeout(() => {
+                    claimBtn.style.transition = "all 0.4s cubic-bezier(0.2, 0.8, 0.3, 1)";
+                    claimBtn.style.opacity = "1";
+                    claimBtn.style.transform = "translateY(0)";
+                }, 300);
             }
         }
         
