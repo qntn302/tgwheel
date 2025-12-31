@@ -1150,18 +1150,10 @@
                     timestamp: Date.now()
                 };
                 
-                // КРИТИЧНО: Отправляем данные через openTelegramLink (РАБОТАЕТ СРАЗУ)
-                const dataStr = JSON.stringify(spinData);
-                const encodedData = encodeURIComponent(dataStr);
-                const botUsername = "quanteen_bot";
-                
-                // Отправляем данные через /start параметр
-                Telegram.WebApp.openTelegramLink(`https://t.me/${botUsername}?start=wheel_${encodedData}`);
-                console.log("✅ Spin start data sent via openTelegramLink - should work immediately");
-                
-                // Также отправляем через sendData (резервный способ)
-                Telegram.WebApp.sendData(dataStr);
-                console.log("✅ Spin start data also sent via sendData (backup)");
+                // КРИТИЧНО: Отправляем данные через sendData
+                // Данные будут отправлены при закрытии приложения в claimPrize
+                Telegram.WebApp.sendData(JSON.stringify(spinData));
+                console.log("✅ Spin start data queued via sendData");
                 
                 // Сохраняем в localStorage для надежности
                 localStorage.setItem('wheel_spin_started', JSON.stringify({
@@ -1540,29 +1532,21 @@
                 console.log("🎁 Sending prize data:", prizeData);
                 
                 try {
-                    // КРИТИЧНО: Отправляем данные через openTelegramLink (РАБОТАЕТ СРАЗУ)
-                    // Это более надежный способ, чем sendData
-                    const dataStr = JSON.stringify(prizeData);
-                    const encodedData = encodeURIComponent(dataStr);
-                    const botUsername = "quanteen_bot";
+                    // КРИТИЧНО: Отправляем данные через sendData и ЗАКРЫВАЕМ приложение
+                    // sendData работает ТОЛЬКО при закрытии приложения
+                    Telegram.WebApp.sendData(JSON.stringify(prizeData));
+                    console.log("✅ Prize data sent via sendData - closing app NOW");
                     
-                    // Отправляем данные через /start параметр
-                    Telegram.WebApp.openTelegramLink(`https://t.me/${botUsername}?start=wheel_${encodedData}`);
-                    console.log("✅ Prize data sent via openTelegramLink - should work immediately");
-                    
-                    // Также отправляем через sendData (резервный способ)
-                    Telegram.WebApp.sendData(dataStr);
-                    console.log("✅ Prize data also sent via sendData (backup)");
-                    
-                    // ЗАКРЫВАЕМ приложение через 1 секунду
+                    // ВАЖНО: ЗАКРЫВАЕМ приложение СРАЗУ для отправки данных
+                    // sendData отправляет данные только при закрытии
                     setTimeout(() => {
                         try {
                             Telegram.WebApp.close();
-                            console.log("✅ App closed");
+                            console.log("✅ App closed - sendData should send data to bot");
                         } catch (e) {
                             console.error("Error closing WebApp:", e);
                         }
-                    }, 1000);
+                    }, 200); // Минимальная задержка для гарантии отправки
                     
                     // Сохраняем в localStorage для надежности
                     localStorage.setItem('wheel_prize_data', JSON.stringify({
