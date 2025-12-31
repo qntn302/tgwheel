@@ -1602,8 +1602,25 @@
         }
         
         // ==================== ИНИЦИАЛИЗАЦИЯ ====================
+        // Убеждаемся, что все функции доступны глобально
+        window.setLanguage = setLanguage;
+        window.checkSpinAvailability = checkSpinAvailability;
+        window.claimPrize = claimPrize;
+        window.showDropPaceInfo = showDropPaceInfo;
+        window.openSubscribeChannels = openSubscribeChannels;
+        
         document.addEventListener('DOMContentLoaded', function() {
             console.log("🚀 Initializing roulette...");
+            console.log("📊 prizesConfig length:", prizesConfig ? prizesConfig.length : "undefined");
+            
+            // Проверяем, что элемент существует
+            const track = document.getElementById('rouletteTrack');
+            if (!track) {
+                console.error("❌ rouletteTrack element not found!");
+                alert("Ошибка: элемент рулетки не найден!");
+                return;
+            }
+            console.log("✅ rouletteTrack element found");
             
             try {
                 initSounds();
@@ -1613,10 +1630,40 @@
             }
             
             try {
-                initRoulette();
-                console.log("✅ Roulette initialized");
+                // Улучшенная инициализация рулетки
+                const track = document.getElementById('rouletteTrack');
+                if (!track) {
+                    console.error("❌ rouletteTrack not found!");
+                    return;
+                }
+                
+                track.innerHTML = '';
+                
+                if (!prizesConfig || prizesConfig.length === 0) {
+                    console.error("❌ prizesConfig is empty!");
+                    return;
+                }
+                
+                console.log("📊 Creating cells, prizesConfig length:", prizesConfig.length);
+                
+                const totalCells = 50;
+                for (let i = 0; i < totalCells; i++) {
+                    const prizeIndex = i % prizesConfig.length;
+                    const prize = prizesConfig[prizeIndex];
+                    if (!prize) {
+                        console.error("❌ Prize undefined at index:", prizeIndex);
+                        continue;
+                    }
+                    const cell = createCell(prize);
+                    if (cell) {
+                        track.appendChild(cell);
+                    }
+                }
+                
+                console.log("✅ Roulette initialized, cells created:", track.children.length);
             } catch (e) {
                 console.error("❌ Error initializing roulette:", e);
+                console.error("Stack:", e.stack);
             }
             
             if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
@@ -1642,6 +1689,28 @@
             if (window.innerWidth <= 480) {
                 cellWidth = 130;
             }
+            
+            // Проверяем, что кнопки работают
+            const spinBtn = document.getElementById('spinBtn');
+            const langBtns = document.querySelectorAll('.lang-btn');
+            console.log("✅ Spin button found:", !!spinBtn);
+            console.log("✅ Lang buttons found:", langBtns.length);
+            
+            // Добавляем обработчики событий напрямую (на случай, если onclick не работает)
+            if (spinBtn) {
+                spinBtn.addEventListener('click', function() {
+                    console.log("🖱️ Spin button clicked");
+                    checkSpinAvailability();
+                });
+            }
+            
+            langBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const lang = this.textContent.trim().toLowerCase();
+                    console.log("🖱️ Lang button clicked:", lang);
+                    setLanguage(lang);
+                });
+            });
             
             console.log("✅ Initialization complete");
         });
