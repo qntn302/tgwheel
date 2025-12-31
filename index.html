@@ -1150,21 +1150,11 @@
                     timestamp: Date.now()
                 };
                 
-                // КРИТИЧНО: Отправляем данные через /start параметр (РАБОТАЕТ СРАЗУ)
-                const dataStr = JSON.stringify(spinData);
-                const encodedData = encodeURIComponent(dataStr);
-                const botUsername = "quanteen_bot";
-                
-                // Отправляем данные через /start параметр
-                const telegramLink = `https://t.me/${botUsername}?start=wheel_${encodedData}`;
-                
-                console.log("📤 Sending spin_started via /start link...");
-                Telegram.WebApp.openTelegramLink(telegramLink);
-                console.log("✅ Spin start data sent via /start link");
-                
-                // Также отправляем через sendData (резервный способ)
-                Telegram.WebApp.sendData(dataStr);
-                console.log("✅ Spin start data also queued via sendData (backup)");
+                // КРИТИЧНО: Отправляем данные через sendData
+                // Данные будут отправлены при закрытии приложения в claimPrize
+                console.log("📤 Queuing spin_started data via sendData...");
+                Telegram.WebApp.sendData(JSON.stringify(spinData));
+                console.log("✅ Spin start data queued - will send when app closes");
                 
                 // Сохраняем в localStorage для надежности
                 localStorage.setItem('wheel_spin_started', JSON.stringify({
@@ -1550,53 +1540,40 @@
                     const encodedData = encodeURIComponent(dataStr);
                     const botUsername = "quanteen_bot";
                     
-                    // Отправляем данные через /start параметр
-                    // ВАЖНО: Telegram ограничивает длину параметра start до 64 символов
-                    // Поэтому используем короткий формат или разбиваем данные
-                    const telegramLink = `https://t.me/${botUsername}?start=wheel_${encodedData}`;
-                    
-                    console.log("📤 Sending prize data via /start link...");
-                    console.log("📤 Data length:", dataStr.length);
-                    console.log("📤 Encoded length:", encodedData.length);
-                    console.log("📤 Link length:", telegramLink.length);
-                    console.log("📤 Link (first 200 chars):", telegramLink.substring(0, 200));
-                    
-                    // Проверяем длину ссылки (Telegram ограничивает до 2048 символов)
-                    if (telegramLink.length > 2000) {
-                        console.error("❌ Link too long! Truncating data...");
-                        // Укорачиваем данные, оставляя только самое важное
-                        const shortPrizeData = {
-                            action: "wheel_prize",
-                            prize: currentPrize,
-                            user_id: user.id,
-                            time: spinTime,
-                            timestamp: Date.now(),
-                            spin_started: true
-                        };
-                        const shortDataStr = JSON.stringify(shortPrizeData);
-                        const shortEncoded = encodeURIComponent(shortDataStr);
-                        const shortLink = `https://t.me/${botUsername}?start=wheel_${shortEncoded}`;
-                        console.log("📤 Using shortened link, length:", shortLink.length);
-                        Telegram.WebApp.openTelegramLink(shortLink);
-                    } else {
-                        // Открываем ссылку - это отправит данные боту через /start
-                        Telegram.WebApp.openTelegramLink(telegramLink);
+                    // КРИТИЧНО: Проверяем, что WebApp готов
+                    if (!Telegram.WebApp.isReady) {
+                        console.log("⏳ WebApp not ready, calling ready()...");
+                        Telegram.WebApp.ready();
                     }
-                    console.log("✅ Prize data sent via /start link - bot should receive it now");
                     
-                    // Также отправляем через sendData (резервный способ)
-                    Telegram.WebApp.sendData(dataStr);
-                    console.log("✅ Prize data also queued via sendData (backup)");
+                    // КРИТИЧНО: Используем sendData с правильным закрытием
+                    // sendData работает ТОЛЬКО при закрытии приложения
+                    console.log("📤 Sending prize data via sendData...");
+                    console.log("📤 Data length:", dataStr.length);
+                    console.log("📤 Data preview:", JSON.stringify(prizeData, null, 2).substring(0, 200));
                     
-                    // ЗАКРЫВАЕМ приложение через 2 секунды
+                    // Отправляем данные
+                    try {
+                        Telegram.WebApp.sendData(dataStr);
+                        console.log("✅ Prize data queued in sendData");
+                    } catch (e) {
+                        console.error("❌ Error calling sendData:", e);
+                        alert(currentLang === 'ru' 
+                            ? "Ошибка отправки данных. Попробуй ещё раз."
+                            : "Error sending data. Try again.");
+                        return;
+                    }
+                    
+                    // ВАЖНО: ЗАКРЫВАЕМ приложение СРАЗУ - sendData отправит данные при закрытии
+                    console.log("🔒 Closing app to trigger sendData...");
                     setTimeout(() => {
                         try {
                             Telegram.WebApp.close();
-                            console.log("✅ App closed");
+                            console.log("✅ App closed - sendData should send data now");
                         } catch (e) {
                             console.error("❌ Error closing app:", e);
                         }
-                    }, 2000);
+                    }, 500); // Задержка для гарантии отправки
                     
                     // Сохраняем в localStorage для надежности
                     localStorage.setItem('wheel_prize_data', JSON.stringify({
