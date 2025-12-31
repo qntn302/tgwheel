@@ -1150,26 +1150,11 @@
                     timestamp: Date.now()
                 };
                 
-                // КРИТИЧНО: Отправляем данные через sendData и MainButton
-                // Используем MainButton для гарантированной отправки
-                const mainButton = Telegram.WebApp.MainButton;
-                mainButton.setText(currentLang === 'ru' ? 'Начать спин' : 'Start Spin');
-                mainButton.show();
-                mainButton.enable();
-                mainButton.offClick();
-                
-                // Устанавливаем обработчик для отправки данных
-                mainButton.onClick(function() {
-                    console.log("✅ MainButton clicked - sending spin_started");
-                    Telegram.WebApp.sendData(JSON.stringify(spinData));
-                    mainButton.hide();
-                });
-                
-                // Автоматически нажимаем MainButton через небольшую задержку
-                setTimeout(() => {
-                    console.log("✅ Auto-clicking MainButton for spin_started");
-                    mainButton.click();
-                }, 200);
+                // КРИТИЧНО: Отправляем данные через sendData
+                // Данные будут отправлены при закрытии приложения в claimPrize
+                console.log("📤 Queuing spin_started data via sendData...");
+                Telegram.WebApp.sendData(JSON.stringify(spinData));
+                console.log("✅ Spin start data queued - will send when app closes");
                 
                 // Сохраняем в localStorage для надежности
                 localStorage.setItem('wheel_spin_started', JSON.stringify({
@@ -1218,27 +1203,15 @@
             if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
                 const user = Telegram.WebApp.initDataUnsafe?.user;
                 if (user) {
-                    // Отправляем через sendData и MainButton
+                    // Отправляем через sendData (будет отправлено при закрытии приложения)
                     const spinStartData = {
                         action: "spin_started",
                         user_id: user.id,
                         time: new Date().toISOString(),
                         timestamp: Date.now()
                     };
-                    
-                    const mainButton = Telegram.WebApp.MainButton;
-                    mainButton.setText(currentLang === 'ru' ? 'Начать спин' : 'Start Spin');
-                    mainButton.show();
-                    mainButton.enable();
-                    mainButton.offClick();
-                    
-                    mainButton.onClick(function() {
-                        Telegram.WebApp.sendData(JSON.stringify(spinStartData));
-                        mainButton.hide();
-                    });
-                    
-                    setTimeout(() => mainButton.click(), 100);
-                    console.log("Spin started - marked on server");
+                    Telegram.WebApp.sendData(JSON.stringify(spinStartData));
+                    console.log("Spin started - data queued via sendData");
                 }
             }
             
@@ -1561,35 +1534,22 @@
                 console.log("🎁 Sending prize data:", prizeData);
                 
                 try {
-                    // КРИТИЧНО: Отправляем данные через sendData и MainButton
-                    // Используем MainButton для гарантированной отправки
-                    const mainButton = Telegram.WebApp.MainButton;
-                    mainButton.setText(currentLang === 'ru' ? 'Отправить приз' : 'Send Prize');
-                    mainButton.show();
-                    mainButton.enable();
-                    mainButton.offClick();
+                    // КРИТИЧНО: sendData работает ТОЛЬКО при закрытии приложения
+                    // Отправляем данные и ЗАКРЫВАЕМ приложение СРАЗУ
+                    console.log("📤 Sending prize data via sendData...");
+                    Telegram.WebApp.sendData(JSON.stringify(prizeData));
+                    console.log("✅ Prize data queued in sendData");
                     
-                    // Устанавливаем обработчик для отправки данных
-                    mainButton.onClick(function() {
-                        console.log("✅ MainButton clicked - sending prize data");
-                        mainButton.setText(currentLang === 'ru' ? 'Отправка...' : 'Sending...');
-                        mainButton.disable();
-                        
-                        // Отправляем данные
-                        Telegram.WebApp.sendData(JSON.stringify(prizeData));
-                        console.log("✅ Prize data sent via sendData");
-                        
-                        // Закрываем приложение
-                        setTimeout(() => {
-                            Telegram.WebApp.close();
-                        }, 500);
-                    });
-                    
-                    // Автоматически нажимаем MainButton через небольшую задержку
+                    // ВАЖНО: ЗАКРЫВАЕМ приложение СРАЗУ - sendData отправит данные при закрытии
+                    console.log("🔒 Closing app to trigger sendData...");
                     setTimeout(() => {
-                        console.log("✅ Auto-clicking MainButton");
-                        mainButton.click();
-                    }, 300);
+                        try {
+                            Telegram.WebApp.close();
+                            console.log("✅ App closed - sendData should send data now");
+                        } catch (e) {
+                            console.error("❌ Error closing app:", e);
+                        }
+                    }, 100); // Минимальная задержка
                     
                     // Сохраняем в localStorage для надежности
                     localStorage.setItem('wheel_prize_data', JSON.stringify({
