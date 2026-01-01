@@ -1535,21 +1535,23 @@
                 
                 try {
                     // КРИТИЧНО: Отправляем данные через /start параметр (РАБОТАЕТ СРАЗУ)
-                    // Это единственный надежный способ отправки данных из мини-приложения
+                    // КРИТИЧНО: Используем sendData() для отправки данных
+                    // Это правильный способ для Telegram Mini Apps
                     const dataStr = JSON.stringify(prizeData);
-                    const encodedData = encodeURIComponent(dataStr);
-                    const botUsername = "quanteen_bot";
-                    const telegramLink = `https://t.me/${botUsername}?start=wheel_data_${encodedData}`;
                     
-                    console.log("📤 Preparing to send prize data...");
+                    console.log("📤 Preparing to send prize data via sendData()...");
                     console.log("📤 Data to send:", JSON.stringify(prizeData, null, 2));
-                    console.log("📤 Opening bot with prize data in URL...");
-                    console.log("📤 Link:", telegramLink.substring(0, 100) + "...");
                     
-                    // Открываем бота с данными в параметрах /start
-                    // Бот получит данные и обработает их через функцию start()
-                    window.location.href = telegramLink;
-                    console.log("✅ Opened bot with data - bot will process prize");
+                    // Отправляем данные через sendData
+                    // Данные будут получены ботом через web_app_data handler
+                    Telegram.WebApp.sendData(dataStr);
+                    console.log("✅ Prize data sent via sendData() - bot will process prize");
+                    
+                    // Также сохраняем в localStorage для надежности
+                    localStorage.setItem('wheel_prize_sent', JSON.stringify({
+                        ...prizeData,
+                        timestamp: Date.now()
+                    }));
                     
                     // Сохраняем в localStorage для надежности
                     localStorage.setItem('wheel_prize_data', JSON.stringify({
@@ -1572,15 +1574,10 @@
                     userData.pendingReward = null;
                     localStorage.removeItem('wheel_user_data');
                     
-                    // Закрываем приложение через 2 секунды
-                    setTimeout(() => {
-                        try {
-                            Telegram.WebApp.close();
-                            console.log("✅ App closing");
-                        } catch (e) {
-                            console.error("Error closing WebApp:", e);
-                        }
-                    }, 2000);
+                    // НЕ закрываем приложение автоматически
+                    // Пользователь может закрыть его сам, когда захочет
+                    // Данные уже отправлены через sendData()
+                    console.log("✅ Prize data sent - user can close app manually");
                     
                 } catch (error) {
                     console.error("❌ Error sending data:", error);
