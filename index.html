@@ -1127,20 +1127,18 @@
             
             if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
                 const user = Telegram.WebApp.initDataUnsafe?.user;
-                if (!user) return;
-                
-                // ✅ Отправляем запрос на сервер для проверки кулдауна
-                const checkData = {
-                    action: "check_cooldown",
-                    user_id: user.id,
-                    time: new Date().toISOString()
-                };
-                
-                Telegram.WebApp.sendData(JSON.stringify(checkData));
-                console.log("🔄 Проверка кулдауна отправлена");
+                if (user && user.id) {
+                    // Отправляем событие начала спина
+                    const spinData = {
+                        action: "spin_started",
+                        user_id: user.id,
+                        time: new Date().toISOString()
+                    };
+                    Telegram.WebApp.sendData(JSON.stringify(spinData));
+                    console.log("🔄 Spin started event sent");
+                }
             }
             
-            // Разрешаем крутить (сервер всё равно проверит)
             spinRoulette();
         }
         
@@ -1456,9 +1454,8 @@
             if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
                 const user = Telegram.WebApp.initDataUnsafe?.user;
                 if (!user || !user.id) {
-                    alert(currentLang === 'ru' 
-                        ? "Ошибка: данные пользователя не найдены."
-                        : "Error: user data not found.");
+                    alert(currentLang === 'ru' ? "Ошибка: данные пользователя не найдены." : "Error: user data not found.");
+                    if (claimBtn) claimBtn.disabled = false;
                     return;
                 }
                 
@@ -1468,42 +1465,22 @@
                     user_id: user.id,
                     username: user.username || "unknown",
                     language: currentLang,
-                    time: new Date().toISOString(),
-                    spin_id: `${user.id}_${Date.now()}`,
-                    // ✅ ВАЖНО: Добавляем spin_started для антиабуза
-                    spin_started: true
+                    time: new Date().toISOString()
                 };
                 
-                console.log("🎁 Отправка данных приза:", prizeData);
+                console.log("🎁 Отправка приза:", prizeData);
+                Telegram.WebApp.sendData(JSON.stringify(prizeData));
                 
-                try {
-                    // ✅ ПРАВИЛЬНЫЙ СПОСОБ
-                    Telegram.WebApp.sendData(JSON.stringify(prizeData));
-                    console.log("✅ Данные отправлены через sendData()");
-                    
-                    // ✅ Показываем пользователю сообщение об успехе
-                    const resultDiv = document.getElementById("result");
-                    if (resultDiv) {
-                        const prizeDesc = document.getElementById("prizeDesc");
-                        if (prizeDesc) {
-                            prizeDesc.textContent = currentLang === 'ru' 
-                                ? "✅ Приз отправлен! Проверь личные сообщения от бота."
-                                : "✅ Prize sent! Check your private messages from the bot.";
-                        }
-                    }
-                    
-                    // ✅ Можно закрыть приложение через 3 секунды
-                    setTimeout(() => {
-                        Telegram.WebApp.close();
-                    }, 3000);
-                    
-                } catch (error) {
-                    console.error("❌ Ошибка отправки:", error);
-                    if (claimBtn) {
-                        claimBtn.disabled = false;
-                        claimBtn.textContent = currentLang === 'ru' ? 'Забрать приз' : 'Claim Prize';
-                    }
+                const prizeDesc = document.getElementById("prizeDesc");
+                if (prizeDesc) {
+                    prizeDesc.textContent = currentLang === 'ru' 
+                        ? "✅ Приз отправлен! Проверь личные сообщения от бота."
+                        : "✅ Prize sent! Check your private messages from the bot.";
                 }
+                
+                setTimeout(() => {
+                    Telegram.WebApp.close();
+                }, 3000);
             }
         }
         
