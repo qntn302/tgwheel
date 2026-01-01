@@ -1198,20 +1198,17 @@
             spinBtn.disabled = true;
             document.getElementById("result").style.display = "none";
             
-            // КРИТИЧНО: Отмечаем начало спина на сервере СРАЗУ (защита от абуза)
-            // Используем MainButton для надежной отправки
+            // Отправляем событие начала спина на сервер
             if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
                 const user = Telegram.WebApp.initDataUnsafe?.user;
                 if (user) {
-                    // Отправляем через sendData (будет отправлено при закрытии приложения)
-                    const spinStartData = {
+                    const startData = {
                         action: "spin_started",
                         user_id: user.id,
-                        time: new Date().toISOString(),
-                        timestamp: Date.now()
+                        timestamp: new Date().toISOString()
                     };
-                    Telegram.WebApp.sendData(JSON.stringify(spinStartData));
-                    console.log("Spin started - data queued via sendData");
+                    Telegram.WebApp.sendData(JSON.stringify(startData));
+                    console.log("✅ Spin started event sent");
                 }
             }
             
@@ -1497,13 +1494,6 @@
                 return;
             }
             
-            // Блокируем повторные нажатия
-            const claimBtn = document.getElementById("claimBtn");
-            if (claimBtn) {
-                claimBtn.disabled = true;
-                claimBtn.textContent = currentLang === 'ru' ? 'Отправка...' : 'Sending...';
-            }
-            
             if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
                 const user = Telegram.WebApp.initDataUnsafe?.user;
                 if (!user || !user.id) {
@@ -1514,9 +1504,6 @@
                     return;
                 }
                 
-                const spinTime = new Date().toISOString();
-                const spinId = `${user.id}_${Date.now()}`;
-                
                 const prizeData = {
                     action: "wheel_prize",
                     prize: currentPrize,
@@ -1524,72 +1511,29 @@
                     user_id: user.id,
                     username: user.username || "unknown",
                     language: currentLang,
-                    time: spinTime,
-                    spin_id: spinId,
-                    timestamp: Date.now(),
-                    // ВАЖНО: Включаем spin_started в данные приза для защиты от абуза
-                    spin_started: true
+                    time: new Date().toISOString(),
+                    timestamp: Date.now()
                 };
                 
-                console.log("🎁 Sending prize data:", prizeData);
+                // 🔥 ПРАВИЛЬНЫЙ СПОСОБ: отправляем через Telegram Web App API
+                Telegram.WebApp.sendData(JSON.stringify(prizeData));
                 
-                try {
-                    // КРИТИЧНО: Отправляем данные через /start параметр (РАБОТАЕТ СРАЗУ)
-                    // КРИТИЧНО: Используем sendData() для отправки данных
-                    // Это правильный способ для Telegram Mini Apps
-                    const dataStr = JSON.stringify(prizeData);
-                    
-                    console.log("📤 Preparing to send prize data via sendData()...");
-                    console.log("📤 Data to send:", JSON.stringify(prizeData, null, 2));
-                    
-                    // Отправляем данные через sendData
-                    // Данные будут получены ботом через web_app_data handler
-                    Telegram.WebApp.sendData(dataStr);
-                    console.log("✅ Prize data sent via sendData() - bot will process prize");
-                    
-                    // Также сохраняем в localStorage для надежности
-                    localStorage.setItem('wheel_prize_sent', JSON.stringify({
-                        ...prizeData,
-                        timestamp: Date.now()
-                    }));
-                    
-                    // Сохраняем в localStorage для надежности
-                    localStorage.setItem('wheel_prize_data', JSON.stringify({
-                        ...prizeData,
-                        timestamp: Date.now()
-                    }));
-                    
-                    // Показываем сообщение об успехе
-                    const resultDiv = document.getElementById("result");
-                    if (resultDiv) {
-                        const prizeDesc = document.getElementById("prizeDesc");
-                        if (prizeDesc) {
-                            prizeDesc.textContent = currentLang === 'ru' 
-                                ? "✅ Приз отправлен! Проверь личные сообщения от бота."
-                                : "✅ Prize sent! Check your private messages from the bot.";
-                        }
-                    }
-                    
-                    // Очищаем данные
-                    userData.pendingReward = null;
-                    localStorage.removeItem('wheel_user_data');
-                    
-                    // НЕ закрываем приложение автоматически
-                    // Пользователь может закрыть его сам, когда захочет
-                    // Данные уже отправлены через sendData()
-                    console.log("✅ Prize data sent - user can close app manually");
-                    
-                } catch (error) {
-                    console.error("❌ Error sending data:", error);
-                    alert(currentLang === 'ru' 
-                        ? "Ошибка отправки данных. Попробуй ещё раз или обратись к администратору."
-                        : "Error sending data. Try again or contact administrator.");
-                    
-                    if (claimBtn) {
-                        claimBtn.disabled = false;
-                        claimBtn.textContent = currentLang === 'ru' ? 'Забрать приз' : 'Claim Prize';
+                // Показываем сообщение пользователю
+                console.log("✅ Данные приза отправлены через Web App");
+                
+                // Показываем сообщение об успехе
+                const resultDiv = document.getElementById("result");
+                if (resultDiv) {
+                    const prizeDesc = document.getElementById("prizeDesc");
+                    if (prizeDesc) {
+                        prizeDesc.textContent = currentLang === 'ru' 
+                            ? "✅ Приз отправлен! Проверь личные сообщения от бота."
+                            : "✅ Prize sent! Check your private messages from the bot.";
                     }
                 }
+                
+                // Опционально можно закрыть приложение
+                // Telegram.WebApp.close();
             } else {
                 console.error("Telegram WebApp not available!");
                 alert(currentLang === 'ru' 
