@@ -1084,17 +1084,6 @@
                 
                 console.log("👤 User ID:", user.id);
                 
-                // 🔥 КРИТИЧНО: СРАЗУ запрашиваем состояние у сервера
-                const initData = {
-                    action: "get_spin_state",
-                    user_id: user.id,
-                    timestamp: Date.now()
-                };
-                
-                // Отправляем запрос серверу
-                Telegram.WebApp.sendData(JSON.stringify(initData));
-                console.log("📤 Requested spin state from server");
-                
                 // Загружаем кэшированные данные сразу (без задержки)
                 const cached = localStorage.getItem('wheel_user_data');
                 if (cached) {
@@ -1130,6 +1119,15 @@
                 
                 updateDropPaceDisplay();
                 updateSpinButtonState(); // Проверяем кулдаун
+                
+                // Отправляем запрос серверу (без блокировки кнопки)
+                const initData = {
+                    action: "get_spin_state",
+                    user_id: user.id,
+                    timestamp: Date.now()
+                };
+                Telegram.WebApp.sendData(JSON.stringify(initData));
+                console.log("📤 Requested spin state from server");
                 
                 // Также запрашиваем полные данные пользователя
                 Telegram.WebApp.sendData(JSON.stringify({
@@ -1226,16 +1224,10 @@
                 return;
             }
             
-            const spinBtn = document.getElementById("spinBtn");
-            if (spinBtn) {
-                spinBtn.disabled = true;
-            }
-            
             // 🔥 ВАЖНО: Сначала запрашиваем разрешение у сервера
             if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
                 const user = Telegram.WebApp.initDataUnsafe?.user;
                 if (!user?.id) {
-                    if (spinBtn) spinBtn.disabled = false;
                     return;
                 }
                 
