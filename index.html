@@ -1151,46 +1151,12 @@
             console.log("🔄 Updating spin button state...");
             console.log("📊 userData.lastSpinTime:", userData.lastSpinTime);
             
-            // 🔥 ВАЖНО: Проверяем кулдаун на клиенте для обычных пользователей
-            // Сервер проверит кулдаун и заблокирует если нужно (включая админа)
+            // 🔥 ВАЖНО: НЕ блокируем кнопку на клиенте
+            // Сервер проверит кулдаун и заблокирует если нужно
+            // Это нужно для админа - клиент не знает, кто админ, поэтому не блокируем
+            // Для обычных пользователей сервер заблокирует при попытке спина
             
-            // Блокируем если есть lastSpinTime и прошло меньше 24 часов
-            if (userData.lastSpinTime) {
-                const timeSinceLastSpin = Date.now() - userData.lastSpinTime;
-                const hoursSinceLastSpin = timeSinceLastSpin / (1000 * 60 * 60);
-                
-                console.log("⏱️ Hours since last spin:", hoursSinceLastSpin);
-                
-                if (hoursSinceLastSpin < 24) {
-                    const hoursLeft = 24 - hoursSinceLastSpin;
-                    spinBtn.disabled = true;
-                    
-                    // Форматируем время
-                    let displayTime, displayUnit;
-                    if (hoursLeft >= 1) {
-                        displayTime = Math.floor(hoursLeft);
-                        displayUnit = currentLang === 'ru' ? 'часов' : 'hours';
-                    } else {
-                        displayTime = Math.ceil(hoursLeft * 60);
-                        displayUnit = currentLang === 'ru' ? 'минут' : 'minutes';
-                    }
-                    
-                    // Обновляем текст кнопки и инфо
-                    spinBtn.textContent = currentLang === 'ru' ? '⏳ Кулдаун' : '⏳ Cooldown';
-                    
-                    if (cooldownInfo) {
-                        cooldownInfo.textContent = currentLang === 'ru' 
-                            ? `Подожди ещё ${displayTime} ${displayUnit}`
-                            : `Wait ${displayTime} more ${displayUnit}`;
-                        cooldownInfo.style.display = 'block';
-                    }
-                    
-                    console.log(`⛔ Button blocked: ${hoursLeft.toFixed(2)} hours left`);
-                    return; // Выходим - кнопка заблокирована
-                }
-            }
-            
-            // Разрешаем кнопку (но реальная проверка будет при нажатии на сервере)
+            // Разрешаем кнопку - сервер проверит кулдаун при нажатии
             spinBtn.disabled = false;
             spinBtn.textContent = currentLang === 'ru' ? '🎡 Крутить колесо' : '🎡 Spin the wheel';
             
@@ -1198,7 +1164,7 @@
                 cooldownInfo.style.display = 'none';
             }
             
-            console.log("✅ Button enabled (pending server check)");
+            console.log("✅ Button enabled (server will check cooldown)");
         }
         
         // ==================== ФУНКЦИИ РУЛЕТКИ ====================
