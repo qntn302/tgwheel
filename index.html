@@ -1547,7 +1547,40 @@
                 };
                 
                 console.log("🎁 Отправка приза:", prizeData);
-                Telegram.WebApp.sendData(JSON.stringify(prizeData));
+                
+                // Проверяем, что WebApp готов к отправке данных
+                if (!Telegram.WebApp.isReady) {
+                    console.log("⚠️ WebApp not ready, calling ready()...");
+                    Telegram.WebApp.ready();
+                }
+                
+                // Проверяем версию WebApp (должна быть >= 6.0 для sendData)
+                console.log("📱 WebApp version:", Telegram.WebApp.version);
+                console.log("📱 WebApp platform:", Telegram.WebApp.platform);
+                console.log("📱 WebApp isReady:", Telegram.WebApp.isReady);
+                
+                try {
+                    const dataString = JSON.stringify(prizeData);
+                    console.log("📤 Sending data string:", dataString);
+                    console.log("📤 Data string length:", dataString.length);
+                    
+                    Telegram.WebApp.sendData(dataString);
+                    
+                    console.log("✅ sendData() called successfully");
+                    
+                    // Проверяем, есть ли callback для подтверждения отправки
+                    Telegram.WebApp.onEvent('viewportChanged', function() {
+                        console.log("📱 Viewport changed");
+                    });
+                    
+                } catch (error) {
+                    console.error("❌ Error calling sendData():", error);
+                    alert(currentLang === 'ru' 
+                        ? "Ошибка отправки данных: " + error.message 
+                        : "Error sending data: " + error.message);
+                    if (claimBtn) claimBtn.disabled = false;
+                    return;
+                }
                 
                 const prizeDesc = document.getElementById("prizeDesc");
                 if (prizeDesc) {
