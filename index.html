@@ -1564,22 +1564,47 @@
                     console.log("📤 Sending data string:", dataString);
                     console.log("📤 Data string length:", dataString.length);
                     
+                    // КРИТИЧНО: sendData() должен вызываться после ready() и expand()
+                    // Также проверяем, что WebApp открыт правильно
+                    if (Telegram.WebApp.initDataUnsafe && Telegram.WebApp.initDataUnsafe.start_param) {
+                        console.log("📱 Start param found:", Telegram.WebApp.initDataUnsafe.start_param);
+                    }
+                    
+                    // Пробуем отправить данные
                     Telegram.WebApp.sendData(dataString);
                     
                     console.log("✅ sendData() called successfully");
                     
-                    // Проверяем, есть ли callback для подтверждения отправки
-                    Telegram.WebApp.onEvent('viewportChanged', function() {
-                        console.log("📱 Viewport changed");
-                    });
+                    // Ждем немного и проверяем, были ли данные отправлены
+                    setTimeout(() => {
+                        console.log("⏰ 1 second after sendData() - checking if data was sent");
+                        // Если данные не отправились, пробуем альтернативный способ
+                        // (через MainButton или через закрытие приложения с данными)
+                    }, 1000);
                     
                 } catch (error) {
                     console.error("❌ Error calling sendData():", error);
-                    alert(currentLang === 'ru' 
-                        ? "Ошибка отправки данных: " + error.message 
-                        : "Error sending data: " + error.message);
-                    if (claimBtn) claimBtn.disabled = false;
-                    return;
+                    console.error("❌ Error stack:", error.stack);
+                    
+                    // Альтернативный способ: используем MainButton для отправки данных
+                    console.log("🔄 Trying alternative method: MainButton");
+                    try {
+                        if (Telegram.WebApp.MainButton) {
+                            Telegram.WebApp.MainButton.setText(currentLang === 'ru' ? 'Отправка...' : 'Sending...');
+                            Telegram.WebApp.MainButton.show();
+                            Telegram.WebApp.MainButton.onClick(function() {
+                                Telegram.WebApp.sendData(dataString);
+                                Telegram.WebApp.MainButton.hide();
+                            });
+                        }
+                    } catch (altError) {
+                        console.error("❌ Alternative method also failed:", altError);
+                        alert(currentLang === 'ru' 
+                            ? "Ошибка отправки данных: " + error.message 
+                            : "Error sending data: " + error.message);
+                        if (claimBtn) claimBtn.disabled = false;
+                        return;
+                    }
                 }
                 
                 const prizeDesc = document.getElementById("prizeDesc");
