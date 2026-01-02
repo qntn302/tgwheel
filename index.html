@@ -1111,34 +1111,118 @@
                     }
                 }
                 updateDropPaceDisplay();
+                updateSpinButtonState();
             } catch (e) {
                 console.error('Error loading user data:', e);
             }
         }
         
+        // ==================== ОБНОВЛЕНИЕ СОСТОЯНИЯ КНОПКИ ====================
+        function updateSpinButtonState() {
+            const spinBtn = document.getElementById("spinBtn");
+            const cooldownInfo = document.getElementById("cooldownInfo");
+            
+            if (!spinBtn) return;
+            
+            // Проверяем кулдаун
+            if (userData.lastSpinTime) {
+                const timeSinceLastSpin = Date.now() - userData.lastSpinTime;
+                const hoursSinceLastSpin = timeSinceLastSpin / (1000 * 60 * 60);
+                
+                if (hoursSinceLastSpin < 24) {
+                    const hoursLeft = 24 - hoursSinceLastSpin;
+                    spinBtn.disabled = true;
+                    
+                    if (cooldownInfo) {
+                        const hoursText = hoursLeft >= 1 ? Math.floor(hoursLeft) : Math.ceil(hoursLeft * 60);
+                        const unit = hoursLeft >= 1 ? (currentLang === 'ru' ? 'часов' : 'hours') : (currentLang === 'ru' ? 'минут' : 'minutes');
+                        cooldownInfo.textContent = currentLang === 'ru' 
+                            ? `⏰ Подожди ещё ${hoursText} ${unit}`
+                            : `⏰ Wait ${hoursText} more ${unit}`;
+                        cooldownInfo.style.display = 'block';
+                    }
+                } else {
+                    spinBtn.disabled = false;
+                    if (cooldownInfo) {
+                        cooldownInfo.style.display = 'none';
+                    }
+                }
+            } else {
+                spinBtn.disabled = false;
+                if (cooldownInfo) {
+                    cooldownInfo.style.display = 'none';
+                }
+            }
+        }
+        
         // ==================== ФУНКЦИИ РУЛЕТКИ ====================
         async function checkSpinAvailability() {
-            if (isSpinning) return;
+            // Блокируем повторные спины
+            if (isSpinning) {
+                console.log("⛔ Spin already in progress, blocking...");
+                return;
+            }
+            
+            // Блокируем, если приз уже был выбран (защита от повторных спинов)
+            if (currentPrize) {
+                console.log("⛔ Prize already selected, blocking new spin...");
+                return;
+            }
             
             if (userData.pendingReward) {
                 showPendingReward();
                 return;
             }
             
+            // КРИТИЧНО: Проверяем кулдаун на клиенте перед спином
+            if (userData.lastSpinTime) {
+                const timeSinceLastSpin = Date.now() - userData.lastSpinTime;
+                const hoursSinceLastSpin = timeSinceLastSpin / (1000 * 60 * 60);
+                
+                if (hoursSinceLastSpin < 24) {
+                    const hoursLeft = 24 - hoursSinceLastSpin;
+                    const spinBtn = document.getElementById("spinBtn");
+                    const cooldownInfo = document.getElementById("cooldownInfo");
+                    
+                    if (spinBtn) {
+                        spinBtn.disabled = true;
+                    }
+                    
+                    if (cooldownInfo) {
+                        const hoursText = hoursLeft >= 1 ? Math.floor(hoursLeft) : Math.ceil(hoursLeft * 60);
+                        const unit = hoursLeft >= 1 ? (currentLang === 'ru' ? 'часов' : 'hours') : (currentLang === 'ru' ? 'минут' : 'minutes');
+                        cooldownInfo.textContent = currentLang === 'ru' 
+                            ? `⏰ Подожди ещё ${hoursText} ${unit}`
+                            : `⏰ Wait ${hoursText} more ${unit}`;
+                        cooldownInfo.style.display = 'block';
+                    }
+                    
+                    console.log(`⛔ Cooldown active: ${hoursLeft.toFixed(2)} hours left`);
+                    return;
+                }
+            }
+            
+            // Блокируем кнопку сразу
+            const spinBtn = document.getElementById("spinBtn");
+            if (spinBtn) {
+                spinBtn.disabled = true;
+            }
+            
+            // Отправляем событие начала спина на сервер
             if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
                 const user = Telegram.WebApp.initDataUnsafe?.user;
                 if (user && user.id) {
-                    // Отправляем событие начала спина
                     const spinData = {
                         action: "spin_started",
                         user_id: user.id,
                         time: new Date().toISOString()
                     };
                     Telegram.WebApp.sendData(JSON.stringify(spinData));
-                    console.log("🔄 Spin started event sent");
+                    console.log("🔄 Spin started event sent to server");
                 }
             }
             
+            // Крутим колесо только после отправки события на сервер
             spinRoulette();
         }
         
@@ -1343,9 +1427,19 @@
                         }
                         
                         showPrize();
-                        isSpinning = false;
-                        spinBtn.disabled = false;
+                        // НЕ сбрасываем isSpinning и НЕ включаем кнопку - пользователь должен забрать приз
+                        // isSpinning остается true до получения приза
+                        // spinBtn остается disabled до получения приза
                         userData.lastSpinTime = Date.now();
+                        
+                        // Обновляем кулдаун информацию
+                        const cooldownInfo = document.getElementById("cooldownInfo");
+                        if (cooldownInfo) {
+                            cooldownInfo.textContent = currentLang === 'ru' 
+                                ? "⏰ Следующий спин через 24 часа"
+                                : "⏰ Next spin in 24 hours";
+                            cooldownInfo.style.display = 'block';
+                        }
                     }
                 }
                 
@@ -1488,6 +1582,27 @@
                         : "✅ Prize sent! Check your private messages from the bot.";
                 }
                 
+                // Блокируем повторные спины - сбрасываем флаги только после отправки приза
+                isSpinning = false;
+                currentPrize = null; // Очищаем приз, чтобы нельзя было отправить повторно
+                userData.lastSpinTime = Date.now(); // Обновляем время последнего спина
+                
+                // Блокируем кнопку до следующего спина (24 часа)
+                const spinBtn = document.getElementById("spinBtn");
+                if (spinBtn) {
+                    spinBtn.disabled = true;
+                }
+                
+                // Обновляем кулдаун информацию
+                const cooldownInfo = document.getElementById("cooldownInfo");
+                if (cooldownInfo) {
+                    cooldownInfo.textContent = currentLang === 'ru' 
+                        ? "⏰ Следующий спин через 24 часа"
+                        : "⏰ Next spin in 24 hours";
+                    cooldownInfo.style.display = 'block';
+                }
+                
+                // Закрываем приложение через 3 секунды
                 setTimeout(() => {
                     Telegram.WebApp.close();
                 }, 3000);
@@ -1501,6 +1616,7 @@
         window.claimPrize = claimPrize;
         window.showDropPaceInfo = showDropPaceInfo;
         window.openSubscribeChannels = openSubscribeChannels;
+        window.updateSpinButtonState = updateSpinButtonState;
         
         document.addEventListener('DOMContentLoaded', function() {
             console.log("🚀 Initializing roulette...");
@@ -1574,6 +1690,11 @@
             try {
                 loadUserData();
                 console.log("✅ User data loaded");
+                
+                // Обновляем состояние кнопки после загрузки данных
+                setTimeout(() => {
+                    updateSpinButtonState();
+                }, 500);
             } catch (e) {
                 console.error("❌ Error loading user data:", e);
             }
