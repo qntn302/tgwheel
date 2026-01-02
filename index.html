@@ -1060,7 +1060,10 @@
         
         // ==================== ЗАГРУЗКА ДАННЫХ ПОЛЬЗОВАТЕЛЯ ====================
         async function loadUserData() {
+            console.log("🔄 Loading user data...");
+            
             if (typeof Telegram === 'undefined' || !Telegram.WebApp) {
+                console.log("⚠️ Telegram.WebApp not available");
                 userData = {
                     dropPace: 5,
                     lastSpinTime: null,
@@ -1074,12 +1077,35 @@
             
             try {
                 const user = Telegram.WebApp.initDataUnsafe.user;
-                if (user) {
-                    Telegram.WebApp.sendData(JSON.stringify({
-                        action: "get_user_data",
-                        user_id: user.id
-                    }));
-                    
+                if (!user || !user.id) {
+                    console.error("❌ No user data");
+                    return;
+                }
+                
+                console.log("👤 User ID:", user.id);
+                
+                // 🔥 КРИТИЧНО: СРАЗУ запрашиваем состояние у сервера
+                const initData = {
+                    action: "get_spin_state",
+                    user_id: user.id,
+                    timestamp: Date.now()
+                };
+                
+                // Отправляем запрос серверу
+                Telegram.WebApp.sendData(JSON.stringify(initData));
+                console.log("📤 Requested spin state from server");
+                
+                // 🔥 ЖДЕМ ОТВЕТ ОТ СЕРВЕРА
+                // Временно блокируем кнопку до получения ответа
+                const spinBtn = document.getElementById("spinBtn");
+                if (spinBtn) {
+                    spinBtn.disabled = true;
+                    spinBtn.textContent = currentLang === 'ru' ? 'Загрузка...' : 'Loading...';
+                }
+                
+                // 🔥 Через 2 секунды проверяем кэшированные данные
+                setTimeout(() => {
+                    // Проверяем localStorage как fallback
                     const cached = localStorage.getItem('wheel_user_data');
                     if (cached) {
                         try {
@@ -1091,7 +1117,9 @@
                                 hasWonFullAccess: parsed.hasWonFullAccess || false,
                                 pendingReward: parsed.pendingReward
                             };
+                            console.log("📦 Loaded cached data");
                         } catch (e) {
+                            console.error("❌ Error parsing cached data:", e);
                             userData = {
                                 dropPace: 0,
                                 lastSpinTime: null,
@@ -1109,7 +1137,22 @@
                             pendingReward: null
                         };
                     }
-                }
+                    
+                    updateDropPaceDisplay();
+                    updateSpinButtonState(); // Проверяем кулдаун
+                    
+                    // Если кнопка всё ещё заблокирована, показываем сообщение
+                    if (spinBtn && spinBtn.disabled) {
+                        spinBtn.textContent = currentLang === 'ru' ? '🎡 Крутить колесо' : '🎡 Spin the wheel';
+                        spinBtn.disabled = false;
+                    }
+                }, 2000);
+                
+                // Также запрашиваем полные данные пользователя
+                Telegram.WebApp.sendData(JSON.stringify({
+                    action: "get_user_data",
+                    user_id: user.id
+                }));
                 updateDropPaceDisplay();
                 updateSpinButtonState();
             } catch (e) {
@@ -1124,35 +1167,61 @@
             
             if (!spinBtn) return;
             
-            // Проверяем кулдаун
+            console.log("🔄 Updating spin button state...");
+            console.log("📊 userData.lastSpinTime:", userData.lastSpinTime);
+            
+            // 🔥 ВАЖНО: Проверяем ДВА источника
+            // 1. userData.lastSpinTime (из localStorage)
+            // 2. Время последнего spin_started (из сервера, но у нас нет его здесь)
+            
+            // Блокируем если есть lastSpinTime и прошло меньше 24 часов
             if (userData.lastSpinTime) {
                 const timeSinceLastSpin = Date.now() - userData.lastSpinTime;
                 const hoursSinceLastSpin = timeSinceLastSpin / (1000 * 60 * 60);
+                
+                console.log("⏱️ Hours since last spin:", hoursSinceLastSpin);
                 
                 if (hoursSinceLastSpin < 24) {
                     const hoursLeft = 24 - hoursSinceLastSpin;
                     spinBtn.disabled = true;
                     
+                    // Форматируем время
+                    let displayTime, displayUnit;
+                    if (hoursLeft >= 1) {
+                        displayTime = Math.floor(hoursLeft);
+                        displayUnit = currentLang === 'ru' ? 'часов' : 'hours';
+                    } else {
+                        displayTime = Math.ceil(hoursLeft * 60);
+                        displayUnit = currentLang === 'ru' ? 'минут' : 'minutes';
+                    }
+                    
+                    // Обновляем текст кнопки и инфо
+                    spinBtn.textContent = currentLang === 'ru' ? '⏳ Кулдаун' : '⏳ Cooldown';
+                    
                     if (cooldownInfo) {
-                        const hoursText = hoursLeft >= 1 ? Math.floor(hoursLeft) : Math.ceil(hoursLeft * 60);
-                        const unit = hoursLeft >= 1 ? (currentLang === 'ru' ? 'часов' : 'hours') : (currentLang === 'ru' ? 'минут' : 'minutes');
                         cooldownInfo.textContent = currentLang === 'ru' 
-                            ? `⏰ Подожди ещё ${hoursText} ${unit}`
-                            : `⏰ Wait ${hoursText} more ${unit}`;
+                            ? `Подожди ещё ${displayTime} ${displayUnit}`
+                            : `Wait ${displayTime} more ${displayUnit}`;
                         cooldownInfo.style.display = 'block';
                     }
-                } else {
-                    spinBtn.disabled = false;
-                    if (cooldownInfo) {
-                        cooldownInfo.style.display = 'none';
-                    }
-                }
-            } else {
-                spinBtn.disabled = false;
-                if (cooldownInfo) {
-                    cooldownInfo.style.display = 'none';
+                    
+                    console.log(`⛔ Button blocked: ${hoursLeft.toFixed(2)} hours left`);
+                    return; // Выходим - кнопка заблокирована
                 }
             }
+            
+            // 🔥 ЕСЛИ НЕТ lastSpinTime, всё равно проверяем сервер
+            // Но мы не можем сделать это синхронно...
+            
+            // Разрешаем кнопку (но реальная проверка будет при нажатии)
+            spinBtn.disabled = false;
+            spinBtn.textContent = currentLang === 'ru' ? '🎡 Крутить колесо' : '🎡 Spin the wheel';
+            
+            if (cooldownInfo) {
+                cooldownInfo.style.display = 'none';
+            }
+            
+            console.log("✅ Button enabled (pending server check)");
         }
         
         // ==================== ФУНКЦИИ РУЛЕТКИ ====================
@@ -1564,6 +1633,24 @@
                         ? "✅ Приз отправлен! Проверь личные сообщения от бота."
                         : "✅ Prize sent! Check your private messages from the bot.";
                 }
+                
+                // 🔥 СОХРАНЯЕМ В localStorage СРАЗУ
+                const claimTime = Date.now();
+                userData.lastSpinTime = claimTime;
+                
+                // Сохраняем в localStorage
+                localStorage.setItem('wheel_user_data', JSON.stringify({
+                    dropPace: userData.dropPace,
+                    lastSpinTime: new Date(claimTime).toISOString(), // ISO строка
+                    fullAccessCooldown: userData.fullAccessCooldown,
+                    hasWonFullAccess: userData.hasWonFullAccess,
+                    pendingReward: null,
+                    // 🔥 ДОБАВЛЯЕМ ТАЙМСТАМП ОТПРАВКИ ПРИЗА
+                    lastPrizeClaim: new Date().toISOString(),
+                    prizeType: currentPrize?.type
+                }));
+                
+                console.log("💾 Saved to localStorage with lastSpinTime:", new Date(claimTime).toISOString());
                 
                 // 🔥 ПОСЛЕ отправки приза — СРАЗУ блокируем ВСЁ
                 const spinBtn = document.getElementById("spinBtn");
