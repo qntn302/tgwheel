@@ -1443,9 +1443,19 @@
         }
         
         function claimPrize() {
-            if (!currentPrize) return;
+            // Блокируем повторные запросы
+            if (!currentPrize) {
+                console.log("⛔ No prize to claim");
+                return;
+            }
             
+            // Блокируем, если уже отправляем
             const claimBtn = document.getElementById("claimBtn");
+            if (claimBtn && claimBtn.disabled) {
+                console.log("⛔ Prize already being sent");
+                return;
+            }
+            
             if (claimBtn) {
                 claimBtn.disabled = true;
                 claimBtn.textContent = currentLang === 'ru' ? 'Отправка...' : 'Sending...';
