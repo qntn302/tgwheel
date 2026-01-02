@@ -1095,40 +1095,21 @@
                 Telegram.WebApp.sendData(JSON.stringify(initData));
                 console.log("📤 Requested spin state from server");
                 
-                // 🔥 ЖДЕМ ОТВЕТ ОТ СЕРВЕРА
-                // Временно блокируем кнопку до получения ответа
-                const spinBtn = document.getElementById("spinBtn");
-                if (spinBtn) {
-                    spinBtn.disabled = true;
-                    spinBtn.textContent = currentLang === 'ru' ? 'Загрузка...' : 'Loading...';
-                }
-                
-                // 🔥 Через 2 секунды проверяем кэшированные данные
-                setTimeout(() => {
-                    // Проверяем localStorage как fallback
-                    const cached = localStorage.getItem('wheel_user_data');
-                    if (cached) {
-                        try {
-                            const parsed = JSON.parse(cached);
-                            userData = {
-                                dropPace: parsed.dropPace || 0,
-                                lastSpinTime: parsed.lastSpinTime ? new Date(parsed.lastSpinTime).getTime() : null,
-                                fullAccessCooldown: parsed.fullAccessCooldown,
-                                hasWonFullAccess: parsed.hasWonFullAccess || false,
-                                pendingReward: parsed.pendingReward
-                            };
-                            console.log("📦 Loaded cached data");
-                        } catch (e) {
-                            console.error("❌ Error parsing cached data:", e);
-                            userData = {
-                                dropPace: 0,
-                                lastSpinTime: null,
-                                fullAccessCooldown: null,
-                                hasWonFullAccess: false,
-                                pendingReward: null
-                            };
-                        }
-                    } else {
+                // Загружаем кэшированные данные сразу (без задержки)
+                const cached = localStorage.getItem('wheel_user_data');
+                if (cached) {
+                    try {
+                        const parsed = JSON.parse(cached);
+                        userData = {
+                            dropPace: parsed.dropPace || 0,
+                            lastSpinTime: parsed.lastSpinTime ? new Date(parsed.lastSpinTime).getTime() : null,
+                            fullAccessCooldown: parsed.fullAccessCooldown,
+                            hasWonFullAccess: parsed.hasWonFullAccess || false,
+                            pendingReward: parsed.pendingReward
+                        };
+                        console.log("📦 Loaded cached data");
+                    } catch (e) {
+                        console.error("❌ Error parsing cached data:", e);
                         userData = {
                             dropPace: 0,
                             lastSpinTime: null,
@@ -1137,23 +1118,18 @@
                             pendingReward: null
                         };
                     }
-                    
-                    updateDropPaceDisplay();
-                    updateSpinButtonState(); // Проверяем кулдаун
-                    
-                    // Если кнопка всё ещё заблокирована после проверки, разблокируем
-                    // (реальная проверка будет при нажатии через can_spin)
-                    if (spinBtn) {
-                        if (spinBtn.disabled && !userData.lastSpinTime) {
-                            // Если нет данных о последнем спине, разрешаем (проверка будет на сервере)
-                            spinBtn.textContent = currentLang === 'ru' ? '🎡 Крутить колесо' : '🎡 Spin the wheel';
-                            spinBtn.disabled = false;
-                        } else if (!spinBtn.disabled) {
-                            // Если кнопка разблокирована, обновляем текст
-                            spinBtn.textContent = currentLang === 'ru' ? '🎡 Крутить колесо' : '🎡 Spin the wheel';
-                        }
-                    }
-                }, 2000);
+                } else {
+                    userData = {
+                        dropPace: 0,
+                        lastSpinTime: null,
+                        fullAccessCooldown: null,
+                        hasWonFullAccess: false,
+                        pendingReward: null
+                    };
+                }
+                
+                updateDropPaceDisplay();
+                updateSpinButtonState(); // Проверяем кулдаун
                 
                 // Также запрашиваем полные данные пользователя
                 Telegram.WebApp.sendData(JSON.stringify({
@@ -1269,30 +1245,13 @@
                     timestamp: Date.now()
                 };
                 
-                // 🔥 ОТПРАВЛЯЕМ И ЖДЕМ ОТВЕТА
+                // 🔥 ОТПРАВЛЯЕМ И СРАЗУ ЗАПУСКАЕМ СПИН (сервер проверит кулдаун)
                 Telegram.WebApp.sendData(JSON.stringify(requestData));
                 console.log("🔄 can_spin request sent to server");
                 
-                // 🔥 Показываем "Проверка..." и ЖДЕМ ответа от сервера
-                if (spinBtn) {
-                    spinBtn.textContent = currentLang === 'ru' ? 'Проверка...' : 'Checking...';
-                }
-                
-                // 🔥 Разрешаем крутить через небольшую задержку (сервер обработает can_spin)
-                // Сервер отправит сообщение "✅ Можно крутить" если разрешено
-                // Если кулдаун активен - сервер отправит сообщение об ошибке
-                // Ждем 1 секунду для обработки сервером, затем разрешаем спин
-                setTimeout(() => {
-                    // Если сервер разрешил (отправил сообщение), можно крутить
-                    // Если кулдаун - сервер заблокировал и отправил сообщение
-                    // В любом случае, если не заблокирован - разрешаем спин
-                    if (!isSpinning && spinBtn) {
-                        // Восстанавливаем текст кнопки
-                        spinBtn.textContent = currentLang === 'ru' ? '🎡 Крутить колесо' : '🎡 Spin the wheel';
-                        // Разрешаем крутить колесо (сервер уже проверил кулдаун)
-                        spinRoulette();
-                    }
-                }, 1000);
+                // 🔥 СРАЗУ запускаем спин - сервер проверит кулдаун и заблокирует если нужно
+                // Не ждем ответа - сервер проверит в wheel_prize
+                spinRoulette();
             }
         }
         
