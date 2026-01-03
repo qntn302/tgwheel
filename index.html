@@ -148,6 +148,9 @@
             color: #ff7f00;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
             transition: color 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         .drop-pace-status.low { 
             color: #e74c3c;
@@ -164,12 +167,6 @@
         .drop-pace-status.peak { 
             color: #9b59b6;
             text-shadow: 0 2px 4px rgba(155, 89, 182, 0.4);
-        }
-        
-        .drop-pace-status {
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
         
         .drop-pace-arrow {
@@ -1321,11 +1318,21 @@
                 selectedPrize = prizesConfig.find(p => p.type === 'empty');
             } else if (serverPrize.type === 'content') {
                 // Для контента ищем по value (например, "sound_pack", "mini_breakdown", etc.)
+                console.log("🔍 Looking for content prize with value:", serverPrize.value);
+                console.log("🔍 Available content prizes:", prizesConfig.filter(p => p.type === 'content').map(p => ({value: p.value, name: p.name})));
+                
                 selectedPrize = prizesConfig.find(p => p.type === 'content' && p.value === serverPrize.value);
+                
                 // Если не нашли по точному совпадению, берем первый контентный приз
                 if (!selectedPrize) {
-                    selectedPrize = prizesConfig.find(p => p.type === 'content');
                     console.warn("⚠️ Exact content prize not found, using first content prize");
+                    selectedPrize = prizesConfig.find(p => p.type === 'content');
+                }
+                
+                if (selectedPrize) {
+                    console.log("✅ Found content prize:", selectedPrize);
+                } else {
+                    console.error("❌ No content prize found at all!");
                 }
             } else if (serverPrize.type === 'discount') {
                 selectedPrize = prizesConfig.find(p => p.type === 'discount' && p.value === serverPrize.value);
@@ -1800,19 +1807,31 @@
                     : "Don't worry, next time will be better!";
                 
             } else if (currentPrize.type === 'content') {
+                console.log("🎁 Displaying content prize:", currentPrize);
                 // Контент - наименование + кнопка для перехода на сайт
                 prizeDesc.textContent = currentLang === 'ru'
-                    ? `🎁 Ты выиграл: ${currentPrize.name_ru}\n\nНажми на кнопку ниже, чтобы открыть контент`
-                    : `🎁 You won: ${currentPrize.name}\n\nClick the button below to open the content`;
+                    ? `🎁 Ты выиграл: ${currentPrize.name_ru || currentPrize.name}\n\nНажми на кнопку ниже, чтобы открыть контент`
+                    : `🎁 You won: ${currentPrize.name || currentPrize.name_ru}\n\nClick the button below to open the content`;
                 
                 const contentLinkBtn = document.getElementById("contentLinkBtn");
-                // Временная заглушка - замените на реальную ссылку позже
-                contentLinkBtn.href = "https://drive.google.com/drive/folders/PLACEHOLDER";
-                contentLinkBtn.querySelector('span').textContent = currentLang === 'ru' 
-                    ? '📦 Открыть контент' 
-                    : '📦 Open content';
+                if (contentLinkBtn) {
+                    // Временная заглушка - замените на реальную ссылку позже
+                    contentLinkBtn.href = "https://drive.google.com/drive/folders/PLACEHOLDER";
+                    const contentLinkBtnSpan = contentLinkBtn.querySelector('span');
+                    if (contentLinkBtnSpan) {
+                        contentLinkBtnSpan.textContent = currentLang === 'ru' 
+                            ? '📦 Открыть контент' 
+                            : '📦 Open content';
+                    }
+                }
                 
-                document.getElementById("contentSection").style.display = "flex";
+                const contentSection = document.getElementById("contentSection");
+                if (contentSection) {
+                    contentSection.style.display = "flex";
+                    console.log("✅ Content section displayed");
+                } else {
+                    console.error("❌ Content section element not found!");
+                }
                 
             } else if (currentPrize.type === 'discount') {
                 // Скидка - звездочки + кнопка скопировать промокод
@@ -2104,6 +2123,29 @@
             if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
                 Telegram.WebApp.ready();
                 Telegram.WebApp.expand();
+                
+                // Обработчик сообщений от бота
+                Telegram.WebApp.onEvent('message', function(event) {
+                    console.log("📩 Received message event from bot:", event);
+                    if (event && event.data) {
+                        handleServerMessage(event.data);
+                    }
+                });
+                
+                // Также проверяем сообщения через postMessage (если используется)
+                window.addEventListener('message', function(event) {
+                    if (event.data && typeof event.data === 'string') {
+                        try {
+                            const data = JSON.parse(event.data);
+                            if (data.action === 'wheel_config' || data.action === 'prize_selected') {
+                                console.log("📩 Received message via postMessage:", data);
+                                handleServerMessage(event.data);
+                            }
+                        } catch (e) {
+                            // Не JSON, игнорируем
+                        }
+                    }
+                });
                 
                 const userLang = Telegram.WebApp.initDataUnsafe.user?.language_code || 'en';
                 const savedLang = localStorage.getItem('wheel_lang') || (userLang === 'ru' ? 'ru' : 'en');
