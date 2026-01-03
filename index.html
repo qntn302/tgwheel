@@ -924,7 +924,19 @@
         const SOUNDS_BASE = "https://qntn302.github.io/tgwheel/sounds/";
         
         // Конфигурация призов будет загружена с сервера
-        let prizesConfig = [];
+        // Временная конфигурация для отображения (без секретных данных)
+        let prizesConfig = [
+            { type: "empty", value: null, icon: "icon_empty.png", name: "Nothing this time", name_ru: "Пока не сегодня", barColor: "empty" },
+            { type: "content", value: "mini_breakdown", icon: "icon_tutorial.png", name: "Mini breakdown", name_ru: "Мини-разбор", barColor: "content" },
+            { type: "content", value: "loops_midi", icon: "icon_loops.png", name: "Loops / MIDI / FLP", name_ru: "Лупы / MIDI / FLP", barColor: "content" },
+            { type: "content", value: "sound_pack", icon: "icon_soundpacks.png", name: "Sound pack", name_ru: "Звуковой пак", barColor: "content" },
+            { type: "content", value: "old_drop", icon: "icon_exclusive_content.png", name: "Old private drop", name_ru: "Старый приватный дроп", barColor: "content" },
+            { type: "discount", value: "10", icon: "icon_10.png", name: "10% discount", name_ru: "Скидка 10%", barColor: "discount" },
+            { type: "discount", value: "15", icon: "icon_15.png", name: "15% discount", name_ru: "Скидка 15%", barColor: "discount" },
+            { type: "discount", value: "20", icon: "icon_20.png", name: "20% discount", name_ru: "Скидка 20%", barColor: "discount" },
+            { type: "access", value: "7", icon: "icon_key7.png", name: "7 days full access", name_ru: "7 дней доступа", barColor: "access" },
+            { type: "access", value: "30", icon: "icon_key30.png", name: "30 days full access", name_ru: "30 дней доступа", barColor: "access" }
+        ];
         
         // Переменные для хранения данных с сервера
         let serverConfig = null;
@@ -1195,21 +1207,27 @@
                 if (data.action === "wheel_config") {
                     console.log("✅ Received wheel config from server");
                     serverConfig = data;
-                    prizesConfig = data.prizes || [];
+                    // Обновляем конфигурацию призов (если пришла с сервера)
+                    if (data.prizes && data.prizes.length > 0) {
+                        prizesConfig = data.prizes;
+                    }
                     userData.dropPace = data.drop_pace || 0;
                     
-                    if (data.images_base) {
-                        IMAGES_BASE = data.images_base;
-                    }
-                    if (data.sounds_base) {
-                        SOUNDS_BASE = data.sounds_base;
-                    }
+                    // НЕ обновляем пути к ресурсам - оставляем старый домен
+                    // if (data.images_base) {
+                    //     IMAGES_BASE = data.images_base;
+                    // }
+                    // if (data.sounds_base) {
+                    //     SOUNDS_BASE = data.sounds_base;
+                    // }
                     
                     waitingForConfig = false;
                     
                     // Инициализируем рулетку после получения конфигурации
                     if (prizesConfig.length > 0) {
                         initRoulette();
+                        // Переинициализируем звуки с правильными путями
+                        initSounds();
                     }
                 } else if (data.action === "prize_selected") {
                     console.log("✅ Received selected prize from server:", data.prize);
@@ -1953,7 +1971,8 @@
                 track.innerHTML = '';
                 
                 if (!prizesConfig || prizesConfig.length === 0) {
-                    console.error("❌ prizesConfig is empty!");
+                    console.warn("⚠️ prizesConfig is empty, will wait for server config");
+                    // Не выходим, просто не создаем ячейки пока
                     return;
                 }
                 
