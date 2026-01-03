@@ -961,24 +961,111 @@
         const IMAGES_BASE = "https://qntn302.github.io/tgwheel/images/";
         const SOUNDS_BASE = "https://qntn302.github.io/tgwheel/sounds/";
         
-        // Конфигурация призов будет загружена с сервера
-        // Временная конфигурация для отображения (без секретных данных)
-        let prizesConfig = [
-            { type: "empty", value: null, icon: "icon_empty.png", name: "Nothing this time", name_ru: "Пока не сегодня", barColor: "empty" },
-            { type: "content", value: "mini_breakdown", icon: "icon_tutorial.png", name: "Mini breakdown", name_ru: "Мини-разбор", barColor: "content" },
-            { type: "content", value: "loops_midi", icon: "icon_loops.png", name: "Loops / MIDI / FLP", name_ru: "Лупы / MIDI / FLP", barColor: "content" },
-            { type: "content", value: "sound_pack", icon: "icon_soundpacks.png", name: "Sound pack", name_ru: "Звуковой пак", barColor: "content" },
-            { type: "content", value: "old_drop", icon: "icon_exclusive_content.png", name: "Old private drop", name_ru: "Старый приватный дроп", barColor: "content" },
-            { type: "discount", value: "10", icon: "icon_10.png", name: "10% discount", name_ru: "Скидка 10%", barColor: "discount" },
-            { type: "discount", value: "15", icon: "icon_15.png", name: "15% discount", name_ru: "Скидка 15%", barColor: "discount" },
-            { type: "discount", value: "20", icon: "icon_20.png", name: "20% discount", name_ru: "Скидка 20%", barColor: "discount" },
-            { type: "access", value: "7", icon: "icon_key7.png", name: "7 days full access", name_ru: "7 дней доступа", barColor: "access" },
-            { type: "access", value: "30", icon: "icon_key30.png", name: "30 days full access", name_ru: "30 дней доступа", barColor: "access" }
+        // ==================== КОНФИГУРАЦИЯ ПРИЗОВ ====================
+        const prizesConfig = [
+            { 
+                type: "empty", 
+                value: null,
+                icon: "icon_empty.png",
+                name: "Nothing this time", 
+                name_ru: "Пока не сегодня",
+                barColor: "empty",
+                description_ru: "Не расстраивайся, в следующий раз обязательно повезет!",
+                description_en: "Don't worry, next time will be better!"
+            },
+            { 
+                type: "content", 
+                value: "mini_breakdown",
+                icon: "icon_tutorial.png",
+                name: "Mini breakdown", 
+                name_ru: "Мини-разбор",
+                barColor: "content",
+                description_ru: "Твой эксклюзивный мини-разбор уже ждет тебя!",
+                description_en: "Your exclusive mini-breakdown is waiting for you!"
+            },
+            { 
+                type: "content", 
+                value: "loops_midi",
+                icon: "icon_loops.png",
+                name: "Loops / MIDI / FLP", 
+                name_ru: "Лупы / MIDI / FLP",
+                barColor: "content",
+                description_ru: "Эксклюзивные лупы и MIDI файлы для твоего творчества!",
+                description_en: "Exclusive loops and MIDI files for your creativity!"
+            },
+            { 
+                type: "content", 
+                value: "sound_pack",
+                icon: "icon_soundpacks.png",
+                name: "Sound pack", 
+                name_ru: "Звуковой пак",
+                barColor: "content",
+                description_ru: "Набор уникальных звуков и сэмплов для твоих треков!",
+                description_en: "A collection of unique sounds and samples for your tracks!"
+            },
+            { 
+                type: "content", 
+                value: "old_drop",
+                icon: "icon_exclusive_content.png",
+                name: "Old private drop", 
+                name_ru: "Старый приватный дроп",
+                barColor: "content",
+                description_ru: "Редкий контент из архивов 301secrets!",
+                description_en: "Rare content from 301secrets archives!"
+            },
+            { 
+                type: "discount", 
+                value: "10",
+                icon: "icon_10.png",
+                name: "10% discount", 
+                name_ru: "Скидка 10%",
+                barColor: "discount",
+                description_ru: "Скидка 10% на полный доступ к 301secrets!",
+                description_en: "10% discount on full access to 301secrets!"
+            },
+            { 
+                type: "discount", 
+                value: "15",
+                icon: "icon_15.png",
+                name: "15% discount", 
+                name_ru: "Скидка 15%",
+                barColor: "discount",
+                description_ru: "Скидка 15% на полный доступ к 301secrets!",
+                description_en: "15% discount on full access to 301secrets!"
+            },
+            { 
+                type: "discount", 
+                value: "20",
+                icon: "icon_20.png",
+                name: "20% discount", 
+                name_ru: "Скидка 20%",
+                barColor: "discount",
+                description_ru: "Скидка 20% на полный доступ к 301secrets!",
+                description_en: "20% discount on full access to 301secrets!"
+            },
+            { 
+                type: "access", 
+                value: "7",
+                icon: "icon_key7.png",
+                name: "7 days full access", 
+                name_ru: "7 дней доступа",
+                barColor: "access",
+                description_ru: "Поздравляем! Ты выиграл 7 дней полного доступа к 301secrets!",
+                description_en: "Congratulations! You won 7 days of full access to 301secrets!"
+            },
+            { 
+                type: "access", 
+                value: "30",
+                icon: "icon_key30.png",
+                name: "30 days full access", 
+                name_ru: "30 дней доступа",
+                barColor: "access",
+                description_ru: "Поздравляем! Ты выиграл 30 дней полного доступа к 301secrets!",
+                description_en: "Congratulations! You won 30 days of full access to 301secrets!"
+            }
         ];
         
-        // Переменные для хранения данных с сервера
-        let serverConfig = null;
-        let waitingForConfig = false;
+        // Переменные для хранения данных
         let waitingForPrize = false;
         
         // ==================== ПЕРЕМЕННЫЕ ====================
@@ -1224,150 +1311,6 @@
         }
         
         // ==================== ЗАГРУЗКА ДАННЫХ ПОЛЬЗОВАТЕЛЯ ====================
-        // ==================== ЗАПРОС ДАННЫХ У СЕРВЕРА ====================
-        function requestWheelConfig() {
-            console.log("📋 Requesting wheel config from server...");
-            waitingForConfig = true;
-            
-            if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
-                const user = Telegram.WebApp.initDataUnsafe?.user;
-                if (user && user.id) {
-                    const requestData = {
-                        action: "get_wheel_config",
-                        user_id: user.id,
-                        timestamp: new Date().toISOString()
-                    };
-                    
-                    try {
-                        Telegram.WebApp.sendData(JSON.stringify(requestData));
-                        console.log("✅ Config request sent to server");
-                    } catch (error) {
-                        console.error("❌ Error sending config request:", error);
-                        waitingForConfig = false;
-                    }
-                } else {
-                    console.error("❌ User data not found");
-                    waitingForConfig = false;
-                }
-            } else {
-                console.error("❌ Telegram.WebApp not available");
-                waitingForConfig = false;
-            }
-        }
-        
-        // Обработка ответов от бота (будет вызываться при получении сообщений)
-        function handleServerMessage(messageText) {
-            try {
-                // Пытаемся распарсить JSON из сообщения
-                let data = null;
-                if (messageText.startsWith('`') && messageText.endsWith('`')) {
-                    // Убираем markdown код
-                    data = JSON.parse(messageText.slice(1, -1));
-                } else {
-                    data = JSON.parse(messageText);
-                }
-                
-                if (data.action === "wheel_config") {
-                    console.log("✅ Received wheel config from server");
-                    serverConfig = data;
-                    // Обновляем конфигурацию призов (если пришла с сервера)
-                    if (data.prizes && data.prizes.length > 0) {
-                        prizesConfig = data.prizes;
-                    }
-                    userData.dropPace = data.drop_pace || 5; // По умолчанию STABLE
-                    
-                    // НЕ обновляем пути к ресурсам - оставляем старый домен
-                    // if (data.images_base) {
-                    //     IMAGES_BASE = data.images_base;
-                    // }
-                    // if (data.sounds_base) {
-                    //     SOUNDS_BASE = data.sounds_base;
-                    // }
-                    
-                    waitingForConfig = false;
-                    
-                    // Инициализируем рулетку после получения конфигурации
-                    if (prizesConfig.length > 0) {
-                        initRoulette();
-                        // Переинициализируем звуки с правильными путями
-                        initSounds();
-                    }
-                } else if (data.action === "prize_selected") {
-                    console.log("✅ Received selected prize from server:", data.prize);
-                    waitingForPrize = false;
-                    
-                    // Используем приз, выбранный сервером
-                    const serverPrize = data.prize;
-                    handleServerSelectedPrize(serverPrize);
-                }
-            } catch (error) {
-                console.error("❌ Error parsing server message:", error);
-                console.error("Message text:", messageText);
-            }
-        }
-        
-        function handleServerSelectedPrize(serverPrize) {
-            console.log("🎁 Handling server selected prize:", serverPrize);
-            console.log("📦 Available prizes config:", prizesConfig);
-            
-            // Находим приз в конфигурации
-            let selectedPrize = null;
-            let prizeIndex = -1;
-            
-            if (serverPrize.type === 'empty') {
-                selectedPrize = prizesConfig.find(p => p.type === 'empty');
-            } else if (serverPrize.type === 'content') {
-                // Для контента ищем по value (например, "sound_pack", "mini_breakdown", etc.)
-                console.log("🔍 Looking for content prize with value:", serverPrize.value);
-                console.log("🔍 Available content prizes:", prizesConfig.filter(p => p.type === 'content').map(p => ({value: p.value, name: p.name})));
-                
-                selectedPrize = prizesConfig.find(p => p.type === 'content' && p.value === serverPrize.value);
-                
-                // Если не нашли по точному совпадению, берем первый контентный приз
-                if (!selectedPrize) {
-                    console.warn("⚠️ Exact content prize not found, using first content prize");
-                    selectedPrize = prizesConfig.find(p => p.type === 'content');
-                }
-                
-                if (selectedPrize) {
-                    console.log("✅ Found content prize:", selectedPrize);
-                } else {
-                    console.error("❌ No content prize found at all!");
-                }
-            } else if (serverPrize.type === 'discount') {
-                selectedPrize = prizesConfig.find(p => p.type === 'discount' && p.value === serverPrize.value);
-            } else if (serverPrize.type === 'access') {
-                selectedPrize = prizesConfig.find(p => p.type === 'access' && p.value === serverPrize.value);
-            }
-            
-            if (selectedPrize) {
-                prizeIndex = prizesConfig.indexOf(selectedPrize);
-                console.log("✅ Found prize in config at index:", prizeIndex, selectedPrize);
-                
-                // Копируем ВСЕ поля из конфигурации приза
-                currentPrize = {
-                    type: selectedPrize.type,
-                    value: selectedPrize.value,
-                    name: selectedPrize.name,
-                    name_ru: selectedPrize.name_ru,
-                    barColor: selectedPrize.barColor,
-                    icon: selectedPrize.icon,
-                    description_ru: selectedPrize.description_ru,
-                    description_en: selectedPrize.description_en
-                };
-                
-                console.log("✅ Current prize set:", currentPrize);
-                
-                // Продолжаем анимацию с выбранным призом
-                continueSpinAnimation(prizeIndex);
-            } else {
-                console.error("❌ Prize not found in config:", serverPrize);
-                console.error("❌ Available prizes:", prizesConfig.map(p => ({type: p.type, value: p.value})));
-                isSpinning = false;
-                const spinBtn = document.getElementById("spinBtn");
-                if (spinBtn) spinBtn.disabled = false;
-            }
-        }
         
         function continueSpinAnimation(prizeIndex) {
             const track = document.getElementById("rouletteTrack");
@@ -1566,101 +1509,57 @@
                 }
             }
             
-            // 🔒 СЕКРЕТНАЯ ЛОГИКА: Запрашиваем выбор приза у сервера
-            console.log('🎲 Requesting prize selection from server...');
-            waitingForPrize = true;
+            // 🔒 СЕКРЕТНАЯ ЛОГИКА: Выбираем приз локально
+            console.log('🎲 Selecting prize locally...');
+            const dropPace = userData.dropPace || 5;
+            const hasWonFullAccess = userData.hasWonFullAccess || false;
+            const fullAccessCooldown = userData.fullAccessCooldown || null;
             
-            if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
-                const user = Telegram.WebApp.initDataUnsafe?.user;
-                if (user && user.id) {
-                    const requestData = {
-                        action: "select_prize",
-                        user_id: user.id,
-                        timestamp: new Date().toISOString()
-                    };
-                    
-                    try {
-                        Telegram.WebApp.sendData(JSON.stringify(requestData));
-                        console.log("✅ Prize selection request sent to server");
-                    } catch (error) {
-                        console.error("❌ Error sending prize request:", error);
-                        waitingForPrize = false;
-                        isSpinning = false;
-                        spinBtn.disabled = false;
-                        return;
-                    }
-                } else {
-                    console.error("❌ User data not found");
-                    waitingForPrize = false;
-                    isSpinning = false;
-                    spinBtn.disabled = false;
-                    return;
+            const selectedPrizeData = selectWheelPrize(dropPace, hasWonFullAccess, fullAccessCooldown);
+            console.log("🎁 Selected prize data:", selectedPrizeData);
+            
+            // Находим приз в конфигурации
+            let selectedPrize = null;
+            let prizeIndex = -1;
+            
+            if (selectedPrizeData.type === 'empty') {
+                selectedPrize = prizesConfig.find(p => p.type === 'empty');
+            } else if (selectedPrizeData.type === 'content') {
+                selectedPrize = prizesConfig.find(p => p.type === 'content' && p.value === selectedPrizeData.value);
+                if (!selectedPrize) {
+                    selectedPrize = prizesConfig.find(p => p.type === 'content');
                 }
+            } else if (selectedPrizeData.type === 'discount') {
+                selectedPrize = prizesConfig.find(p => p.type === 'discount' && p.value === selectedPrizeData.value);
+            } else if (selectedPrizeData.type === 'access') {
+                selectedPrize = prizesConfig.find(p => p.type === 'access' && p.value === selectedPrizeData.value);
+            }
+            
+            if (selectedPrize) {
+                prizeIndex = prizesConfig.indexOf(selectedPrize);
+                currentPrize = {
+                    type: selectedPrize.type,
+                    value: selectedPrize.value,
+                    name: selectedPrize.name,
+                    name_ru: selectedPrize.name_ru,
+                    barColor: selectedPrize.barColor,
+                    icon: selectedPrize.icon,
+                    description_ru: selectedPrize.description_ru,
+                    description_en: selectedPrize.description_en
+                };
+                console.log("✅ Prize selected and set:", currentPrize);
             } else {
-                console.error("❌ Telegram.WebApp not available");
-                waitingForPrize = false;
+                console.error("❌ Prize not found in config!");
                 isSpinning = false;
                 spinBtn.disabled = false;
                 return;
             }
             
-            // Ждем ответа от сервера (будет обработан в handleServerMessage)
-            // Пока что продолжаем анимацию с временным призом
-            let selectedType = 'empty';
-            let selectedValue = null;
-            
-            // Находим индекс приза в конфиге (временно, пока не получим ответ от сервера)
-            let prizeIndex = -1;
-            
-            if (selectedType === 'empty') {
-                // Ищем empty
-                for (let i = 0; i < prizesConfig.length; i++) {
-                    if (prizesConfig[i].type === 'empty') {
-                        prizeIndex = i;
-                        break;
-                    }
-                }
-            } else if (selectedType === 'content') {
-                // Для контента выбираем случайный из доступных
-                const contentPrizes = prizesConfig.filter(p => p.type === 'content');
-                if (contentPrizes.length > 0) {
-                    const randomContent = contentPrizes[Math.floor(Math.random() * contentPrizes.length)];
-                    prizeIndex = prizesConfig.indexOf(randomContent);
-                }
-            } else if (selectedType === 'discount') {
-                // Ищем конкретную скидку
-                for (let i = 0; i < prizesConfig.length; i++) {
-                    if (prizesConfig[i].type === 'discount' && prizesConfig[i].value === selectedValue) {
-                        prizeIndex = i;
-                        break;
-                    }
-                }
-            } else if (selectedType === 'access') {
-                // Ищем конкретный доступ
-                for (let i = 0; i < prizesConfig.length; i++) {
-                    if (prizesConfig[i].type === 'access' && prizesConfig[i].value === selectedValue) {
-                        prizeIndex = i;
-                        break;
-                    }
-                }
-            }
-            
             if (prizeIndex === -1) {
-                prizeIndex = 0; // Fallback на empty
-            }
-            
-            // Сохраняем выбранный приз
-            const selectedPrize = prizesConfig[prizeIndex];
-            currentPrize = {
-                type: selectedPrize.type,
-                value: selectedPrize.value,
-                name: selectedPrize.name,
-                name_ru: selectedPrize.name_ru
-            };
-            
-            // Для контента сохраняем конкретный тип
-            if (selectedPrize.type === 'content' && selectedPrize.value) {
-                currentPrize.value = selectedPrize.value;
+                console.error("❌ Invalid prize index!");
+                isSpinning = false;
+                spinBtn.disabled = false;
+                return;
             }
             
             // Вычисляем позицию для остановки
@@ -1808,10 +1707,12 @@
                 
             } else if (currentPrize.type === 'content') {
                 console.log("🎁 Displaying content prize:", currentPrize);
-                // Контент - наименование + кнопка для перехода на сайт
-                prizeDesc.textContent = currentLang === 'ru'
-                    ? `🎁 Ты выиграл: ${currentPrize.name_ru || currentPrize.name}\n\nНажми на кнопку ниже, чтобы открыть контент`
-                    : `🎁 You won: ${currentPrize.name || currentPrize.name_ru}\n\nClick the button below to open the content`;
+                // Контент - наименование + описание + кнопка для перехода на сайт
+                const description = currentLang === 'ru' 
+                    ? (currentPrize.description_ru || `🎁 Ты выиграл: ${currentPrize.name_ru || currentPrize.name}\n\nНажми на кнопку ниже, чтобы открыть контент`)
+                    : (currentPrize.description_en || `🎁 You won: ${currentPrize.name || currentPrize.name_ru}\n\nClick the button below to open the content`);
+                
+                prizeDesc.textContent = description;
                 
                 const contentLinkBtn = document.getElementById("contentLinkBtn");
                 if (contentLinkBtn) {
@@ -1835,21 +1736,33 @@
                 
             } else if (currentPrize.type === 'discount') {
                 // Скидка - звездочки + кнопка скопировать промокод
-                prizeDesc.textContent = currentLang === 'ru'
-                    ? `🎁 Ты выиграл скидку ${currentPrize.value}%!\n\nПромокод скрыт за звездочками — скопируй его для использования`
-                    : `🎁 You won a ${currentPrize.value}% discount!\n\nThe promo code is hidden behind stars — copy it to use`;
+                const description = currentLang === 'ru'
+                    ? (currentPrize.description_ru || `🎁 Ты выиграл скидку ${currentPrize.value}%!\n\nПромокод скрыт за звездочками — скопируй его для использования`)
+                    : (currentPrize.description_en || `🎁 You won a ${currentPrize.value}% discount!\n\nThe promo code is hidden behind stars — copy it to use`);
+                
+                prizeDesc.textContent = description;
                 
                 // Промокод будет получен от сервера, пока показываем звездочки
                 const promoStars = document.getElementById("promoStars");
-                promoStars.textContent = '★★★★★';
-                promoStars.title = currentLang === 'ru' ? 'Промокод скрыт' : 'Promo code hidden';
+                if (promoStars) {
+                    promoStars.textContent = '★★★★★';
+                    promoStars.title = currentLang === 'ru' ? 'Промокод скрыт' : 'Promo code hidden';
+                }
                 
                 const copyPromoBtn = document.getElementById("copyPromoBtn");
-                copyPromoBtn.querySelector('span').textContent = currentLang === 'ru' 
-                    ? '📋 Скопировать промокод' 
-                    : '📋 Copy promo code';
+                if (copyPromoBtn) {
+                    const span = copyPromoBtn.querySelector('span');
+                    if (span) {
+                        span.textContent = currentLang === 'ru' 
+                            ? '📋 Скопировать промокод' 
+                            : '📋 Copy promo code';
+                    }
+                }
                 
-                document.getElementById("discountSection").style.display = "flex";
+                const discountSection = document.getElementById("discountSection");
+                if (discountSection) {
+                    discountSection.style.display = "flex";
+                }
                 
             } else if (currentPrize.type === 'access') {
                 // Доступ - поздравление + кнопка вступить
@@ -1864,16 +1777,26 @@
                         : '🌟 Congratulations on the rarest win!\n\nYou got 30 days of full access';
                 }
                 
-                prizeDesc.textContent = currentLang === 'ru'
-                    ? 'Исследуй всё внутри — контент, рабочие процессы и сообщество'
-                    : 'Explore everything inside — content, workflows and community';
+                const description = currentLang === 'ru'
+                    ? (currentPrize.description_ru || `🎉 Поздравляем! Ты выиграл ${currentPrize.value} дней полного доступа к 301secrets!\n\nНажми на кнопку ниже, чтобы вступить`)
+                    : (currentPrize.description_en || `🎉 Congratulations! You won ${currentPrize.value} days of full access to 301secrets!\n\nClick the button below to join`);
+                
+                prizeDesc.textContent = description;
                 
                 const joinChannelBtn = document.getElementById("joinChannelBtn");
-                joinChannelBtn.querySelector('span').textContent = currentLang === 'ru' 
-                    ? '🚪 Вступить' 
-                    : '🚪 Join';
+                if (joinChannelBtn) {
+                    const span = joinChannelBtn.querySelector('span');
+                    if (span) {
+                        span.textContent = currentLang === 'ru' 
+                            ? '🚪 Вступить' 
+                            : '🚪 Join';
+                    }
+                }
                 
-                document.getElementById("accessSection").style.display = "flex";
+                const accessSection = document.getElementById("accessSection");
+                if (accessSection) {
+                    accessSection.style.display = "flex";
+                }
             }
             
             // Показываем кнопку закрытия
@@ -2159,8 +2082,10 @@
                 loadUserData();
                 console.log("✅ User data loaded");
                 
-                // Запрашиваем конфигурацию у сервера
-                requestWheelConfig();
+                // Инициализируем рулетку сразу (конфигурация уже в коде)
+                if (prizesConfig.length > 0) {
+                    initRoulette();
+                }
                 
                 // Обновляем состояние кнопки после загрузки данных
                 setTimeout(() => {
