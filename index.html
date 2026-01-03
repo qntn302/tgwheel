@@ -835,7 +835,10 @@
                 Drop Pace
                 <button class="info-btn" onclick="showDropPaceInfo()" title="Info">ℹ️</button>
             </div>
-            <div class="drop-pace-status" id="dropPaceStatus">Stable</div>
+            <div class="drop-pace-status" id="dropPaceStatus">
+                <span id="dropPaceText">Stable</span>
+                <span class="drop-pace-arrow" id="dropPaceArrow"></span>
+            </div>
         </div>
         
         <!-- Горизонтальная рулетка -->
@@ -948,7 +951,7 @@
         let isSpinning = false;
         let currentPrize = null;
         let userData = {
-            dropPace: 0,
+            dropPace: 5, // По умолчанию STABLE
             lastSpinTime: null,
             fullAccessCooldown: null,
             hasWonFullAccess: false,
@@ -1137,22 +1140,47 @@
         function updateDropPaceDisplay() {
             const t = translations[currentLang];
             const statusEl = document.getElementById('dropPaceStatus');
+            const textEl = document.getElementById('dropPaceText');
+            const arrowEl = document.getElementById('dropPaceArrow');
             const pace = userData.dropPace;
             
+            // Определяем уровень
+            let levelText = '';
             statusEl.className = 'drop-pace-status';
             if (pace >= 0 && pace <= 2) {
-                statusEl.textContent = t.dropPaceLow;
+                levelText = t.dropPaceLow;
                 statusEl.classList.add('low');
-            } else if (pace >= 3 && pace <= 5) {
-                statusEl.textContent = t.dropPaceStable;
+            } else if (pace >= 3 && pace <= 8) {
+                levelText = t.dropPaceStable;
                 statusEl.classList.add('stable');
-            } else if (pace >= 6 && pace <= 8) {
-                statusEl.textContent = t.dropPaceHigh;
-                statusEl.classList.add('high');
+            } else if (pace >= 9 && pace <= 10) {
+                levelText = t.dropPacePeak;
+                statusEl.classList.add('peak');
             } else {
-                statusEl.textContent = t.dropPacePeak;
+                // Если pace > 10, ограничиваем до 10
+                levelText = t.dropPacePeak;
                 statusEl.classList.add('peak');
             }
+            
+            textEl.textContent = levelText;
+            
+            // Показываем стрелочку изменения
+            if (previousDropPace !== null && previousDropPace !== pace) {
+                if (pace > previousDropPace) {
+                    arrowEl.textContent = '↑';
+                    arrowEl.className = 'drop-pace-arrow up';
+                } else if (pace < previousDropPace) {
+                    arrowEl.textContent = '↓';
+                    arrowEl.className = 'drop-pace-arrow down';
+                } else {
+                    arrowEl.className = 'drop-pace-arrow stable';
+                }
+            } else {
+                arrowEl.className = 'drop-pace-arrow stable';
+            }
+            
+            // Сохраняем текущий pace для следующего сравнения
+            previousDropPace = pace;
         }
         
         function showDropPaceInfo() {
@@ -1211,7 +1239,7 @@
                     if (data.prizes && data.prizes.length > 0) {
                         prizesConfig = data.prizes;
                     }
-                    userData.dropPace = data.drop_pace || 0;
+                    userData.dropPace = data.drop_pace || 5; // По умолчанию STABLE
                     
                     // НЕ обновляем пути к ресурсам - оставляем старый домен
                     // if (data.images_base) {
@@ -1323,32 +1351,40 @@
                     try {
                         const parsed = JSON.parse(cached);
                         userData = {
-                            dropPace: parsed.dropPace || 0,
+                            dropPace: parsed.dropPace || 5, // По умолчанию STABLE
                             lastSpinTime: parsed.lastSpinTime ? new Date(parsed.lastSpinTime).getTime() : null,
                             fullAccessCooldown: parsed.fullAccessCooldown,
                             hasWonFullAccess: parsed.hasWonFullAccess || false,
                             pendingReward: parsed.pendingReward
                         };
-                        console.log("📦 Loaded cached data");
+                        
+                        // Сохраняем предыдущий pace для стрелочки
+                        if (previousDropPace === null) {
+                            previousDropPace = userData.dropPace;
+                        }
+                        
+                        console.log("📦 Loaded cached data, dropPace:", userData.dropPace);
                     } catch (e) {
                         console.error("❌ Error parsing cached data:", e);
                         userData = {
-                            dropPace: 0,
+                            dropPace: 5, // По умолчанию STABLE
                             lastSpinTime: null,
                             fullAccessCooldown: null,
                             hasWonFullAccess: false,
                             pendingReward: null
                         };
+                        previousDropPace = 5;
                     }
                 } else {
-                    userData = {
-                        dropPace: 0,
-                        lastSpinTime: null,
-                        fullAccessCooldown: null,
-                        hasWonFullAccess: false,
-                        pendingReward: null
-                    };
-                }
+                        userData = {
+                            dropPace: 5, // По умолчанию STABLE для новых пользователей
+                            lastSpinTime: null,
+                            fullAccessCooldown: null,
+                            hasWonFullAccess: false,
+                            pendingReward: null
+                        };
+                        previousDropPace = 5;
+                    }
                 
                 updateDropPaceDisplay();
                 updateSpinButtonState(); // Проверяем кулдаун
