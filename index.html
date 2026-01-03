@@ -165,6 +165,44 @@
             color: #9b59b6;
             text-shadow: 0 2px 4px rgba(155, 89, 182, 0.4);
         }
+        
+        .drop-pace-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .drop-pace-arrow {
+            font-size: 18px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            line-height: 1;
+        }
+        
+        .drop-pace-arrow.up {
+            color: #2ecc71;
+            animation: pulseUp 1.5s ease-in-out infinite;
+        }
+        
+        .drop-pace-arrow.down {
+            color: #e74c3c;
+            animation: pulseDown 1.5s ease-in-out infinite;
+        }
+        
+        .drop-pace-arrow.stable {
+            display: none;
+        }
+        
+        @keyframes pulseUp {
+            0%, 100% { opacity: 1; transform: translateY(0); }
+            50% { opacity: 0.7; transform: translateY(-3px); }
+        }
+        
+        @keyframes pulseDown {
+            0%, 100% { opacity: 1; transform: translateY(0); }
+            50% { opacity: 0.7; transform: translateY(3px); }
+        }
+        
         .info-btn {
             background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(8px);
@@ -1272,6 +1310,9 @@
         }
         
         function handleServerSelectedPrize(serverPrize) {
+            console.log("🎁 Handling server selected prize:", serverPrize);
+            console.log("📦 Available prizes config:", prizesConfig);
+            
             // Находим приз в конфигурации
             let selectedPrize = null;
             let prizeIndex = -1;
@@ -1279,7 +1320,13 @@
             if (serverPrize.type === 'empty') {
                 selectedPrize = prizesConfig.find(p => p.type === 'empty');
             } else if (serverPrize.type === 'content') {
+                // Для контента ищем по value (например, "sound_pack", "mini_breakdown", etc.)
                 selectedPrize = prizesConfig.find(p => p.type === 'content' && p.value === serverPrize.value);
+                // Если не нашли по точному совпадению, берем первый контентный приз
+                if (!selectedPrize) {
+                    selectedPrize = prizesConfig.find(p => p.type === 'content');
+                    console.warn("⚠️ Exact content prize not found, using first content prize");
+                }
             } else if (serverPrize.type === 'discount') {
                 selectedPrize = prizesConfig.find(p => p.type === 'discount' && p.value === serverPrize.value);
             } else if (serverPrize.type === 'access') {
@@ -1288,17 +1335,27 @@
             
             if (selectedPrize) {
                 prizeIndex = prizesConfig.indexOf(selectedPrize);
+                console.log("✅ Found prize in config at index:", prizeIndex, selectedPrize);
+                
+                // Копируем ВСЕ поля из конфигурации приза
                 currentPrize = {
                     type: selectedPrize.type,
                     value: selectedPrize.value,
                     name: selectedPrize.name,
-                    name_ru: selectedPrize.name_ru
+                    name_ru: selectedPrize.name_ru,
+                    barColor: selectedPrize.barColor,
+                    icon: selectedPrize.icon,
+                    description_ru: selectedPrize.description_ru,
+                    description_en: selectedPrize.description_en
                 };
+                
+                console.log("✅ Current prize set:", currentPrize);
                 
                 // Продолжаем анимацию с выбранным призом
                 continueSpinAnimation(prizeIndex);
             } else {
                 console.error("❌ Prize not found in config:", serverPrize);
+                console.error("❌ Available prizes:", prizesConfig.map(p => ({type: p.type, value: p.value})));
                 isSpinning = false;
                 const spinBtn = document.getElementById("spinBtn");
                 if (spinBtn) spinBtn.disabled = false;
@@ -1694,10 +1751,20 @@
         }
         
         function showPrize() {
+            console.log("🎁 showPrize() called, currentPrize:", currentPrize);
+            
+            if (!currentPrize) {
+                console.error("❌ No currentPrize to show!");
+                return;
+            }
+            
             const resultDiv = document.getElementById("result");
             const prizeName = document.getElementById("prizeName");
             const prizeDesc = document.getElementById("prizeDesc");
             const prizeRarityBadge = document.getElementById("prizeRarityBadge");
+            
+            // Показываем результат
+            resultDiv.style.display = "block";
             
             // Скрываем все секции
             document.getElementById("contentSection").style.display = "none";
@@ -1706,7 +1773,7 @@
             document.getElementById("emptySection").style.display = "none";
             
             // Устанавливаем название приза
-            prizeName.textContent = currentLang === 'ru' ? currentPrize.name_ru : currentPrize.name;
+            prizeName.textContent = currentLang === 'ru' ? (currentPrize.name_ru || currentPrize.name) : (currentPrize.name || currentPrize.name_ru);
             
             // Устанавливаем цвет редкости и бейдж
             const rarityColors = {
