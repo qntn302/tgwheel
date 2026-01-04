@@ -1366,85 +1366,56 @@
             // Нужно найти ячейку, которая точно соответствует выбранному призу
             const cellsInTrack = 50;
             
-            // Находим все ячейки в треке, которые соответствуют выбранному призу
-            // Ячейка i содержит приз с индексом (i % prizesConfig.length)
-            const matchingCells = [];
-            for (let i = 0; i < cellsInTrack; i++) {
-                const cellPrizeIndex = i % prizesConfig.length;
-                if (cellPrizeIndex === prizeIndex) {
-                    matchingCells.push(i);
-                }
-            }
+            // Находим индекс ячейки в треке, которая соответствует выбранному призу
+            // Ячейки создаются циклически: ячейка i содержит приз с индексом (i % prizesConfig.length)
+            // Нужно найти ячейку, которая точно соответствует prizeIndex
             
-            console.log("🔍 Matching cells for prize index", prizeIndex, ":", matchingCells);
+            // Вычисляем количество полных циклов и выбираем ячейку ближе к концу, но не последнюю
+            const cyclesBefore = Math.floor(20 / prizesConfig.length); // Нормальное количество циклов
+            let targetCellIndexInTrack = cyclesBefore * prizesConfig.length + prizeIndex;
             
-            // Выбираем ячейку ближе к концу трека для эффекта прокрутки, но не последнюю
-            // Оставляем запас в 3-5 ячеек от конца
-            let targetCellIndexInTrack = -1;
-            const reserveFromEnd = 3;
-            for (let i = matchingCells.length - 1; i >= 0; i--) {
-                if (matchingCells[i] < cellsInTrack - reserveFromEnd) {
-                    targetCellIndexInTrack = matchingCells[i];
-                    break;
-                }
-            }
-            
-            // Если не нашли подходящую, берем предпоследнюю подходящую
-            if (targetCellIndexInTrack === -1 && matchingCells.length > 0) {
-                targetCellIndexInTrack = matchingCells[Math.max(0, matchingCells.length - 2)];
-            }
-            
-            // Если все еще не нашли, используем базовый расчет
-            if (targetCellIndexInTrack === -1) {
-                const cyclesBefore = Math.floor(25 / prizesConfig.length);
-                targetCellIndexInTrack = cyclesBefore * prizesConfig.length + prizeIndex;
-                if (targetCellIndexInTrack >= cellsInTrack) {
-                    targetCellIndexInTrack = prizeIndex;
-                    while (targetCellIndexInTrack + prizesConfig.length < cellsInTrack - reserveFromEnd) {
-                        targetCellIndexInTrack += prizesConfig.length;
-                    }
-                }
-            }
-            
-            // Проверяем, что выбранная ячейка действительно соответствует призу
-            const checkCellPrizeIndex = targetCellIndexInTrack % prizesConfig.length;
-            const checkCellPrize = prizesConfig[checkCellPrizeIndex];
-            
-            console.log("🎯 Target cell index in track:", targetCellIndexInTrack);
-            console.log("🎯 Cell prize index:", checkCellPrizeIndex, "Expected:", prizeIndex);
-            console.log("🎯 Cell prize icon:", checkCellPrize.icon, "Expected:", selectedPrize.icon);
-            
-            if (checkCellPrizeIndex !== prizeIndex) {
-                console.error("❌ CRITICAL MISMATCH!");
-                console.error("Cell prize:", checkCellPrize);
-                console.error("Expected prize:", selectedPrize);
-                // Принудительно находим правильную ячейку
+            // Убеждаемся, что не выходим за границы трека (оставляем запас в 5 ячеек)
+            const maxCellIndex = cellsInTrack - 5;
+            if (targetCellIndexInTrack >= maxCellIndex) {
+                // Находим последнюю подходящую ячейку до границы
                 targetCellIndexInTrack = prizeIndex;
-                while (targetCellIndexInTrack + prizesConfig.length < cellsInTrack - reserveFromEnd) {
+                while (targetCellIndexInTrack + prizesConfig.length < maxCellIndex) {
                     targetCellIndexInTrack += prizesConfig.length;
                 }
-                console.log("🔧 Force corrected to cell:", targetCellIndexInTrack);
+            }
+            
+            // Финальная проверка: убеждаемся, что ячейка действительно соответствует призу
+            const checkCellPrizeIndex = targetCellIndexInTrack % prizesConfig.length;
+            if (checkCellPrizeIndex !== prizeIndex) {
+                console.error("❌ Mismatch detected! Fixing...");
+                // Исправляем: находим правильную ячейку
+                targetCellIndexInTrack = prizeIndex;
+                while (targetCellIndexInTrack + prizesConfig.length < maxCellIndex) {
+                    targetCellIndexInTrack += prizesConfig.length;
+                }
             }
             
             // Вычисляем позицию так, чтобы центр выбранной ячейки оказался точно под указателем
+            // Указатель находится в центре контейнера (centerOffset)
+            // Нужно сдвинуть трек влево на (targetCellIndexInTrack * cellWidthValue), 
+            // затем сдвинуть обратно на centerOffset, чтобы центр ячейки был под указателем
             const targetPosition = -(targetCellIndexInTrack * cellWidthValue) + centerOffset;
             
-            // Добавляем очень маленькое случайное смещение для естественности (не более 3px)
-            const randomOffset = (Math.random() - 0.5) * 3;
-            let finalPosition = targetPosition + randomOffset;
+            // Убираем случайное смещение полностью для точности остановки на правильной ячейке
+            let finalPosition = targetPosition;
             
-            console.log("🎯 Cell width:", cellWidthValue, "Center offset:", centerOffset);
-            console.log("🎯 Target position:", targetPosition, "Final position:", finalPosition);
-            
-            // Финальная проверка после всех вычислений
-            const finalCheckCellIndex = Math.round((centerOffset - finalPosition) / cellWidthValue);
-            const finalCheckCellPrizeIndex = finalCheckCellIndex % prizesConfig.length;
-            console.log("🎯 Final check - Cell under pointer:", finalCheckCellIndex, "Prize index:", finalCheckCellPrizeIndex, "Expected:", prizeIndex);
-            if (finalCheckCellPrizeIndex !== prizeIndex) {
-                console.warn("⚠️ Final position might be off, adjusting...");
-                // Корректируем позицию - убираем случайное смещение
-                finalPosition = targetPosition;
+            // Проверяем, что позиция не выходит за границы (не слишком далеко влево)
+            // Минимальная позиция должна быть такой, чтобы последние ячейки были видны
+            const minPosition = -((cellsInTrack - 1) * cellWidthValue) + centerOffset;
+            if (finalPosition < minPosition) {
+                console.warn("⚠️ Position too far left, adjusting...");
+                finalPosition = minPosition;
             }
+            
+            console.log("🎯 Prize index:", prizeIndex, "Icon:", selectedPrize.icon);
+            console.log("🎯 Target cell in track:", targetCellIndexInTrack);
+            console.log("🎯 Cell prize check:", targetCellIndexInTrack % prizesConfig.length, "Expected:", prizeIndex);
+            console.log("🎯 Final position:", finalPosition);
             
             if (spinStartSound) {
                 spinStartSound.currentTime = 0;
