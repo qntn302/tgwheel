@@ -43,10 +43,13 @@
             z-index: 1000;
         }
         .lang-btn {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(30px) saturate(200%);
-            -webkit-backdrop-filter: blur(30px) saturate(200%);
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.25) 0%, 
+                rgba(255, 255, 255, 0.1) 50%, 
+                rgba(255, 255, 255, 0.05) 100%);
+            backdrop-filter: blur(40px) saturate(180%) brightness(1.1);
+            -webkit-backdrop-filter: blur(40px) saturate(180%) brightness(1.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             color: white;
             padding: 8px 18px;
             border-radius: 20px;
@@ -57,41 +60,71 @@
             position: relative;
             overflow: hidden;
             box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.12),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2),
-                0 0 0 0.5px rgba(255, 255, 255, 0.05);
+                0 8px 32px rgba(0, 0, 0, 0.2),
+                inset 0 2px 4px rgba(255, 255, 255, 0.3),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.1),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
+            transform-style: preserve-3d;
         }
         .lang-btn::before {
             content: '';
             position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, 
+                rgba(255, 255, 255, 0.4) 0%, 
+                transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        .lang-btn::after {
+            content: '';
+            position: absolute;
             top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, 
-                transparent, 
-                rgba(255, 255, 255, 0.15), 
-                transparent);
-            transition: left 0.5s ease;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 20px;
+            padding: 1px;
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.5) 0%, 
+                transparent 50%, 
+                rgba(0, 0, 0, 0.1) 100%);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
         }
         .lang-btn:hover::before {
-            left: 100%;
+            opacity: 1;
         }
         .lang-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.25);
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.35) 0%, 
+                rgba(255, 255, 255, 0.15) 50%, 
+                rgba(255, 255, 255, 0.1) 100%);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px) scale(1.02);
             box-shadow: 
-                0 12px 40px rgba(0, 0, 0, 0.15),
-                inset 0 1px 0 rgba(255, 255, 255, 0.25),
-                0 0 0 0.5px rgba(255, 255, 255, 0.1);
+                0 12px 40px rgba(0, 0, 0, 0.25),
+                inset 0 2px 6px rgba(255, 255, 255, 0.4),
+                inset 0 -2px 6px rgba(0, 0, 0, 0.15),
+                0 0 0 1px rgba(255, 255, 255, 0.2);
         }
         .lang-btn.active {
-            background: rgba(255, 127, 0, 0.15);
-            border-color: rgba(255, 127, 0, 0.4);
+            background: linear-gradient(135deg, 
+                rgba(255, 127, 0, 0.3) 0%, 
+                rgba(255, 127, 0, 0.15) 50%, 
+                rgba(255, 127, 0, 0.1) 100%);
+            border-color: rgba(255, 127, 0, 0.5);
             box-shadow: 
-                0 8px 32px rgba(255, 127, 0, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3),
-                0 0 0 0.5px rgba(255, 127, 0, 0.2);
+                0 8px 32px rgba(255, 127, 0, 0.3),
+                inset 0 2px 6px rgba(255, 255, 255, 0.4),
+                inset 0 -2px 6px rgba(0, 0, 0, 0.2),
+                0 0 0 1px rgba(255, 127, 0, 0.3);
         }
         
         h1 {
@@ -109,31 +142,47 @@
         }
         
         .drop-pace-indicator {
-            background: rgba(255, 255, 255, 0.04);
-            backdrop-filter: blur(30px) saturate(200%);
-            -webkit-backdrop-filter: blur(30px) saturate(200%);
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.25) 0%, 
+                rgba(255, 255, 255, 0.1) 50%, 
+                rgba(255, 255, 255, 0.05) 100%);
+            backdrop-filter: blur(40px) saturate(180%) brightness(1.1);
+            -webkit-backdrop-filter: blur(40px) saturate(180%) brightness(1.1);
             border-radius: 16px;
             padding: 16px;
             margin: 15px 0;
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             text-align: center;
             position: relative;
             overflow: hidden;
             box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.12),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2),
-                0 0 0 0.5px rgba(255, 255, 255, 0.05);
+                0 8px 32px rgba(0, 0, 0, 0.2),
+                inset 0 2px 4px rgba(255, 255, 255, 0.3),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.1),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
         }
         .drop-pace-indicator::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, 
+                rgba(255, 255, 255, 0.3) 0%, 
+                transparent 70%);
+            pointer-events: none;
+        }
+        .drop-pace-indicator::after {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
-            height: 1px;
+            height: 2px;
             background: linear-gradient(90deg, 
                 transparent, 
-                rgba(255, 255, 255, 0.3), 
+                rgba(255, 255, 255, 0.5), 
                 transparent);
         }
         .drop-pace-label {
@@ -164,10 +213,13 @@
         .drop-pace-arrow.down { color: #e74c3c; }
         .drop-pace-arrow.stable { display: none; }
         .info-btn {
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(20px) saturate(200%);
-            -webkit-backdrop-filter: blur(20px) saturate(200%);
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.25) 0%, 
+                rgba(255, 255, 255, 0.1) 50%, 
+                rgba(255, 255, 255, 0.05) 100%);
+            backdrop-filter: blur(30px) saturate(180%) brightness(1.1);
+            -webkit-backdrop-filter: blur(30px) saturate(180%) brightness(1.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             color: white;
             padding: 4px 8px;
             border-radius: 50%;
@@ -180,14 +232,43 @@
             align-items: center;
             justify-content: center;
             box-shadow: 
-                0 2px 8px rgba(0, 0, 0, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.15);
+                0 2px 8px rgba(0, 0, 0, 0.15),
+                inset 0 2px 4px rgba(255, 255, 255, 0.3),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.1),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .info-btn::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, 
+                rgba(255, 255, 255, 0.4) 0%, 
+                transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        .info-btn:hover::before {
+            opacity: 1;
         }
         .info-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: rgba(255, 255, 255, 0.25);
-            transform: scale(1.1);
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.35) 0%, 
+                rgba(255, 255, 255, 0.15) 50%, 
+                rgba(255, 255, 255, 0.1) 100%);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: scale(1.15);
+            box-shadow: 
+                0 4px 12px rgba(0, 0, 0, 0.2),
+                inset 0 2px 6px rgba(255, 255, 255, 0.4),
+                inset 0 -2px 6px rgba(0, 0, 0, 0.15),
+                0 0 0 1px rgba(255, 255, 255, 0.15);
         }
         
         .roulette-container {
@@ -196,16 +277,32 @@
             height: 200px;
             margin: 20px auto;
             overflow: hidden;
-            background: rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(30px) saturate(200%);
-            -webkit-backdrop-filter: blur(30px) saturate(200%);
+            background: linear-gradient(135deg, 
+                rgba(0, 0, 0, 0.2) 0%, 
+                rgba(0, 0, 0, 0.1) 50%, 
+                rgba(0, 0, 0, 0.05) 100%);
+            backdrop-filter: blur(40px) saturate(180%) brightness(1.1);
+            -webkit-backdrop-filter: blur(40px) saturate(180%) brightness(1.1);
             border-radius: 20px;
             padding: 20px 0;
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.12),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2),
-                0 0 0 0.5px rgba(255, 255, 255, 0.05);
+                0 8px 32px rgba(0, 0, 0, 0.2),
+                inset 0 2px 4px rgba(255, 255, 255, 0.3),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.1),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
+        }
+        .roulette-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 30%, 
+                rgba(255, 255, 255, 0.2) 0%, 
+                transparent 50%);
+            pointer-events: none;
         }
         .roulette-track {
             position: relative;
@@ -219,19 +316,38 @@
             width: 140px;
             height: 160px;
             margin: 0 5px;
-            background: rgba(255, 255, 255, 0.04);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.2) 0%, 
+                rgba(255, 255, 255, 0.1) 50%, 
+                rgba(255, 255, 255, 0.05) 100%);
+            backdrop-filter: blur(30px) saturate(180%) brightness(1.1);
+            -webkit-backdrop-filter: blur(30px) saturate(180%) brightness(1.1);
             border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.25);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: space-between;
             padding: 12px;
+            position: relative;
+            overflow: hidden;
             box-shadow: 
-                0 4px 16px rgba(0, 0, 0, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.15);
+                0 4px 16px rgba(0, 0, 0, 0.15),
+                inset 0 2px 4px rgba(255, 255, 255, 0.3),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.1),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
+        }
+        .roulette-cell::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 30%, 
+                rgba(255, 255, 255, 0.3) 0%, 
+                transparent 50%);
+            pointer-events: none;
         }
         .roulette-cell img {
             width: 60px;
@@ -291,11 +407,14 @@
         }
         
         .spin-btn {
-            background: rgba(255, 127, 0, 0.08);
-            backdrop-filter: blur(30px) saturate(200%);
-            -webkit-backdrop-filter: blur(30px) saturate(200%);
+            background: linear-gradient(135deg, 
+                rgba(255, 127, 0, 0.25) 0%, 
+                rgba(255, 127, 0, 0.15) 50%, 
+                rgba(255, 127, 0, 0.1) 100%);
+            backdrop-filter: blur(40px) saturate(180%) brightness(1.1);
+            -webkit-backdrop-filter: blur(40px) saturate(180%) brightness(1.1);
             color: white;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             padding: 18px 45px;
             font-size: 20px;
             font-weight: 700;
@@ -308,9 +427,10 @@
             position: relative;
             overflow: hidden;
             box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.12),
-                inset 0 1px 0 rgba(255, 255, 255, 0.25),
-                0 0 0 0.5px rgba(255, 255, 255, 0.1);
+                0 8px 32px rgba(255, 127, 0, 0.3),
+                inset 0 2px 6px rgba(255, 255, 255, 0.4),
+                inset 0 -2px 6px rgba(0, 0, 0, 0.2),
+                0 0 0 1px rgba(255, 255, 255, 0.15);
         }
         .spin-btn::before {
             content: '';
@@ -319,54 +439,93 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: linear-gradient(45deg, 
-                transparent 30%, 
-                rgba(255, 255, 255, 0.1) 50%, 
+            background: radial-gradient(circle, 
+                rgba(255, 255, 255, 0.4) 0%, 
                 transparent 70%);
-            transform: rotate(45deg);
-            transition: all 0.6s ease;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+        }
+        .spin-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 50px;
+            padding: 1px;
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.6) 0%, 
+                transparent 50%, 
+                rgba(0, 0, 0, 0.2) 100%);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
         }
         .spin-btn:hover::before {
-            left: 100%;
-            top: 100%;
+            opacity: 1;
         }
         .spin-btn:hover {
-            background: rgba(255, 127, 0, 0.15);
-            border-color: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
+            background: linear-gradient(135deg, 
+                rgba(255, 127, 0, 0.35) 0%, 
+                rgba(255, 127, 0, 0.2) 50%, 
+                rgba(255, 127, 0, 0.15) 100%);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-3px) scale(1.02);
             box-shadow: 
-                0 12px 40px rgba(255, 127, 0, 0.25),
-                inset 0 1px 0 rgba(255, 255, 255, 0.35),
-                0 0 0 0.5px rgba(255, 255, 255, 0.15);
+                0 12px 40px rgba(255, 127, 0, 0.4),
+                inset 0 2px 8px rgba(255, 255, 255, 0.5),
+                inset 0 -2px 8px rgba(0, 0, 0, 0.25),
+                0 0 0 1px rgba(255, 255, 255, 0.2);
         }
         .spin-btn:disabled {
-            background: rgba(85, 85, 85, 0.05);
-            backdrop-filter: blur(15px);
+            background: linear-gradient(135deg, 
+                rgba(85, 85, 85, 0.1) 0%, 
+                rgba(85, 85, 85, 0.05) 100%);
+            backdrop-filter: blur(20px);
             cursor: not-allowed;
             transform: none;
-            border-color: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.1);
             box-shadow: 
                 0 4px 16px rgba(0, 0, 0, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+                inset 0 1px 2px rgba(255, 255, 255, 0.1);
         }
         
         .result {
-            background: rgba(255, 255, 255, 0.04);
-            backdrop-filter: blur(30px) saturate(200%);
-            -webkit-backdrop-filter: blur(30px) saturate(200%);
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.25) 0%, 
+                rgba(255, 255, 255, 0.1) 50%, 
+                rgba(255, 255, 255, 0.05) 100%);
+            backdrop-filter: blur(40px) saturate(180%) brightness(1.1);
+            -webkit-backdrop-filter: blur(40px) saturate(180%) brightness(1.1);
             border-radius: 20px;
             padding: 24px;
             margin: 20px 0;
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             display: none;
             position: relative;
             overflow: hidden;
             box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.12),
-                inset 0 1px 0 rgba(255, 255, 255, 0.25),
-                0 0 0 0.5px rgba(255, 255, 255, 0.05);
+                0 8px 32px rgba(0, 0, 0, 0.2),
+                inset 0 2px 4px rgba(255, 255, 255, 0.3),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.1),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
         }
         .result::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 30%, 
+                rgba(255, 255, 255, 0.3) 0%, 
+                transparent 50%);
+            pointer-events: none;
+        }
+        .result::after {
             content: '';
             position: absolute;
             top: 0;
@@ -375,7 +534,7 @@
             height: 2px;
             background: linear-gradient(90deg, 
                 transparent, 
-                rgba(255, 127, 0, 0.4), 
+                rgba(255, 127, 0, 0.5), 
                 transparent);
         }
         .prize-name {
@@ -425,16 +584,35 @@
             gap: 12px;
         }
         .promo-code-display {
-            background: rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(20px) saturate(200%);
-            -webkit-backdrop-filter: blur(20px) saturate(200%);
+            background: linear-gradient(135deg, 
+                rgba(0, 0, 0, 0.3) 0%, 
+                rgba(0, 0, 0, 0.2) 50%, 
+                rgba(0, 0, 0, 0.1) 100%);
+            backdrop-filter: blur(30px) saturate(180%) brightness(1.1);
+            -webkit-backdrop-filter: blur(30px) saturate(180%) brightness(1.1);
             border-radius: 12px;
             padding: 16px 24px;
             margin: 8px 0;
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
             box-shadow: 
-                0 4px 16px rgba(0, 0, 0, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+                0 4px 16px rgba(0, 0, 0, 0.15),
+                inset 0 2px 4px rgba(255, 255, 255, 0.15),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.1),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
+        }
+        .promo-code-display::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 30%, 
+                rgba(255, 255, 255, 0.2) 0%, 
+                transparent 50%);
+            pointer-events: none;
         }
         .promo-stars {
             font-size: 24px;
@@ -443,11 +621,14 @@
             font-weight: 700;
         }
         .prize-action-btn {
-            background: rgba(46, 204, 113, 0.08);
-            backdrop-filter: blur(30px) saturate(200%);
-            -webkit-backdrop-filter: blur(30px) saturate(200%);
+            background: linear-gradient(135deg, 
+                rgba(46, 204, 113, 0.25) 0%, 
+                rgba(46, 204, 113, 0.15) 50%, 
+                rgba(46, 204, 113, 0.1) 100%);
+            backdrop-filter: blur(40px) saturate(180%) brightness(1.1);
+            -webkit-backdrop-filter: blur(40px) saturate(180%) brightness(1.1);
             color: white;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             padding: 14px 28px;
             border-radius: 25px;
             cursor: pointer;
@@ -462,48 +643,80 @@
             position: relative;
             overflow: hidden;
             box-shadow: 
-                0 6px 24px rgba(46, 204, 113, 0.15),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2),
-                0 0 0 0.5px rgba(255, 255, 255, 0.1);
+                0 6px 24px rgba(46, 204, 113, 0.2),
+                inset 0 2px 4px rgba(255, 255, 255, 0.3),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.15),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
         }
         .prize-action-btn::before {
             content: '';
             position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, 
+                rgba(255, 255, 255, 0.4) 0%, 
+                transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        .prize-action-btn::after {
+            content: '';
+            position: absolute;
             top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, 
-                transparent, 
-                rgba(255, 255, 255, 0.15), 
-                transparent);
-            transition: left 0.5s ease;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 25px;
+            padding: 1px;
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.5) 0%, 
+                transparent 50%, 
+                rgba(0, 0, 0, 0.1) 100%);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
         }
         .prize-action-btn:hover::before {
-            left: 100%;
+            opacity: 1;
         }
         .prize-action-btn:hover {
-            background: rgba(46, 204, 113, 0.15);
-            border-color: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
+            background: linear-gradient(135deg, 
+                rgba(46, 204, 113, 0.35) 0%, 
+                rgba(46, 204, 113, 0.2) 50%, 
+                rgba(46, 204, 113, 0.15) 100%);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-3px) scale(1.02);
             box-shadow: 
-                0 8px 28px rgba(46, 204, 113, 0.25),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3),
-                0 0 0 0.5px rgba(255, 255, 255, 0.15);
+                0 8px 28px rgba(46, 204, 113, 0.3),
+                inset 0 2px 6px rgba(255, 255, 255, 0.4),
+                inset 0 -2px 6px rgba(0, 0, 0, 0.2),
+                0 0 0 1px rgba(255, 255, 255, 0.15);
         }
         .prize-action-btn.access-btn {
-            background: rgba(241, 196, 15, 0.08);
+            background: linear-gradient(135deg, 
+                rgba(241, 196, 15, 0.25) 0%, 
+                rgba(241, 196, 15, 0.15) 50%, 
+                rgba(241, 196, 15, 0.1) 100%);
             box-shadow: 
-                0 6px 24px rgba(241, 196, 15, 0.15),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2),
-                0 0 0 0.5px rgba(255, 255, 255, 0.1);
+                0 6px 24px rgba(241, 196, 15, 0.2),
+                inset 0 2px 4px rgba(255, 255, 255, 0.3),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.15),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
         }
         .prize-action-btn.access-btn:hover {
-            background: rgba(241, 196, 15, 0.15);
+            background: linear-gradient(135deg, 
+                rgba(241, 196, 15, 0.35) 0%, 
+                rgba(241, 196, 15, 0.2) 50%, 
+                rgba(241, 196, 15, 0.15) 100%);
             box-shadow: 
-                0 8px 28px rgba(241, 196, 15, 0.25),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3),
-                0 0 0 0.5px rgba(255, 255, 255, 0.15);
+                0 8px 28px rgba(241, 196, 15, 0.3),
+                inset 0 2px 6px rgba(255, 255, 255, 0.4),
+                inset 0 -2px 6px rgba(0, 0, 0, 0.2),
+                0 0 0 1px rgba(255, 255, 255, 0.15);
         }
         .access-congrats {
             font-size: 16px;
@@ -520,11 +733,14 @@
             padding: 20px;
         }
         .close-prize-btn {
-            background: rgba(127, 140, 141, 0.08);
-            backdrop-filter: blur(20px) saturate(200%);
-            -webkit-backdrop-filter: blur(20px) saturate(200%);
+            background: linear-gradient(135deg, 
+                rgba(127, 140, 141, 0.2) 0%, 
+                rgba(127, 140, 141, 0.1) 50%, 
+                rgba(127, 140, 141, 0.05) 100%);
+            backdrop-filter: blur(30px) saturate(180%) brightness(1.1);
+            -webkit-backdrop-filter: blur(30px) saturate(180%) brightness(1.1);
             color: rgba(255, 255, 255, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.25);
             padding: 10px 20px;
             border-radius: 20px;
             cursor: pointer;
@@ -532,34 +748,77 @@
             font-size: 13px;
             margin-top: 16px;
             transition: all 0.3s ease;
-            box-shadow: 
-                0 4px 16px rgba(0, 0, 0, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.15);
-        }
-        .close-prize-btn:hover {
-            background: rgba(127, 140, 141, 0.15);
-            border-color: rgba(255, 255, 255, 0.25);
-            box-shadow: 
-                0 6px 20px rgba(0, 0, 0, 0.12),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-        }
-        
-        .prizes-info {
-            background: rgba(255, 255, 255, 0.04);
-            backdrop-filter: blur(30px) saturate(200%);
-            -webkit-backdrop-filter: blur(30px) saturate(200%);
-            border-radius: 18px;
-            padding: 20px;
-            margin: 20px 0;
-            border: 1px solid rgba(255, 255, 255, 0.18);
             position: relative;
             overflow: hidden;
             box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.12),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2),
-                0 0 0 0.5px rgba(255, 255, 255, 0.05);
+                0 4px 16px rgba(0, 0, 0, 0.15),
+                inset 0 2px 4px rgba(255, 255, 255, 0.25),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.1),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
+        }
+        .close-prize-btn::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, 
+                rgba(255, 255, 255, 0.3) 0%, 
+                transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        .close-prize-btn:hover::before {
+            opacity: 1;
+        }
+        .close-prize-btn:hover {
+            background: linear-gradient(135deg, 
+                rgba(127, 140, 141, 0.3) 0%, 
+                rgba(127, 140, 141, 0.15) 50%, 
+                rgba(127, 140, 141, 0.1) 100%);
+            border-color: rgba(255, 255, 255, 0.35);
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 
+                0 6px 20px rgba(0, 0, 0, 0.18),
+                inset 0 2px 6px rgba(255, 255, 255, 0.3),
+                inset 0 -2px 6px rgba(0, 0, 0, 0.15),
+                0 0 0 1px rgba(255, 255, 255, 0.15);
+        }
+        
+        .prizes-info {
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.25) 0%, 
+                rgba(255, 255, 255, 0.1) 50%, 
+                rgba(255, 255, 255, 0.05) 100%);
+            backdrop-filter: blur(40px) saturate(180%) brightness(1.1);
+            -webkit-backdrop-filter: blur(40px) saturate(180%) brightness(1.1);
+            border-radius: 18px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.2),
+                inset 0 2px 4px rgba(255, 255, 255, 0.3),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.1),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
         }
         .prizes-info::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 30%, 
+                rgba(255, 255, 255, 0.3) 0%, 
+                transparent 50%);
+            pointer-events: none;
+        }
+        .prizes-info::after {
             content: '';
             position: absolute;
             top: 0;
@@ -568,7 +827,7 @@
             height: 1px;
             background: linear-gradient(90deg, 
                 transparent, 
-                rgba(255, 255, 255, 0.3), 
+                rgba(255, 255, 255, 0.5), 
                 transparent);
         }
         .prizes-title {
@@ -596,24 +855,40 @@
         }
         
         .rules {
-            background: rgba(0, 0, 0, 0.08);
-            backdrop-filter: blur(30px) saturate(200%);
-            -webkit-backdrop-filter: blur(30px) saturate(200%);
+            background: linear-gradient(135deg, 
+                rgba(0, 0, 0, 0.2) 0%, 
+                rgba(0, 0, 0, 0.1) 50%, 
+                rgba(0, 0, 0, 0.05) 100%);
+            backdrop-filter: blur(40px) saturate(180%) brightness(1.1);
+            -webkit-backdrop-filter: blur(40px) saturate(180%) brightness(1.1);
             border-radius: 18px;
             padding: 18px;
             margin-top: 20px;
             font-size: 13px;
             color: rgba(255, 255, 255, 0.85);
             text-align: left;
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             position: relative;
             overflow: hidden;
             box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.12),
-                inset 0 1px 0 rgba(255, 255, 255, 0.15),
-                0 0 0 0.5px rgba(255, 255, 255, 0.05);
+                0 8px 32px rgba(0, 0, 0, 0.2),
+                inset 0 2px 4px rgba(255, 255, 255, 0.2),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.1),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
         }
         .rules::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 30%, 
+                rgba(255, 255, 255, 0.2) 0%, 
+                transparent 50%);
+            pointer-events: none;
+        }
+        .rules::after {
             content: '';
             position: absolute;
             top: 0;
@@ -622,7 +897,7 @@
             height: 1px;
             background: linear-gradient(90deg, 
                 transparent, 
-                rgba(255, 255, 255, 0.3), 
+                rgba(255, 255, 255, 0.5), 
                 transparent);
         }
         .rules strong {
@@ -787,6 +1062,7 @@
             
             const probs = getWheelProbabilities(drop_pace);
             
+            // Проверяем кулдаун на full access
             if (has_won_full_access && full_access_cooldown) {
                 const cooldownEnd = new Date(full_access_cooldown);
                 if (new Date() < cooldownEnd) {
@@ -795,15 +1071,27 @@
                 }
             }
             
+            // Генерируем случайное число от 0 до 100
             const randomValue = Math.random() * 100;
             let cumulative = 0;
+            
+            console.log(`🎲 Drop Pace: ${drop_pace}`);
+            console.log(`🎲 Probabilities:`, probs);
+            console.log(`🎲 Random value: ${randomValue.toFixed(2)}`);
             
             const prizeOrder = ["empty", "content", "discount_10", "discount_15", "discount_20", "access_7", "access_30"];
             
             for (const prizeType of prizeOrder) {
-                if (!(prizeType in probs) || probs[prizeType] <= 0) continue;
-                cumulative += probs[prizeType];
+                if (!(prizeType in probs)) {
+                    continue;
+                }
+                const prob = probs[prizeType];
+                if (prob <= 0) {
+                    continue;
+                }
+                cumulative += prob;
                 if (randomValue <= cumulative) {
+                    console.log(`✅ Selected: ${prizeType} (cumulative: ${cumulative.toFixed(2)}, prob: ${prob})`);
                     if (prizeType.startsWith('discount_')) {
                         return { type: "discount", value: prizeType.split('_')[1] };
                     } else if (prizeType.startsWith('access_')) {
@@ -811,7 +1099,9 @@
                     } else if (prizeType === 'content') {
                         const contentPrizes = prizesConfig.filter(p => p.type === "content");
                         if (contentPrizes.length > 0) {
-                            const selected = contentPrizes[Math.floor(Math.random() * contentPrizes.length)];
+                            const randomIndex = Math.floor(Math.random() * contentPrizes.length);
+                            const selected = contentPrizes[randomIndex];
+                            console.log(`🎁 Selected content prize: ${selected.value} (${selected.name})`);
                             return { type: "content", value: selected.value };
                         }
                     } else {
@@ -819,6 +1109,9 @@
                     }
                 }
             }
+            
+            // Fallback - если ничего не выбрано, возвращаем empty
+            console.log("⚠️ No prize selected, returning empty");
             return { type: "empty", value: null };
         }
         
@@ -1169,32 +1462,65 @@
             prizeRarityBadge.className = 'prize-rarity-badge ' + rarity.class;
             prizeRarityBadge.textContent = rarity.text;
             
+            console.log("🎁 Displaying prize type:", currentPrize.type, "value:", currentPrize.value, "name:", currentPrize.name);
+            
             if (currentPrize.type === 'empty') {
-                document.getElementById("emptyMessage").textContent = currentLang === 'ru' 
-                    ? "😔 Пока не сегодня...\n\nТвой Drop Pace продолжает расти — возвращайся завтра!"
-                    : "😔 Nothing this time...\n\nYour Drop Pace keeps building — come back tomorrow!";
+                console.log("📦 Showing empty prize section");
+                const emptyMessage = document.getElementById("emptyMessage");
+                if (emptyMessage) {
+                    emptyMessage.textContent = currentLang === 'ru' 
+                        ? "😔 Пока не сегодня...\n\nТвой Drop Pace продолжает расти — возвращайся завтра!"
+                        : "😔 Nothing this time...\n\nYour Drop Pace keeps building — come back tomorrow!";
+                }
                 document.getElementById("emptySection").style.display = "flex";
                 prizeDesc.textContent = currentLang === 'ru' ? currentPrize.description_ru : currentPrize.description_en;
             } else if (currentPrize.type === 'content') {
+                console.log("📦 Showing content prize section:", currentPrize.value, currentPrize.name);
                 prizeDesc.textContent = currentLang === 'ru' ? currentPrize.description_ru : currentPrize.description_en;
                 const contentLinkBtn = document.getElementById("contentLinkBtn");
-                contentLinkBtn.href = "https://drive.google.com/drive/folders/1NM9wyTcn-cKJp50-crX5GZoSmLojLY6n?usp=sharing";
-                contentLinkBtn.target = "_blank";
-                contentLinkBtn.querySelector('span').textContent = currentLang === 'ru' ? '📦 Открыть контент' : '📦 Open content';
+                if (contentLinkBtn) {
+                    contentLinkBtn.href = "https://drive.google.com/drive/folders/1NM9wyTcn-cKJp50-crX5GZoSmLojLY6n?usp=sharing";
+                    contentLinkBtn.target = "_blank";
+                    const span = contentLinkBtn.querySelector('span');
+                    if (span) {
+                        span.textContent = currentLang === 'ru' ? '📦 Открыть контент' : '📦 Open content';
+                    }
+                }
                 document.getElementById("contentSection").style.display = "flex";
             } else if (currentPrize.type === 'discount') {
+                console.log("💰 Showing discount prize section:", currentPrize.value);
                 prizeDesc.textContent = currentLang === 'ru' ? currentPrize.description_ru : currentPrize.description_en;
-                document.getElementById("promoStars").textContent = '★★★★★';
-                document.getElementById("copyPromoBtn").querySelector('span').textContent = currentLang === 'ru' ? '📋 Скопировать промокод' : '📋 Copy promo code';
+                const promoStars = document.getElementById("promoStars");
+                if (promoStars) {
+                    promoStars.textContent = '★★★★★';
+                }
+                const copyBtn = document.getElementById("copyPromoBtn");
+                if (copyBtn) {
+                    const span = copyBtn.querySelector('span');
+                    if (span) {
+                        span.textContent = currentLang === 'ru' ? '📋 Скопировать промокод' : '📋 Copy promo code';
+                    }
+                }
                 document.getElementById("discountSection").style.display = "flex";
             } else if (currentPrize.type === 'access') {
+                console.log("🔑 Showing access prize section:", currentPrize.value);
                 const accessCongrats = document.getElementById("accessCongrats");
-                accessCongrats.textContent = currentPrize.value === '7' 
-                    ? (currentLang === 'ru' ? '🎉 Поздравляем с редчайшим выигрышем!\n\nТы получил 7 дней полного доступа' : '🎉 Congratulations on the rarest win!\n\nYou got 7 days of full access')
-                    : (currentLang === 'ru' ? '🌟 Поздравляем с редчайшим выигрышем!\n\nТы получил 30 дней полного доступа' : '🌟 Congratulations on the rarest win!\n\nYou got 30 days of full access');
+                if (accessCongrats) {
+                    accessCongrats.textContent = currentPrize.value === '7' 
+                        ? (currentLang === 'ru' ? '🎉 Поздравляем с редчайшим выигрышем!\n\nТы получил 7 дней полного доступа' : '🎉 Congratulations on the rarest win!\n\nYou got 7 days of full access')
+                        : (currentLang === 'ru' ? '🌟 Поздравляем с редчайшим выигрышем!\n\nТы получил 30 дней полного доступа' : '🌟 Congratulations on the rarest win!\n\nYou got 30 days of full access');
+                }
                 prizeDesc.textContent = currentLang === 'ru' ? currentPrize.description_ru : currentPrize.description_en;
-                document.getElementById("joinChannelBtn").querySelector('span').textContent = currentLang === 'ru' ? '🚪 Вступить' : '🚪 Join';
+                const joinBtn = document.getElementById("joinChannelBtn");
+                if (joinBtn) {
+                    const span = joinBtn.querySelector('span');
+                    if (span) {
+                        span.textContent = currentLang === 'ru' ? '🚪 Вступить' : '🚪 Join';
+                    }
+                }
                 document.getElementById("accessSection").style.display = "flex";
+            } else {
+                console.error("❌ Unknown prize type:", currentPrize.type);
             }
             
             document.getElementById("closePrizeBtn").querySelector('span').textContent = currentLang === 'ru' ? '✕ Закрыть' : '✕ Close';
