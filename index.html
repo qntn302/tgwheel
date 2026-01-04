@@ -1147,27 +1147,57 @@
         
         // ==================== ИНИЦИАЛИЗАЦИЯ РУЛЕТКИ ====================
         function initRoulette() {
-            const track = document.getElementById('rouletteTrack');
-            track.innerHTML = '';
-            for (let i = 0; i < 50; i++) {
-                const prizeIndex = i % prizesConfig.length;
-                const prize = prizesConfig[prizeIndex];
-                const cell = createCell(prize);
-                cell.setAttribute('data-cell-index', i);
-                cell.setAttribute('data-prize-index', prizeIndex);
-                cell.setAttribute('data-prize-type', prize.type);
-                cell.setAttribute('data-prize-value', prize.value || '');
-                track.appendChild(cell);
+            try {
+                const track = document.getElementById('rouletteTrack');
+                if (!track) {
+                    console.error("❌ Track element not found!");
+                    return;
+                }
+                
+                if (!prizesConfig || prizesConfig.length === 0) {
+                    console.error("❌ prizesConfig is not defined or empty!");
+                    return;
+                }
+                
+                track.innerHTML = '';
+                for (let i = 0; i < 50; i++) {
+                    const prizeIndex = i % prizesConfig.length;
+                    const prize = prizesConfig[prizeIndex];
+                    if (!prize) {
+                        console.error(`❌ Prize at index ${prizeIndex} is undefined!`);
+                        continue;
+                    }
+                    const cell = createCell(prize);
+                    if (cell) {
+                        cell.setAttribute('data-cell-index', i);
+                        cell.setAttribute('data-prize-index', prizeIndex);
+                        cell.setAttribute('data-prize-type', prize.type);
+                        cell.setAttribute('data-prize-value', prize.value || '');
+                        track.appendChild(cell);
+                    }
+                }
+                console.log("🎡 Roulette initialized: 50 cells created");
+                
+                // Детальная отладка первых 15 ячеек
+                if (track.children.length > 0) {
+                    console.log("🎡 First 15 cells:");
+                    Array.from(track.children).slice(0, 15).forEach((cell, i) => {
+                        try {
+                            const prizeIdx = parseInt(cell.getAttribute('data-prize-index'));
+                            const prize = prizesConfig[prizeIdx];
+                            if (prize) {
+                                console.log(`${i}: index=${prizeIdx}, type=${prize.type}, value=${prize.value}, icon=${prize.icon}, name=${prize.name_ru}`);
+                            }
+                        } catch (e) {
+                            console.error("Error logging cell:", e);
+                        }
+                    });
+                } else {
+                    console.error("❌ No cells were created!");
+                }
+            } catch (e) {
+                console.error("❌ Error in initRoulette:", e);
             }
-            console.log("🎡 Roulette initialized: 50 cells created");
-            
-            // Детальная отладка первых 15 ячеек
-            console.log("🎡 First 15 cells:");
-            Array.from(track.children).slice(0, 15).forEach((cell, i) => {
-                const prizeIdx = cell.getAttribute('data-prize-index');
-                const prize = prizesConfig[prizeIdx];
-                console.log(`${i}: index=${prizeIdx}, type=${prize.type}, value=${prize.value}, icon=${prize.icon}, name=${prize.name_ru}`);
-            });
         }
         
         function createCell(prize) {
@@ -1305,20 +1335,43 @@
         
         // ==================== СПИН РУЛЕТКИ ====================
         function spinRoulette() {
-            if (isSpinning) return;
-            isSpinning = true;
-            
-            const spinBtn = document.getElementById("spinBtn");
-            const track = document.getElementById("rouletteTrack");
-            
-            if (!track) {
-                console.error("❌ Track element not found!");
-                isSpinning = false;
-                return;
-            }
-            
-            spinBtn.disabled = true;
-            document.getElementById("result").style.display = "none";
+            try {
+                if (isSpinning) {
+                    console.log("⚠️ Already spinning, ignoring click");
+                    return;
+                }
+                isSpinning = true;
+                
+                const spinBtn = document.getElementById("spinBtn");
+                const track = document.getElementById("rouletteTrack");
+                
+                if (!spinBtn) {
+                    console.error("❌ Spin button not found!");
+                    isSpinning = false;
+                    return;
+                }
+                
+                if (!track) {
+                    console.error("❌ Track element not found!");
+                    isSpinning = false;
+                    return;
+                }
+                
+                if (track.children.length === 0) {
+                    console.error("❌ No cells in track! Reinitializing...");
+                    initRoulette();
+                    if (track.children.length === 0) {
+                        console.error("❌ Still no cells after reinit!");
+                        isSpinning = false;
+                        return;
+                    }
+                }
+                
+                spinBtn.disabled = true;
+                const resultDiv = document.getElementById("result");
+                if (resultDiv) {
+                    resultDiv.style.display = "none";
+                }
             
             const dropPace = userData.dropPace || 5;
             const hasWonFullAccess = userData.hasWonFullAccess || false;
@@ -1479,6 +1532,11 @@
                     animationFrameId = requestAnimationFrame(trackRoulettePosition);
                 });
             });
+            } catch (e) {
+                console.error("❌ Error in spinRoulette:", e);
+                isSpinning = false;
+                if (spinBtn) spinBtn.disabled = false;
+            }
         }
         
         // ==================== ПОКАЗ ПРИЗА ====================
@@ -1636,19 +1694,59 @@
         
         // ==================== ИНИЦИАЛИЗАЦИЯ ====================
         document.addEventListener('DOMContentLoaded', function() {
-            initSounds();
-            initRoulette();
-            loadUserData();
-            
-            if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
-                Telegram.WebApp.ready();
-                Telegram.WebApp.expand();
-                const userLang = Telegram.WebApp.initDataUnsafe.user?.language_code || 'en';
-                const savedLang = localStorage.getItem('wheel_lang') || (userLang === 'ru' ? 'ru' : 'en');
-                setLanguage(savedLang);
-            } else {
-                const savedLang = localStorage.getItem('wheel_lang') || 'en';
-                setLanguage(savedLang);
+            try {
+                console.log("🚀 Initializing roulette...");
+                console.log("📊 prizesConfig length:", prizesConfig ? prizesConfig.length : "undefined");
+                
+                initSounds();
+                
+                const track = document.getElementById('rouletteTrack');
+                if (!track) {
+                    console.error("❌ Track element not found in DOM!");
+                    return;
+                }
+                
+                initRoulette();
+                
+                // Проверяем, что ячейки созданы
+                if (track.children.length === 0) {
+                    console.error("❌ No cells created! Retrying...");
+                    setTimeout(() => {
+                        initRoulette();
+                        if (track.children.length === 0) {
+                            console.error("❌ Still no cells after retry!");
+                        } else {
+                            console.log("✅ Cells created after retry:", track.children.length);
+                        }
+                    }, 100);
+                } else {
+                    console.log("✅ Cells created:", track.children.length);
+                }
+                
+                loadUserData();
+                
+                // Проверяем кнопку
+                const spinBtn = document.getElementById("spinBtn");
+                if (!spinBtn) {
+                    console.error("❌ Spin button not found!");
+                } else {
+                    console.log("✅ Spin button found");
+                }
+                
+                if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
+                    Telegram.WebApp.ready();
+                    Telegram.WebApp.expand();
+                    const userLang = Telegram.WebApp.initDataUnsafe.user?.language_code || 'en';
+                    const savedLang = localStorage.getItem('wheel_lang') || (userLang === 'ru' ? 'ru' : 'en');
+                    setLanguage(savedLang);
+                } else {
+                    const savedLang = localStorage.getItem('wheel_lang') || 'en';
+                    setLanguage(savedLang);
+                }
+                
+                console.log("✅ Initialization complete");
+            } catch (e) {
+                console.error("❌ Error during initialization:", e);
             }
         });
     </script>
