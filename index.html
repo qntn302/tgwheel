@@ -43,9 +43,10 @@
             z-index: 1000;
         }
         .lang-btn {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.25);
             color: white;
             padding: 8px 18px;
             border-radius: 20px;
@@ -53,13 +54,20 @@
             font-size: 14px;
             font-weight: 600;
             transition: all 0.3s ease;
+            box-shadow: 
+                0 4px 16px rgba(0, 0, 0, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
         }
         .lang-btn:hover {
-            background: rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.35);
         }
         .lang-btn.active {
-            background: rgba(255, 127, 0, 0.3);
+            background: rgba(255, 127, 0, 0.25);
             border-color: rgba(255, 127, 0, 0.5);
+            box-shadow: 
+                0 4px 16px rgba(255, 127, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
         
         h1 {
@@ -77,13 +85,17 @@
         }
         
         .drop-pace-indicator {
-            background: rgba(255, 255, 255, 0.12);
-            backdrop-filter: blur(15px);
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
             border-radius: 16px;
             padding: 16px;
             margin: 15px 0;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.25);
             text-align: center;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
         }
         .drop-pace-label {
             color: rgba(255, 255, 255, 0.9);
@@ -134,11 +146,15 @@
             height: 200px;
             margin: 20px auto;
             overflow: hidden;
-            background: rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(15px);
+            background: rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
             border-radius: 20px;
             padding: 20px 0;
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
         .roulette-track {
             position: relative;
@@ -220,10 +236,11 @@
         }
         
         .spin-btn {
-            background: rgba(255, 127, 0, 0.25);
-            backdrop-filter: blur(15px);
+            background: rgba(255, 127, 0, 0.15);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
             color: white;
-            border: 1px solid rgba(255, 127, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             padding: 18px 45px;
             font-size: 20px;
             font-weight: 700;
@@ -233,25 +250,38 @@
             width: 90%;
             max-width: 300px;
             transition: all 0.4s ease;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
         .spin-btn:hover {
-            background: rgba(255, 127, 0, 0.35);
+            background: rgba(255, 127, 0, 0.25);
+            border-color: rgba(255, 255, 255, 0.4);
             transform: translateY(-2px);
+            box-shadow: 
+                0 12px 40px rgba(255, 127, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
         }
         .spin-btn:disabled {
-            background: rgba(85, 85, 85, 0.2);
+            background: rgba(85, 85, 85, 0.1);
+            backdrop-filter: blur(10px);
             cursor: not-allowed;
             transform: none;
+            border-color: rgba(255, 255, 255, 0.1);
         }
         
         .result {
-            background: rgba(255, 255, 255, 0.12);
-            backdrop-filter: blur(15px);
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
             border-radius: 20px;
             padding: 24px;
             margin: 20px 0;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.25);
             display: none;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.25),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
         .prize-name {
             font-size: 24px;
@@ -312,9 +342,11 @@
             font-weight: 700;
         }
         .prize-action-btn {
-            background: rgba(46, 204, 113, 0.25);
+            background: rgba(46, 204, 113, 0.15);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
             color: white;
-            border: 1px solid rgba(46, 204, 113, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             padding: 14px 28px;
             border-radius: 25px;
             cursor: pointer;
@@ -326,17 +358,30 @@
             display: inline-block;
             text-align: center;
             transition: all 0.3s ease;
+            box-shadow: 
+                0 6px 24px rgba(46, 204, 113, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
         }
         .prize-action-btn:hover {
-            background: rgba(46, 204, 113, 0.35);
+            background: rgba(46, 204, 113, 0.25);
+            border-color: rgba(255, 255, 255, 0.4);
             transform: translateY(-2px);
+            box-shadow: 
+                0 8px 28px rgba(46, 204, 113, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
         .prize-action-btn.access-btn {
-            background: rgba(241, 196, 15, 0.25);
-            border-color: rgba(241, 196, 15, 0.4);
+            background: rgba(241, 196, 15, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 
+                0 6px 24px rgba(241, 196, 15, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
         }
         .prize-action-btn.access-btn:hover {
-            background: rgba(241, 196, 15, 0.35);
+            background: rgba(241, 196, 15, 0.25);
+            box-shadow: 
+                0 8px 28px rgba(241, 196, 15, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
         .access-congrats {
             font-size: 16px;
@@ -366,6 +411,61 @@
         }
         .close-prize-btn:hover {
             background: rgba(127, 140, 141, 0.3);
+        }
+        
+        .prizes-info {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 18px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        }
+        .prizes-title {
+            color: #ff7f00;
+            font-size: 18px;
+            margin-bottom: 14px;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(255, 127, 0, 0.3);
+        }
+        .prizes-list {
+            text-align: left;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 13px;
+            line-height: 1.9;
+            padding-left: 10px;
+        }
+        .prizes-list div {
+            margin-bottom: 8px;
+        }
+        .prizes-note {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+            margin-top: 14px;
+            font-style: italic;
+        }
+        
+        .rules {
+            background: rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 18px;
+            padding: 18px;
+            margin-top: 20px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.85);
+            text-align: left;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+        .rules strong {
+            color: rgba(255, 255, 255, 0.95);
         }
         
         @keyframes fadeInScale {
@@ -454,6 +554,27 @@
             <button class="close-prize-btn" id="closePrizeBtn" onclick="closePrizeWindow()" style="display: none;">
                 <span>✕ Закрыть</span>
             </button>
+        </div>
+        
+        <div class="prizes-info" id="prizesInfo">
+            <div class="prizes-title" id="prizesTitle">Что можно выиграть?</div>
+            <div class="prizes-list" id="prizesList">
+                <div>• Мои эксклюзивные лупы, MIDI, FLP</div>
+                <div>• Ограниченный контент из 301secrets</div>
+                <div>• Скидки на полный доступ</div>
+                <div>• Бесплатные 7 / 30 дней доступа в 301secrets</div>
+            </div>
+            <div class="prizes-note" id="prizesNote">
+                Некоторые награды редкие • Есть пустые слоты • Повторный спин через 24 часа
+            </div>
+        </div>
+        
+        <div class="rules" id="rules">
+            <strong>📜 Правила:</strong><br>
+            1. Одна попытка в 24 часа<br>
+            2. Скидки действуют 7 дней<br>
+            3. Доступ к привату — одноразово<br>
+            4. Файлы приходят в личку от бота
         </div>
     </div>
     
@@ -545,12 +666,42 @@
             ru: {
                 title: "🎡 Колесо наград", subtitle: "Крути колесо и смотри что выпадет сегодня", spinBtn: "🎡 Крутить колесо",
                 dropPaceLow: "Low", dropPaceStable: "Stable", dropPaceHigh: "High", dropPacePeak: "Peak",
-                dropPaceInfo: "Drop Pace отражает твою активность\n\nБудь последовательным, чтобы увеличить шансы\n\nРедкие награды сбрасывают темп"
+                dropPaceInfo: "Drop Pace отражает твою активность\n\nБудь последовательным, чтобы увеличить шансы\n\nРедкие награды сбрасывают темп",
+                prizesTitle: "Что можно выиграть?",
+                prizesList: [
+                    "• Мои эксклюзивные лупы, MIDI, FLP",
+                    "• Ограниченный контент из 301secrets",
+                    "• Скидки на полный доступ",
+                    "• Бесплатные 7 / 30 дней доступа в 301secrets"
+                ],
+                prizesNote: "Некоторые награды редкие • Есть пустые слоты • Повторный спин через 24 часа",
+                rulesTitle: "📜 Правила:",
+                rules: [
+                    "1. Одна попытка в 24 часа",
+                    "2. Скидки действуют 7 дней",
+                    "3. Доступ к привату — одноразово",
+                    "4. Файлы приходят в личку от бота"
+                ]
             },
             en: {
                 title: "🎡 Wheel of Drops", subtitle: "Spin the wheel and see what drops today", spinBtn: "🎡 Spin the wheel",
                 dropPaceLow: "Low", dropPaceStable: "Stable", dropPaceHigh: "High", dropPacePeak: "Peak",
-                dropPaceInfo: "Drop Pace reflects your activity\n\nStay consistent to increase your chances\n\nRare rewards reset the pace"
+                dropPaceInfo: "Drop Pace reflects your activity\n\nStay consistent to increase your chances\n\nRare rewards reset the pace",
+                prizesTitle: "What you can unlock?",
+                prizesList: [
+                    "• My exclusive loops, midi, flps",
+                    "• Limited content from 301secrets",
+                    "• Discounts on full access",
+                    "• Free 7 / 30 days of full access to 301secrets"
+                ],
+                prizesNote: "Some rewards are rare • There are also empty slots • You can spin again in 24 hours",
+                rulesTitle: "📜 Rules:",
+                rules: [
+                    "1. One try every 24 hours",
+                    "2. Discounts valid for 7 days",
+                    "3. Private access is one-time",
+                    "4. Files arrive via bot DM"
+                ]
             }
         };
         
@@ -604,9 +755,14 @@
         // ==================== ЯЗЫК ====================
         function setLanguage(lang) {
             currentLang = lang;
-            document.getElementById('title').textContent = translations[lang].title;
-            document.getElementById('subtitle').textContent = translations[lang].subtitle;
-            document.getElementById('spinBtn').textContent = translations[lang].spinBtn;
+            const t = translations[lang];
+            document.getElementById('title').textContent = t.title;
+            document.getElementById('subtitle').textContent = t.subtitle;
+            document.getElementById('spinBtn').textContent = t.spinBtn;
+            document.getElementById('prizesTitle').textContent = t.prizesTitle;
+            document.getElementById('prizesNote').textContent = t.prizesNote;
+            document.getElementById('prizesList').innerHTML = t.prizesList.map(item => `<div>${item}</div>`).join('');
+            document.getElementById('rules').innerHTML = `<strong>${t.rulesTitle}</strong><br>${t.rules.join('<br>')}`;
             document.querySelectorAll('.lang-btn').forEach(btn => {
                 btn.classList.remove('active');
                 if (btn.textContent === lang.toUpperCase()) btn.classList.add('active');
@@ -716,6 +872,7 @@
             const fullAccessCooldown = userData.fullAccessCooldown || null;
             
             const selectedPrizeData = selectWheelPrize(dropPace, hasWonFullAccess, fullAccessCooldown);
+            console.log("🎲 Selected prize data:", selectedPrizeData);
             
             let selectedPrize = null;
             let prizeIndex = -1;
@@ -724,7 +881,10 @@
                 selectedPrize = prizesConfig.find(p => p.type === 'empty');
             } else if (selectedPrizeData.type === 'content') {
                 selectedPrize = prizesConfig.find(p => p.type === 'content' && p.value === selectedPrizeData.value);
-                if (!selectedPrize) selectedPrize = prizesConfig.find(p => p.type === 'content');
+                if (!selectedPrize) {
+                    console.warn("⚠️ Content prize with value", selectedPrizeData.value, "not found, using first content");
+                    selectedPrize = prizesConfig.find(p => p.type === 'content');
+                }
             } else if (selectedPrizeData.type === 'discount') {
                 selectedPrize = prizesConfig.find(p => p.type === 'discount' && p.value === selectedPrizeData.value);
             } else if (selectedPrizeData.type === 'access') {
@@ -732,13 +892,20 @@
             }
             
             if (!selectedPrize) {
-                console.error("❌ Prize not found!");
+                console.error("❌ Prize not found! selectedPrizeData:", selectedPrizeData);
                 isSpinning = false;
                 spinBtn.disabled = false;
                 return;
             }
             
             prizeIndex = prizesConfig.indexOf(selectedPrize);
+            if (prizeIndex === -1) {
+                console.error("❌ Prize index not found!");
+                isSpinning = false;
+                spinBtn.disabled = false;
+                return;
+            }
+            
             currentPrize = {
                 type: selectedPrize.type,
                 value: selectedPrize.value,
@@ -749,6 +916,8 @@
                 description_ru: selectedPrize.description_ru,
                 description_en: selectedPrize.description_en
             };
+            
+            console.log("✅ Prize selected:", currentPrize, "Index:", prizeIndex);
             
             const containerWidth = document.querySelector('.roulette-container').offsetWidth;
             const cellWidth = 150;
@@ -808,7 +977,12 @@
         
         // ==================== ПОКАЗ ПРИЗА ====================
         function showPrize() {
-            if (!currentPrize) return;
+            if (!currentPrize) {
+                console.error("❌ No currentPrize to show!");
+                return;
+            }
+            
+            console.log("🎁 Showing prize:", currentPrize);
             
             const resultDiv = document.getElementById("result");
             const prizeName = document.getElementById("prizeName");
