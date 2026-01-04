@@ -1081,6 +1081,13 @@
                             const randomIndex = Math.floor(Math.random() * contentPrizes.length);
                             const selected = contentPrizes[randomIndex];
                             console.log(`🎁 Selected content prize: ${selected.value} (${selected.name})`);
+                            
+                            // ВАЖНО: Проверяем, что приз существует и имеет правильную структуру
+                            if (!selected.value) {
+                                console.error("❌ Content prize has no value!");
+                                // Fallback к первому контенту
+                                return { type: "content", value: contentPrizes[0].value };
+                            }
                             return { type: "content", value: selected.value };
                         }
                     } else {
@@ -1148,12 +1155,19 @@
                 const cell = createCell(prize);
                 cell.setAttribute('data-cell-index', i);
                 cell.setAttribute('data-prize-index', prizeIndex);
+                cell.setAttribute('data-prize-type', prize.type);
+                cell.setAttribute('data-prize-value', prize.value || '');
                 track.appendChild(cell);
             }
             console.log("🎡 Roulette initialized: 50 cells created");
-            console.log("🎡 First 10 cells:", Array.from(track.children).slice(0, 10).map((c, i) => 
-                `${i}: prizeIndex=${c.getAttribute('data-prize-index')} icon=${prizesConfig[i % prizesConfig.length].icon}`
-            ));
+            
+            // Детальная отладка первых 15 ячеек
+            console.log("🎡 First 15 cells:");
+            Array.from(track.children).slice(0, 15).forEach((cell, i) => {
+                const prizeIdx = cell.getAttribute('data-prize-index');
+                const prize = prizesConfig[prizeIdx];
+                console.log(`${i}: index=${prizeIdx}, type=${prize.type}, value=${prize.value}, icon=${prize.icon}, name=${prize.name_ru}`);
+            });
         }
         
         function createCell(prize) {
@@ -1361,45 +1375,63 @@
             console.log("✅ Prize selected:", currentPrize);
             console.log("✅ Prize index in config:", prizeIndex);
             console.log("✅ Prize icon:", selectedPrize.icon);
-            console.log("✅ All prizes in config:", prizesConfig.map((p, i) => `${i}: ${p.icon} - ${p.name_ru || p.name}`));
-            
+
             const containerWidth = document.querySelector('.roulette-container').offsetWidth;
             const cellWidth = 150;
             const centerOffset = containerWidth / 2 - cellWidth / 2;
-            
-            // Находим ячейку в треке, которая соответствует выбранному призу
-            // Ячейки создаются циклически: ячейка i содержит приз с индексом (i % prizesConfig.length)
-            const cyclesBefore = Math.floor(25 / prizesConfig.length);
-            let targetCellIndex = cyclesBefore * prizesConfig.length + prizeIndex;
-            
-            // Проверяем реальную ячейку в DOM
+
+            // КРИТИЧНО ИСПРАВЛЕНО: Правильное вычисление индекса ячейки
+            // 1. Находим центральную позицию в текущем отображении колеса
+            // 2. Добавляем достаточное количество ячеек для эффекта прокрутки
+            const totalCells = 50; // Всего ячеек в DOM
+            let targetCellIndex = Math.floor(totalCells / 2) + prizeIndex;
+
+            // Проверяем, что ячейка существует и содержит правильный приз
             const track = document.getElementById("rouletteTrack");
             if (track && track.children[targetCellIndex]) {
                 const targetCell = track.children[targetCellIndex];
                 const actualPrizeIndex = parseInt(targetCell.getAttribute('data-prize-index'));
                 console.log("🎯 Target cell", targetCellIndex, "contains prize index:", actualPrizeIndex, "Expected:", prizeIndex);
+                
                 if (actualPrizeIndex !== prizeIndex) {
-                    console.error("❌ MISMATCH! Finding correct cell...");
-                    // Ищем правильную ячейку
+                    // Ищем правильную ячейку с тем же призом
+                    console.warn("⚠️ Mismatch! Searching for correct cell...");
+                    let foundIndex = -1;
                     for (let i = 0; i < track.children.length; i++) {
                         const cell = track.children[i];
                         if (parseInt(cell.getAttribute('data-prize-index')) === prizeIndex) {
-                            targetCellIndex = i;
-                            console.log("🔧 Found correct cell at index:", i);
-                            break;
+                            // Проверяем, чтобы ячейка была достаточно далеко для прокрутки
+                            if (i > totalCells / 2) {
+                                foundIndex = i;
+                                break;
+                            }
                         }
                     }
+                    
+                    if (foundIndex !== -1) {
+                        console.log("✅ Found correct cell at index:", foundIndex);
+                        targetCellIndex = foundIndex;
+                    } else {
+                        console.error("❌ Could not find correct cell!");
+                        // Используем fallback - добавим больше ячеек в начало
+                        targetCellIndex = totalCells + prizeIndex;
+                    }
                 }
+            } else {
+                console.error("❌ Target cell not found!");
+                // Fallback
+                targetCellIndex = totalCells + prizeIndex;
             }
-            
+
             // Вычисляем позицию так, чтобы ячейка targetCellIndex оказалась под указателем
             const targetPosition = -(targetCellIndex * cellWidth) + centerOffset;
-            const finalPosition = targetPosition;
-            
-            console.log("🎯 Prize index:", prizeIndex, "Icon:", selectedPrize.icon);
+            // Добавляем немного случайности для эффекта, но чтобы ячейка была четко под указателем
+            const randomOffset = (Math.random() * 20 - 10); // ±10px для небольшой раскачки
+            const finalPosition = targetPosition + randomOffset;
+
             console.log("🎯 Final target cell index:", targetCellIndex);
-            console.log("🎯 Container width:", containerWidth, "Center offset:", centerOffset);
-            console.log("🎯 Final position:", finalPosition);
+            console.log("🎯 Cell width:", cellWidth, "Center offset:", centerOffset);
+            console.log("🎯 Target position:", targetPosition, "Final:", finalPosition);
             
             if (spinStartSound) {
                 spinStartSound.currentTime = 0;
