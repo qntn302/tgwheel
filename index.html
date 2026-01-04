@@ -150,10 +150,12 @@
             color: #ff7f00;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
             transition: color 0.3s ease;
-            display: inline-flex;
+            display: flex;
             align-items: center;
             gap: 8px;
             justify-content: center;
+            width: 100%;
+            margin: 0 auto;
         }
         .drop-pace-status.low { 
             color: #e74c3c;
@@ -1568,16 +1570,17 @@
             // Вычисляем позицию для остановки
             // Начинаем с позиции, где видно несколько ячеек слева
             const containerWidth = document.querySelector('.roulette-container').offsetWidth;
-            const centerOffset = containerWidth / 2 - cellWidth / 2;
+            const cellWidthValue = 150; // Ширина одной ячейки
+            const centerOffset = containerWidth / 2 - cellWidthValue / 2;
             
             // Находим позицию выбранного приза в треке
             // Учитываем, что трек содержит 50 ячеек (несколько циклов)
             const cyclesBefore = Math.floor(25 / prizesConfig.length);
             const targetCellIndex = cyclesBefore * prizesConfig.length + prizeIndex;
-            const targetPosition = -(targetCellIndex * cellWidth) + centerOffset;
+            const targetPosition = -(targetCellIndex * cellWidthValue) + centerOffset;
             
             // Добавляем случайное смещение для реалистичности (небольшое)
-            const randomOffset = (Math.random() - 0.5) * cellWidth * 0.2;
+            const randomOffset = (Math.random() - 0.5) * cellWidthValue * 0.2;
             const finalPosition = targetPosition + randomOffset;
             
             // Воспроизводим звук старта
@@ -1590,6 +1593,13 @@
             lastCellIndex = null;
             
             // Анимация
+            if (!track) {
+                console.error("❌ Track element not found!");
+                isSpinning = false;
+                spinBtn.disabled = false;
+                return;
+            }
+            
             track.style.transition = 'none';
             track.style.transform = 'translateX(0px)';
             
@@ -1598,8 +1608,9 @@
                 track.style.transition = 'none';
                 track.style.transform = 'translateX(0px)';
                 
-                // Запускаем анимацию после небольшой задержки
-                setTimeout(() => {
+                // Запускаем анимацию после небольшой задержки через requestAnimationFrame
+                requestAnimationFrame(() => {
+                    console.log(`🎡 Starting wheel animation to position: ${finalPosition}px`);
                     track.style.transition = 'transform 5.5s cubic-bezier(0.2, 0.8, 0.3, 0.99)';
                     track.style.transform = `translateX(${finalPosition}px)`;
                     
@@ -1626,7 +1637,8 @@
                             const relativeX = pointerX - trackLeft;
                             
                             // Вычисляем индекс ячейки, центр которой находится под указателем
-                            const currentCellIndex = Math.round((relativeX - cellWidth / 2) / cellWidth);
+                            const cellWidthForTracking = 150;
+                            const currentCellIndex = Math.round((relativeX - cellWidthForTracking / 2) / cellWidthForTracking);
                             
                             // Если индекс изменился и находится в допустимых пределах - воспроизводим звук
                             if (lastCellIndex !== null && currentCellIndex !== lastCellIndex && 
@@ -1648,6 +1660,7 @@
                                 cancelAnimationFrame(animationFrameId);
                             }
                             
+                            console.log("✅ Animation completed, showing prize");
                             showPrize();
                             // НЕ сбрасываем isSpinning и НЕ включаем кнопку - пользователь должен забрать приз
                         }
@@ -1655,7 +1668,7 @@
                     
                     // Запускаем отслеживание
                     animationFrameId = requestAnimationFrame(trackRoulettePosition);
-                }, 50);
+                });
             });
         }
         
