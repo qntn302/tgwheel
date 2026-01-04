@@ -1146,8 +1146,14 @@
                 const prizeIndex = i % prizesConfig.length;
                 const prize = prizesConfig[prizeIndex];
                 const cell = createCell(prize);
+                cell.setAttribute('data-cell-index', i);
+                cell.setAttribute('data-prize-index', prizeIndex);
                 track.appendChild(cell);
             }
+            console.log("🎡 Roulette initialized: 50 cells created");
+            console.log("🎡 First 10 cells:", Array.from(track.children).slice(0, 10).map((c, i) => 
+                `${i}: prizeIndex=${c.getAttribute('data-prize-index')} icon=${prizesConfig[i % prizesConfig.length].icon}`
+            ));
         }
         
         function createCell(prize) {
@@ -1357,31 +1363,42 @@
             console.log("✅ Prize icon:", selectedPrize.icon);
             console.log("✅ All prizes in config:", prizesConfig.map((p, i) => `${i}: ${p.icon} - ${p.name_ru || p.name}`));
             
-            const container = document.querySelector('.roulette-container');
-            const containerWidth = container.offsetWidth;
+            const containerWidth = document.querySelector('.roulette-container').offsetWidth;
             const cellWidth = 150;
+            const centerOffset = containerWidth / 2 - cellWidth / 2;
             
-            // Вычисляем индекс ячейки в треке, которая соответствует выбранному призу
+            // Находим ячейку в треке, которая соответствует выбранному призу
             // Ячейки создаются циклически: ячейка i содержит приз с индексом (i % prizesConfig.length)
             const cyclesBefore = Math.floor(25 / prizesConfig.length);
-            const targetCellIndex = cyclesBefore * prizesConfig.length + prizeIndex;
+            let targetCellIndex = cyclesBefore * prizesConfig.length + prizeIndex;
             
-            // Вычисляем позицию так, чтобы центр ячейки оказался под указателем
-            // Центр ячейки targetCellIndex находится на позиции: targetCellIndex * cellWidth + cellWidth / 2
-            // Указатель находится в центре контейнера: containerWidth / 2
-            // translateX сдвигает элемент: отрицательное значение = влево, положительное = вправо
-            // Чтобы центр ячейки был под указателем, нужно сдвинуть трек влево на:
-            // translateX = -(targetCellIndex * cellWidth + cellWidth / 2 - containerWidth / 2)
-            const targetPosition = -(targetCellIndex * cellWidth + cellWidth / 2 - containerWidth / 2);
+            // Проверяем реальную ячейку в DOM
+            const track = document.getElementById("rouletteTrack");
+            if (track && track.children[targetCellIndex]) {
+                const targetCell = track.children[targetCellIndex];
+                const actualPrizeIndex = parseInt(targetCell.getAttribute('data-prize-index'));
+                console.log("🎯 Target cell", targetCellIndex, "contains prize index:", actualPrizeIndex, "Expected:", prizeIndex);
+                if (actualPrizeIndex !== prizeIndex) {
+                    console.error("❌ MISMATCH! Finding correct cell...");
+                    // Ищем правильную ячейку
+                    for (let i = 0; i < track.children.length; i++) {
+                        const cell = track.children[i];
+                        if (parseInt(cell.getAttribute('data-prize-index')) === prizeIndex) {
+                            targetCellIndex = i;
+                            console.log("🔧 Found correct cell at index:", i);
+                            break;
+                        }
+                    }
+                }
+            }
             
-            // Добавляем небольшое случайное смещение для естественности
-            const randomOffset = (Math.random() - 0.5) * 10;
-            const finalPosition = targetPosition + randomOffset;
+            // Вычисляем позицию так, чтобы ячейка targetCellIndex оказалась под указателем
+            const targetPosition = -(targetCellIndex * cellWidth) + centerOffset;
+            const finalPosition = targetPosition;
             
             console.log("🎯 Prize index:", prizeIndex, "Icon:", selectedPrize.icon);
-            console.log("🎯 Target cell:", targetCellIndex);
-            console.log("🎯 Container width:", containerWidth);
-            console.log("🎯 Target position:", targetPosition);
+            console.log("🎯 Final target cell index:", targetCellIndex);
+            console.log("🎯 Container width:", containerWidth, "Center offset:", centerOffset);
             console.log("🎯 Final position:", finalPosition);
             
             if (spinStartSound) {
