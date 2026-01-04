@@ -1195,6 +1195,23 @@
                 } else {
                     console.error("❌ No cells were created!");
                 }
+                
+                // Проверяем что кнопки существуют
+                const spinBtn = document.getElementById("spinBtn");
+                if (spinBtn) {
+                    console.log("✅ Spin button found");
+                } else {
+                    console.error("❌ Spin button not found in initRoulette!");
+                }
+                
+                const langBtns = document.querySelectorAll('.lang-btn');
+                if (langBtns.length > 0) {
+                    console.log("✅ Language buttons found:", langBtns.length);
+                } else {
+                    console.error("❌ Language buttons not found!");
+                }
+                
+                console.log("✅ Roulette initialized with", track.children.length, "cells");
             } catch (e) {
                 console.error("❌ Error in initRoulette:", e);
             }
@@ -1440,7 +1457,7 @@
             let targetCellIndex = Math.floor(totalCells / 2) + prizeIndex;
 
             // Проверяем, что ячейка существует и содержит правильный приз
-            const track = document.getElementById("rouletteTrack");
+            // УБРАЛИ const перед track - используем уже объявленную переменную
             if (track && track.children[targetCellIndex]) {
                 const targetCell = track.children[targetCellIndex];
                 const actualPrizeIndex = parseInt(targetCell.getAttribute('data-prize-index'));
@@ -1507,14 +1524,14 @@
                     const container = document.querySelector('.roulette-container');
                     const containerRect = container.getBoundingClientRect();
                     const pointerX = containerRect.left + containerRect.width / 2;
-                    const cellWidth = 150;
+                    const cellWidthPx = 150; // переименовали чтобы избежать конфликта
                     
                     function trackRoulettePosition() {
                         const elapsed = Date.now() - startTime;
                         if (elapsed < duration) {
                             const trackRect = track.getBoundingClientRect();
                             const relativeX = pointerX - trackRect.left;
-                            const currentCellIndex = Math.floor(relativeX / cellWidth);
+                            const currentCellIndex = Math.floor(relativeX / cellWidthPx);
                             if (lastCellIndex !== null && currentCellIndex !== lastCellIndex && currentCellIndex >= 0 && currentCellIndex < 50) {
                                 playTick();
                             }
