@@ -1357,9 +1357,12 @@
             console.log("✅ Prize icon:", selectedPrize.icon);
             console.log("✅ All prizes in config:", prizesConfig.map((p, i) => `${i}: ${p.icon} - ${p.name_ru || p.name}`));
             
-            const containerWidth = document.querySelector('.roulette-container').offsetWidth;
+            const container = document.querySelector('.roulette-container');
+            const containerWidth = container.offsetWidth;
             const cellWidthValue = 150; // 140px width + 5px margin on each side (5px left + 5px right)
-            const centerOffset = containerWidth / 2 - cellWidthValue / 2;
+            // centerOffset - это смещение, чтобы центр ячейки был под указателем
+            // Указатель находится в центре контейнера, поэтому centerOffset = 0 (центр ячейки уже под центром)
+            const centerOffset = 0;
             
             // Находим индекс ячейки в треке, которая соответствует выбранному призу
             // В треке создается 50 ячеек, которые циклически повторяют призы из prizesConfig
@@ -1396,26 +1399,41 @@
             }
             
             // Вычисляем позицию так, чтобы центр выбранной ячейки оказался точно под указателем
-            // Указатель находится в центре контейнера (centerOffset)
-            // Нужно сдвинуть трек влево на (targetCellIndexInTrack * cellWidthValue), 
-            // затем сдвинуть обратно на centerOffset, чтобы центр ячейки был под указателем
-            const targetPosition = -(targetCellIndexInTrack * cellWidthValue) + centerOffset;
+            // Указатель находится в центре контейнера
+            // Нужно сдвинуть трек влево так, чтобы ячейка targetCellIndexInTrack оказалась под указателем
+            // Центр ячейки находится на позиции: targetCellIndexInTrack * cellWidthValue + cellWidthValue / 2
+            // Чтобы центр ячейки был под центром контейнера (0), нужно сдвинуть трек на:
+            const targetPosition = -(targetCellIndexInTrack * cellWidthValue + cellWidthValue / 2) + containerWidth / 2;
             
             // Убираем случайное смещение полностью для точности остановки на правильной ячейке
             let finalPosition = targetPosition;
             
-            // Проверяем, что позиция не выходит за границы (не слишком далеко влево)
-            // Минимальная позиция должна быть такой, чтобы последние ячейки были видны
-            const minPosition = -((cellsInTrack - 1) * cellWidthValue) + centerOffset;
+            // Проверяем, что позиция не выходит за границы
+            const minPosition = -((cellsInTrack - 1) * cellWidthValue + cellWidthValue / 2) + containerWidth / 2;
             if (finalPosition < minPosition) {
                 console.warn("⚠️ Position too far left, adjusting...");
                 finalPosition = minPosition;
             }
             
+            // Финальная проверка: вычисляем, какая ячейка окажется под указателем
+            const checkPosition = -finalPosition + containerWidth / 2;
+            const checkCellIndex = Math.floor(checkPosition / cellWidthValue);
+            const checkCellPrizeIndexFinal = checkCellIndex % prizesConfig.length;
+            
             console.log("🎯 Prize index:", prizeIndex, "Icon:", selectedPrize.icon);
             console.log("🎯 Target cell in track:", targetCellIndexInTrack);
             console.log("🎯 Cell prize check:", targetCellIndexInTrack % prizesConfig.length, "Expected:", prizeIndex);
+            console.log("🎯 Container width:", containerWidth);
+            console.log("🎯 Target position:", targetPosition);
             console.log("🎯 Final position:", finalPosition);
+            console.log("🎯 Final check - Cell under pointer:", checkCellIndex, "Prize index:", checkCellPrizeIndexFinal, "Expected:", prizeIndex);
+            
+            if (checkCellPrizeIndexFinal !== prizeIndex) {
+                console.error("❌ FINAL MISMATCH! Recalculating...");
+                // Пересчитываем позицию для правильной ячейки
+                finalPosition = -(targetCellIndexInTrack * cellWidthValue + cellWidthValue / 2) + containerWidth / 2;
+                console.log("🔧 Corrected final position:", finalPosition);
+            }
             
             if (spinStartSound) {
                 spinStartSound.currentTime = 0;
