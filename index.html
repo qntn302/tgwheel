@@ -1426,8 +1426,7 @@
                 const centerOffset = containerWidth / 2 - cellWidth / 2;
                 const totalCells = 50;
                 
-                // Простой расчет: находим ячейку с нужным призом
-                // Начальная позиция под указателем - ячейка 25 (середина из 50)
+                // Начальная позиция: ячейка 25 (середина) под указателем
                 const startCellIndex = 25;
                 const currentPrizeIndexAtStart = startCellIndex % prizesConfig.length;
                 
@@ -1445,19 +1444,7 @@
                 const targetCellIndex = startCellIndex + totalCellsToMove;
                 
                 // Вычисляем финальную позицию так, чтобы ячейка targetCellIndex оказалась под указателем
-                // Используем модульную арифметику для зацикливания ячеек
-                const actualCellIndex = targetCellIndex % totalCells;
-                const actualPrizeIndex = actualCellIndex % prizesConfig.length;
-                
-                // Если приз не совпадает, корректируем на один цикл призов
-                let finalCellIndex = targetCellIndex;
-                if (actualPrizeIndex !== prizeIndex) {
-                    const adjustment = (prizeIndex - actualPrizeIndex + prizesConfig.length) % prizesConfig.length;
-                    finalCellIndex = targetCellIndex + adjustment;
-                }
-                
-                // Вычисляем финальную позицию
-                const targetPosition = -(finalCellIndex * cellWidth) + centerOffset;
+                const targetPosition = -(targetCellIndex * cellWidth) + centerOffset;
                 const finalPosition = targetPosition;
 
                 console.log("🎯 Target cell index:", targetCellIndex);
