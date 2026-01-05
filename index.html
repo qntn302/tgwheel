@@ -1150,8 +1150,6 @@
         // ==================== ИНИЦИАЛИЗАЦИЯ РУЛЕТКИ ====================
         function initRoulette() {
             try {
-                console.log("🎡 Initializing roulette for WebView...");
-                
                 const track = document.getElementById('rouletteTrack');
                 if (!track) {
                     console.error("❌ Track element not found!");
@@ -1163,19 +1161,14 @@
                     return;
                 }
                 
-                // Очищаем трек
                 track.innerHTML = '';
-                
-                // Создаем ячейки
                 for (let i = 0; i < 50; i++) {
                     const prizeIndex = i % prizesConfig.length;
                     const prize = prizesConfig[prizeIndex];
-                    
                     if (!prize) {
                         console.error(`❌ Prize at index ${prizeIndex} is undefined!`);
                         continue;
                     }
-                    
                     const cell = createCell(prize);
                     if (cell) {
                         cell.setAttribute('data-cell-index', i);
@@ -1185,53 +1178,9 @@
                         track.appendChild(cell);
                     }
                 }
-                
-                console.log(`✅ Roulette initialized: ${track.children.length} cells created`);
-                
-                // 🔥 КРИТИЧНО: Принудительный рефлоу для WebView
-                setTimeout(() => {
-                    track.offsetHeight; // Trigger reflow
-                    console.log("🔄 DOM reflow triggered for WebView");
-                }, 100);
-                
+                console.log("🎡 Roulette initialized: 50 cells created");
             } catch (e) {
                 console.error("❌ Error in initRoulette:", e);
-            }
-        }
-        
-        // ==================== БЕЗОПАСНАЯ ИНИЦИАЛИЗАЦИЯ ====================
-        function safeInitRoulette() {
-            try {
-                initializationAttempts++;
-                console.log(`🔄 Init attempt ${initializationAttempts}/${MAX_INIT_ATTEMPTS}`);
-                
-                const track = document.getElementById('rouletteTrack');
-                if (!track) {
-                    console.error("❌ Track element not found!");
-                    if (initializationAttempts < MAX_INIT_ATTEMPTS) {
-                        setTimeout(safeInitRoulette, 500);
-                    }
-                    return;
-                }
-                
-                initRoulette();
-                
-                // Проверяем результат
-                setTimeout(() => {
-                    if (track.children.length === 0 && initializationAttempts < MAX_INIT_ATTEMPTS) {
-                        console.warn("⚠️ No cells created, retrying...");
-                        safeInitRoulette();
-                    } else if (track.children.length > 0) {
-                        console.log(`✅ Successfully created ${track.children.length} cells`);
-                        initializationAttempts = 0; // Сброс счетчика
-                    }
-                }, 300);
-                
-            } catch (e) {
-                console.error("❌ Error in safeInitRoulette:", e);
-                if (initializationAttempts < MAX_INIT_ATTEMPTS) {
-                    setTimeout(safeInitRoulette, 500);
-                }
             }
         }
         
@@ -1462,140 +1411,103 @@
                 
                 console.log("✅ Prize selected:", currentPrize);
                 console.log("✅ Prize index in config:", prizeIndex);
+                console.log("✅ Prize icon:", selectedPrize.icon);
+
+                const container = document.querySelector('.roulette-container');
+                if (!container) {
+                    console.error("❌ Container not found!");
+                    isSpinning = false;
+                    spinBtn.disabled = false;
+                    return;
+                }
                 
-                // 🔥 КРИТИЧНО: Для WebView нужно ждать полной загрузки DOM
-                setTimeout(() => {
-                    try {
-                        const container = document.querySelector('.roulette-container');
-                        if (!container) {
-                            console.error("❌ Container not found!");
-                            throw new Error("Container not found");
-                        }
+                const containerWidth = container.offsetWidth;
+                const cellWidth = 150;
+                const centerOffset = containerWidth / 2 - cellWidth / 2;
+                const totalCells = 50;
+                
+                // Простой расчет: находим ячейку с нужным призом
+                // Начальная позиция под указателем - ячейка 25 (середина из 50)
+                const startCellIndex = 25;
+                const currentPrizeIndexAtStart = startCellIndex % prizesConfig.length;
+                
+                // Вычисляем смещение до нужного приза
+                let prizeOffset = prizeIndex - currentPrizeIndexAtStart;
+                if (prizeOffset < 0) {
+                    prizeOffset += prizesConfig.length;
+                }
+                
+                // Добавляем несколько полных циклов для эффекта прокрутки
+                const fullCycles = 3;
+                const totalCellsToMove = fullCycles * prizesConfig.length + prizeOffset;
+                
+                // Целевая ячейка для остановки
+                const targetCellIndex = startCellIndex + totalCellsToMove;
+                
+                // Вычисляем финальную позицию так, чтобы ячейка targetCellIndex оказалась под указателем
+                // Используем модульную арифметику для зацикливания ячеек
+                const actualCellIndex = targetCellIndex % totalCells;
+                const actualPrizeIndex = actualCellIndex % prizesConfig.length;
+                
+                // Если приз не совпадает, корректируем на один цикл призов
+                let finalCellIndex = targetCellIndex;
+                if (actualPrizeIndex !== prizeIndex) {
+                    const adjustment = (prizeIndex - actualPrizeIndex + prizesConfig.length) % prizesConfig.length;
+                    finalCellIndex = targetCellIndex + adjustment;
+                }
+                
+                // Вычисляем финальную позицию
+                const targetPosition = -(finalCellIndex * cellWidth) + centerOffset;
+                const finalPosition = targetPosition;
+
+                console.log("🎯 Target cell index:", targetCellIndex);
+                console.log("🎯 Final position:", finalPosition);
+                
+                if (spinStartSound) {
+                    spinStartSound.currentTime = 0;
+                    spinStartSound.play().catch(() => {});
+                }
+                
+                lastCellIndex = null;
+                track.style.transition = 'none';
+                track.style.transform = 'translateX(0px)';
+                
+                requestAnimationFrame(() => {
+                    track.style.transition = 'none';
+                    track.style.transform = 'translateX(0px)';
+                    requestAnimationFrame(() => {
+                        track.style.transition = 'transform 5.5s cubic-bezier(0.2, 0.8, 0.3, 0.99)';
+                        track.style.transform = `translateX(${finalPosition}px)`;
                         
-                        // Принудительный рефлоу для получения правильных размеров
-                        container.getBoundingClientRect();
+                        const startTime = Date.now();
+                        const duration = 5500;
+                        const containerRect = container.getBoundingClientRect();
+                        const pointerX = containerRect.left + containerRect.width / 2;
+                        const cellWidthPx = 150;
                         
-                        const containerWidth = container.offsetWidth;
-                        console.log("📏 Container width:", containerWidth);
-                        
-                        const cellWidth = 150;
-                        const centerOffset = containerWidth / 2 - cellWidth / 2;
-                        console.log("📐 Center offset:", centerOffset);
-                        
-                        const totalCells = 50;
-                        
-                        // 🔥 КРИТИЧНО ИСПРАВЛЕНО: Правильный расчет позиции для WebView
-                        // Вместо сложной математики используем простой и надежный подход
-                        
-                        // 1. Находим начальную ячейку под указателем (сейчас там ячейка 25)
-                        const startCellIndex = 25; // Центральная ячейка из 50
-                        
-                        // 2. Вычисляем смещение, необходимое чтобы подвести нужный приз к указателю
-                        // Мы знаем что приз с индексом prizeIndex должен оказаться под указателем
-                        // Сейчас под указателем приз с индексом (25 % 10 = 5)
-                        const currentPrizeIndex = 5; // 25 % 10 = 5
-                        
-                        // 3. Вычисляем насколько нужно сдвинуть колесо
-                        let prizeOffset = prizeIndex - currentPrizeIndex;
-                        if (prizeOffset < 0) {
-                            prizeOffset += 10; // Зацикливаем
-                        }
-                        
-                        // 4. Каждый приз занимает cellWidth, поэтому:
-                        const targetCellsToMove = prizeOffset;
-                        
-                        // 5. Но нужно чтобы колесо прокатилось достаточно для эффекта
-                        // Добавляем несколько полных циклов
-                        const fullCycles = 3; // 3 полных цикла
-                        const totalCellsToMove = fullCycles * 10 + targetCellsToMove;
-                        
-                        // 6. Целевая ячейка для остановки
-                        const targetCellIndex = startCellIndex + totalCellsToMove;
-                        
-                        console.log("🎯 Calculations:");
-                        console.log("  Start cell index:", startCellIndex);
-                        console.log("  Current prize under pointer:", currentPrizeIndex);
-                        console.log("  Target prize index:", prizeIndex);
-                        console.log("  Prize offset:", prizeOffset);
-                        console.log("  Full cycles:", fullCycles);
-                        console.log("  Total cells to move:", totalCellsToMove);
-                        console.log("  Target cell index:", targetCellIndex);
-                        
-                        // 7. Проверяем, что целевая ячейка содержит правильный приз
-                        const checkCellIndex = targetCellIndex % totalCells;
-                        const checkPrizeIndex = checkCellIndex % prizesConfig.length;
-                        
-                        if (checkPrizeIndex !== prizeIndex) {
-                            console.warn("⚠️ Mismatch detected! Adjusting...");
-                            // Корректируем
-                            const adjustment = prizeIndex - checkPrizeIndex;
-                            if (adjustment !== 0) {
-                                console.log("🔧 Adjustment needed:", adjustment);
+                        function trackRoulettePosition() {
+                            const elapsed = Date.now() - startTime;
+                            if (elapsed < duration) {
+                                const trackRect = track.getBoundingClientRect();
+                                const relativeX = pointerX - trackRect.left;
+                                const currentCellIndex = Math.floor(relativeX / cellWidthPx);
+                                if (lastCellIndex !== null && currentCellIndex !== lastCellIndex && currentCellIndex >= 0 && currentCellIndex < totalCells) {
+                                    playTick();
+                                }
+                                lastCellIndex = currentCellIndex;
+                                animationFrameId = requestAnimationFrame(trackRoulettePosition);
+                            } else {
+                                if (winSound) {
+                                    winSound.currentTime = 0;
+                                    winSound.play().catch(() => {});
+                                }
+                                if (animationFrameId) cancelAnimationFrame(animationFrameId);
+                                showPrize();
                             }
                         }
-                        
-                        // 8. Вычисляем финальную позицию
-                        const targetPosition = -(targetCellIndex * cellWidth) + centerOffset;
-                        
-                        // 9. Добавляем небольшую случайность для естественности
-                        const randomOffset = Math.floor(Math.random() * 30) - 15; // ±15px
-                        const finalPosition = targetPosition + randomOffset;
-                        
-                        console.log("🎯 Final position calculations:");
-                        console.log("  Target position:", targetPosition);
-                        console.log("  Random offset:", randomOffset);
-                        console.log("  Final position:", finalPosition);
-                        console.log("  Should stop at prize:", prizesConfig[prizeIndex].name_ru);
-                        
-                        if (spinStartSound) {
-                            spinStartSound.currentTime = 0;
-                            spinStartSound.play().catch(() => {});
-                        }
-                        
-                        lastCellIndex = null;
-                        track.style.transition = 'none';
-                        track.style.transform = 'translateX(0px)';
-                        
-                        // 🔥 КРИТИЧНО: Принудительный рефлоу для сброса анимации
-                        track.offsetHeight;
-                        
-                        requestAnimationFrame(() => {
-                            track.style.transition = 'none';
-                            track.style.transform = 'translateX(0px)';
-                            
-                            // Еще один рефлоу
-                            track.offsetHeight;
-                            
-                            requestAnimationFrame(() => {
-                                track.style.transition = 'transform 5.5s cubic-bezier(0.2, 0.8, 0.3, 0.99)';
-                                track.style.transform = `translateX(${finalPosition}px)`;
-                                
-                                const startTime = Date.now();
-                                const duration = 5500;
-                                
-                                function trackRoulettePosition() {
-                                    const elapsed = Date.now() - startTime;
-                                    if (elapsed < duration) {
-                                        animationFrameId = requestAnimationFrame(trackRoulettePosition);
-                                    } else {
-                                        if (winSound) {
-                                            winSound.currentTime = 0;
-                                            winSound.play().catch(() => {});
-                                        }
-                                        if (animationFrameId) cancelAnimationFrame(animationFrameId);
-                                        showPrize();
-                                    }
-                                }
-                                animationFrameId = requestAnimationFrame(trackRoulettePosition);
-                            });
-                        });
-                        
-                    } catch (e) {
-                        console.error("❌ Error in spin animation:", e);
-                        isSpinning = false;
-                        if (spinBtn) spinBtn.disabled = false;
-                    }
-                }, 50); // 🔥 Небольшая задержка для стабилизации WebView
+                        animationFrameId = requestAnimationFrame(trackRoulettePosition);
+                    });
+                });
                 
             } catch (e) {
                 console.error("❌ Error in spinRoulette:", e);
@@ -1761,25 +1673,46 @@
         // ==================== ИНИЦИАЛИЗАЦИЯ ====================
         document.addEventListener('DOMContentLoaded', function() {
             try {
-                console.log("🚀 Initializing for Telegram WebView...");
-                
-                // Проверяем что мы в мини-приложении
-                if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
-                    console.log("📱 Telegram WebApp detected");
-                    Telegram.WebApp.ready();
-                    Telegram.WebApp.expand();
-                    
-                    // Настройка для WebView
-                    document.body.style.webkitTransform = 'translateZ(0)';
-                    document.body.style.transform = 'translateZ(0)';
-                }
+                console.log("🚀 Initializing roulette...");
                 
                 initSounds();
-                safeInitRoulette(); // Используем безопасную инициализацию
+                
+                const track = document.getElementById('rouletteTrack');
+                if (!track) {
+                    console.error("❌ Track element not found in DOM!");
+                    return;
+                }
+                
+                initRoulette();
+                
+                // Проверяем, что ячейки созданы
+                if (track.children.length === 0) {
+                    console.error("❌ No cells created! Retrying...");
+                    setTimeout(() => {
+                        initRoulette();
+                        if (track.children.length === 0) {
+                            console.error("❌ Still no cells after retry!");
+                        } else {
+                            console.log("✅ Cells created after retry:", track.children.length);
+                        }
+                    }, 100);
+                } else {
+                    console.log("✅ Cells created:", track.children.length);
+                }
+                
                 loadUserData();
                 
-                // Устанавливаем язык
+                // Проверяем кнопку
+                const spinBtn = document.getElementById("spinBtn");
+                if (!spinBtn) {
+                    console.error("❌ Spin button not found!");
+                } else {
+                    console.log("✅ Spin button found");
+                }
+                
                 if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
+                    Telegram.WebApp.ready();
+                    Telegram.WebApp.expand();
                     const userLang = Telegram.WebApp.initDataUnsafe.user?.language_code || 'en';
                     const savedLang = localStorage.getItem('wheel_lang') || (userLang === 'ru' ? 'ru' : 'en');
                     setLanguage(savedLang);
@@ -1789,24 +1722,6 @@
                 }
                 
                 console.log("✅ Initialization complete");
-                
-                // Тестовая проверка кнопок
-                setTimeout(() => {
-                    const spinBtn = document.getElementById("spinBtn");
-                    const langBtns = document.querySelectorAll('.lang-btn');
-                    
-                    console.log(`🔘 Spin button: ${spinBtn ? 'Found' : 'Not found'}`);
-                    console.log(`🔘 Language buttons: ${langBtns.length} found`);
-                    
-                    if (spinBtn) {
-                        console.log("✅ Spin button is clickable");
-                    }
-                    
-                    if (langBtns.length > 0) {
-                        console.log("✅ Language buttons are clickable");
-                    }
-                }, 1000);
-                
             } catch (e) {
                 console.error("❌ Error during initialization:", e);
             }
