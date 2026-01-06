@@ -1178,6 +1178,19 @@
                         track.appendChild(cell);
                     }
                 }
+                
+                // Устанавливаем начальную позицию: ячейка 25 должна быть под указателем
+                const container = document.querySelector('.roulette-container');
+                if (container) {
+                    const containerWidth = container.offsetWidth;
+                    const cellWidth = 150;
+                    const centerOffset = containerWidth / 2 - cellWidth / 2;
+                    const startCellIndex = 25;
+                    const initialPosition = -(startCellIndex * cellWidth) + centerOffset;
+                    track.style.transition = 'none';
+                    track.style.transform = `translateX(${initialPosition}px)`;
+                }
+                
                 console.log("🎡 Roulette initialized: 50 cells created");
             } catch (e) {
                 console.error("❌ Error in initRoulette:", e);
@@ -1424,28 +1437,65 @@
                 const containerWidth = container.offsetWidth;
                 const cellWidth = 150;
                 const centerOffset = containerWidth / 2 - cellWidth / 2;
-                const totalCells = 50;
+                const totalCells = track.children.length;
                 
-                // Начальная позиция: ячейка 25 (середина) под указателем
+                // Находим ячейку на колесе, которая соответствует выбранному призу
+                // Начальная позиция под указателем - ячейка 25 (середина из 50)
                 const startCellIndex = 25;
-                const currentPrizeIndexAtStart = startCellIndex % prizesConfig.length;
+                let targetCellIndex = -1;
                 
-                // Вычисляем смещение до нужного приза
-                let prizeOffset = prizeIndex - currentPrizeIndexAtStart;
-                if (prizeOffset < 0) {
-                    prizeOffset += prizesConfig.length;
+                // Ищем ячейку с правильным типом и значением приза
+                for (let i = 0; i < totalCells; i++) {
+                    const cell = track.children[i];
+                    const cellType = cell.getAttribute('data-prize-type');
+                    const cellValue = cell.getAttribute('data-prize-value') || '';
+                    const prizeValue = currentPrize.value || '';
+                    
+                    if (cellType === currentPrize.type && cellValue === prizeValue) {
+                        // Нашли подходящую ячейку, но нужно выбрать ту, которая будет после прокрутки
+                        // Берем первую подходящую ячейку после startCellIndex
+                        if (i >= startCellIndex) {
+                            targetCellIndex = i;
+                            break;
+                        }
+                    }
+                }
+                
+                // Если не нашли после startCellIndex, ищем с начала
+                if (targetCellIndex === -1) {
+                    for (let i = 0; i < totalCells; i++) {
+                        const cell = track.children[i];
+                        const cellType = cell.getAttribute('data-prize-type');
+                        const cellValue = cell.getAttribute('data-prize-value') || '';
+                        const prizeValue = currentPrize.value || '';
+                        
+                        if (cellType === currentPrize.type && cellValue === prizeValue) {
+                            targetCellIndex = i;
+                            break;
+                        }
+                    }
+                }
+                
+                // Если все еще не нашли, используем fallback
+                if (targetCellIndex === -1) {
+                    console.warn("⚠️ Target cell not found, using fallback");
+                    targetCellIndex = startCellIndex;
+                }
+                
+                // Вычисляем смещение от начальной позиции
+                let cellsToMove = targetCellIndex - startCellIndex;
+                if (cellsToMove < 0) {
+                    cellsToMove += totalCells;
                 }
                 
                 // Добавляем несколько полных циклов для эффекта прокрутки
                 const fullCycles = 3;
-                const totalCellsToMove = fullCycles * prizesConfig.length + prizeOffset;
+                const totalCellsToMove = fullCycles * totalCells + cellsToMove;
                 
-                // Целевая ячейка для остановки
-                const targetCellIndex = startCellIndex + totalCellsToMove;
-                
-                // Вычисляем финальную позицию так, чтобы ячейка targetCellIndex оказалась под указателем
-                const targetPosition = -(targetCellIndex * cellWidth) + centerOffset;
-                const finalPosition = targetPosition;
+                // Вычисляем финальную позицию
+                // Начальная позиция: ячейка startCellIndex находится под указателем (centerOffset)
+                // Нужно прокрутить на totalCellsToMove ячеек влево
+                const finalPosition = -(totalCellsToMove * cellWidth) + centerOffset;
 
                 console.log("🎯 Target cell index:", targetCellIndex);
                 console.log("🎯 Final position:", finalPosition);
@@ -1456,12 +1506,15 @@
                 }
                 
                 lastCellIndex = null;
+                
+                // Устанавливаем начальную позицию: ячейка startCellIndex должна быть под указателем
+                const initialPosition = -(startCellIndex * cellWidth) + centerOffset;
                 track.style.transition = 'none';
-                track.style.transform = 'translateX(0px)';
+                track.style.transform = `translateX(${initialPosition}px)`;
                 
                 requestAnimationFrame(() => {
                     track.style.transition = 'none';
-                    track.style.transform = 'translateX(0px)';
+                    track.style.transform = `translateX(${initialPosition}px)`;
                     requestAnimationFrame(() => {
                         track.style.transition = 'transform 5.5s cubic-bezier(0.2, 0.8, 0.3, 0.99)';
                         track.style.transform = `translateX(${finalPosition}px)`;
@@ -1478,7 +1531,7 @@
                                 const trackRect = track.getBoundingClientRect();
                                 const relativeX = pointerX - trackRect.left;
                                 const currentCellIndex = Math.floor(relativeX / cellWidthPx);
-                                if (lastCellIndex !== null && currentCellIndex !== lastCellIndex && currentCellIndex >= 0 && currentCellIndex < totalCells) {
+                                if (lastCellIndex !== null && currentCellIndex !== lastCellIndex && currentCellIndex >= 0 && currentCellIndex < track.children.length) {
                                     playTick();
                                 }
                                 lastCellIndex = currentCellIndex;
