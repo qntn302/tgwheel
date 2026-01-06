@@ -1376,6 +1376,19 @@
                 const hasWonFullAccess = userData.hasWonFullAccess || false;
                 const fullAccessCooldown = userData.fullAccessCooldown || null;
                 
+                // Отправляем spin_started на сервер перед началом спина
+                if (typeof Telegram !== 'undefined' && Telegram.WebApp && Telegram.WebApp.sendData) {
+                    try {
+                        const spinStartedData = JSON.stringify({
+                            action: "spin_started"
+                        });
+                        Telegram.WebApp.sendData(spinStartedData);
+                        console.log("📤 Sent spin_started to server");
+                    } catch (e) {
+                        console.error("❌ Error sending spin_started:", e);
+                    }
+                }
+                
                 const selectedPrizeData = selectWheelPrize(dropPace, hasWonFullAccess, fullAccessCooldown);
                 console.log("🎲 Selected prize data:", selectedPrizeData);
                 
@@ -1706,6 +1719,25 @@
                 fullAccessCooldown: userData.fullAccessCooldown,
                 hasWonFullAccess: userData.hasWonFullAccess
             }));
+            
+            // Отправляем данные о призе на сервер
+            if (typeof Telegram !== 'undefined' && Telegram.WebApp && Telegram.WebApp.sendData) {
+                try {
+                    const prizeData = JSON.stringify({
+                        action: "wheel_prize",
+                        prize: {
+                            type: currentPrize.type,
+                            value: currentPrize.value,
+                            name: currentPrize.name
+                        },
+                        language: currentLang
+                    });
+                    Telegram.WebApp.sendData(prizeData);
+                    console.log("📤 Sent prize data to server:", prizeData);
+                } catch (e) {
+                    console.error("❌ Error sending prize data:", e);
+                }
+            }
         }
         
         function copyPromoCode() {
