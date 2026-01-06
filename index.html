@@ -1485,22 +1485,12 @@
                 if (matchingCells.length === 0) {
                     console.error("❌ No matching cells found for prize:", currentPrize);
                     console.error("❌ This should not happen! Prize was selected but cell not found.");
-                    console.error("❌ Trying to find any cell with type:", currentPrize.type);
-                    // Пытаемся найти любую ячейку с таким типом
-                    for (let i = 0; i < totalCells; i++) {
-                        const cell = track.children[i];
-                        const cellType = cell.getAttribute('data-prize-type');
-                        if (cellType === currentPrize.type) {
-                            matchingCells.push(i);
-                            console.log("⚠️ Found cell with matching type at index:", i);
-                        }
-                    }
-                    if (matchingCells.length === 0) {
-                        console.error("❌ Still no matching cells! Using fallback.");
-                        targetCellIndex = startCellIndex;
-                    } else {
-                        targetCellIndex = matchingCells[0];
-                    }
+                    console.error("❌ Prize type:", currentPrize.type, "value:", currentPrize.value);
+                    // КРИТИЧНО: Не используем fallback с другим призом - это вызовет расхождение
+                    // Вместо этого используем первую ячейку с правильным типом и значением из следующего цикла
+                    // или просто используем startCellIndex, но НЕ изменяем currentPrize
+                    console.error("❌ Using startCellIndex as fallback, but keeping currentPrize unchanged");
+                    targetCellIndex = startCellIndex;
                 }
                 
                 if (matchingCells.length > 0 && targetCellIndex === -1) {
@@ -1554,32 +1544,58 @@
                     console.log("🔍 Found cell value:", foundCellValue, "Expected:", expectedValue);
                     
                     if (foundCellType !== currentPrize.type || foundCellValue !== expectedValue) {
-                        console.error("❌ MISMATCH! Target cell does not match selected prize!");
-                        console.error("❌ Selected prize:", currentPrize);
+                        console.error("❌ CRITICAL MISMATCH! Target cell does not match selected prize!");
+                        console.error("❌ Selected prize type:", currentPrize.type, "value:", currentPrize.value);
                         console.error("❌ Found cell type:", foundCellType, "value:", foundCellValue);
+                        console.error("❌ This should not happen! Re-searching for correct cell...");
                         
-                        // КРИТИЧНО: Если ячейка не соответствует, обновляем currentPrize по найденной ячейке
-                        // Это гарантирует, что отправленный приз будет соответствовать визуальному
-                        const foundPrize = prizesConfig.find(p => p.type === foundCellType && (p.value || '') === foundCellValue);
-                        if (foundPrize) {
-                            console.log("⚠️ Updating currentPrize to match found cell:", foundPrize);
-                            currentPrize = {
-                                type: foundPrize.type,
-                                value: foundPrize.value,
-                                name: foundPrize.name,
-                                name_ru: foundPrize.name_ru,
-                                barColor: foundPrize.barColor,
-                                icon: foundPrize.icon,
-                                description_ru: foundPrize.description_ru,
-                                description_en: foundPrize.description_en
-                            };
-                            console.log("✅ currentPrize updated to:", currentPrize);
+                        // КРИТИЧНО: Переищем правильную ячейку с точным совпадением
+                        matchingCells.length = 0;
+                        for (let i = 0; i < totalCells; i++) {
+                            const cell = track.children[i];
+                            const cellType = cell.getAttribute('data-prize-type');
+                            const cellValue = cell.getAttribute('data-prize-value') || '';
+                            const prizeValue = currentPrize.value || '';
+                            
+                            if (cellType === currentPrize.type && cellValue === prizeValue) {
+                                matchingCells.push(i);
+                            }
+                        }
+                        
+                        if (matchingCells.length > 0) {
+                            // Выбираем ближайшую ячейку после startCellIndex
+                            let bestCell = null;
+                            let bestDistance = Infinity;
+                            for (const cellIndex of matchingCells) {
+                                let distance = cellIndex - startCellIndex;
+                                if (distance < 0) {
+                                    distance += totalCells;
+                                }
+                                if (distance < bestDistance) {
+                                    bestDistance = distance;
+                                    bestCell = cellIndex;
+                                }
+                            }
+                            if (bestCell !== null) {
+                                targetCellIndex = bestCell;
+                                console.log("✅ Found correct cell at index:", targetCellIndex);
+                                // Пересчитываем позицию с правильной ячейкой
+                                // Переменные будут пересчитаны ниже в основном блоке
+                                console.log("✅ Will recalculate position with correct cell in main block");
+                            }
                         } else {
-                            console.error("❌ Could not find prize config for found cell!");
+                            console.error("❌ Still no matching cells found! This is a critical error.");
                         }
                     } else {
                         console.log("✅ Target cell matches selected prize!");
                     }
+                }
+                
+                // КРИТИЧНО: Убеждаемся, что targetCellIndex установлен правильно
+                if (targetCellIndex < 0 || targetCellIndex >= totalCells) {
+                    console.error("❌ Invalid targetCellIndex:", targetCellIndex);
+                    console.error("❌ Using startCellIndex as fallback");
+                    targetCellIndex = startCellIndex;
                 }
                 
                 // Вычисляем смещение от начальной позиции
@@ -1605,6 +1621,26 @@
                 // Очень маленький диапазон от -2 до +2 пикселей для точного центрирования
                 const wobbleAmount = (Math.random() * 4 - 2); // От -2 до +2
                 finalPosition += wobbleAmount;
+                
+                // КРИТИЧНО: Финальная проверка - убеждаемся, что ячейка под указателем соответствует currentPrize
+                console.log("🔍 Final verification before spin:");
+                console.log("🔍 currentPrize:", currentPrize);
+                console.log("🔍 targetCellIndex:", targetCellIndex);
+                if (targetCellIndex >= 0 && targetCellIndex < totalCells) {
+                    const finalCell = track.children[targetCellIndex];
+                    const finalCellType = finalCell.getAttribute('data-prize-type');
+                    const finalCellValue = finalCell.getAttribute('data-prize-value') || '';
+                    const finalExpectedValue = currentPrize.value || '';
+                    console.log("🔍 Final cell type:", finalCellType, "value:", finalCellValue);
+                    console.log("🔍 Expected type:", currentPrize.type, "value:", finalExpectedValue);
+                    if (finalCellType !== currentPrize.type || finalCellValue !== finalExpectedValue) {
+                        console.error("❌ FINAL MISMATCH DETECTED! Stopping spin to prevent wrong prize!");
+                        isSpinning = false;
+                        spinBtn.disabled = false;
+                        alert("Ошибка: несоответствие приза. Пожалуйста, попробуйте еще раз.");
+                        return;
+                    }
+                }
 
                 console.log("🎯 Start cell index:", startCellIndex);
                 console.log("🎯 Target cell index:", targetCellIndex);
