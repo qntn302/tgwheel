@@ -1448,44 +1448,63 @@
                 const startCellIndex = 100;
                 
                 // Находим ячейку на колесе, которая соответствует выбранному призу
-                // Ищем ячейку в диапазоне от startCellIndex до startCellIndex + prizesConfig.length
-                // чтобы она была достаточно далеко для эффекта прокрутки, но не слишком далеко
+                // Ищем все ячейки с правильным типом и значением приза
                 let targetCellIndex = -1;
-                const searchRange = prizesConfig.length * 2; // Ищем в диапазоне 2 циклов
+                const matchingCells = [];
                 
-                // Ищем ячейку с правильным типом и значением приза в диапазоне после startCellIndex
-                for (let i = startCellIndex; i < Math.min(startCellIndex + searchRange, totalCells); i++) {
+                // Собираем все подходящие ячейки
+                for (let i = 0; i < totalCells; i++) {
                     const cell = track.children[i];
                     const cellType = cell.getAttribute('data-prize-type');
                     const cellValue = cell.getAttribute('data-prize-value') || '';
                     const prizeValue = currentPrize.value || '';
                     
                     if (cellType === currentPrize.type && cellValue === prizeValue) {
-                        targetCellIndex = i;
-                        break;
+                        matchingCells.push(i);
                     }
                 }
                 
-                // Если не нашли в диапазоне, ищем следующую подходящую ячейку
-                if (targetCellIndex === -1) {
-                    for (let i = startCellIndex + searchRange; i < totalCells; i++) {
-                        const cell = track.children[i];
-                        const cellType = cell.getAttribute('data-prize-type');
-                        const cellValue = cell.getAttribute('data-prize-value') || '';
-                        const prizeValue = currentPrize.value || '';
-                        
-                        if (cellType === currentPrize.type && cellValue === prizeValue) {
-                            targetCellIndex = i;
-                            break;
+                if (matchingCells.length === 0) {
+                    console.error("❌ No matching cells found for prize:", currentPrize);
+                    targetCellIndex = startCellIndex;
+                } else {
+                    // Выбираем ячейку, которая будет после startCellIndex с учетом циклов
+                    // Нужна ячейка, которая будет достаточно далеко для эффекта прокрутки
+                    const minDistance = prizesConfig.length * 2; // Минимальное расстояние для эффекта
+                    let bestCell = null;
+                    let bestDistance = Infinity;
+                    
+                    for (const cellIndex of matchingCells) {
+                        let distance = cellIndex - startCellIndex;
+                        if (distance < 0) {
+                            distance += totalCells;
+                        }
+                        // Если расстояние достаточное и меньше текущего лучшего
+                        if (distance >= minDistance && distance < bestDistance) {
+                            bestDistance = distance;
+                            bestCell = cellIndex;
                         }
                     }
+                    
+                    // Если не нашли с достаточным расстоянием, берем ближайшую после startCellIndex
+                    if (bestCell === null) {
+                        for (const cellIndex of matchingCells) {
+                            let distance = cellIndex - startCellIndex;
+                            if (distance < 0) {
+                                distance += totalCells;
+                            }
+                            if (distance < bestDistance) {
+                                bestDistance = distance;
+                                bestCell = cellIndex;
+                            }
+                        }
+                    }
+                    
+                    targetCellIndex = bestCell !== null ? bestCell : matchingCells[0];
                 }
                 
-                // Если все еще не нашли, используем fallback
-                if (targetCellIndex === -1) {
-                    console.warn("⚠️ Target cell not found, using fallback");
-                    targetCellIndex = startCellIndex + prizesConfig.length; // Следующая ячейка в цикле
-                }
+                console.log("🎯 Found matching cells:", matchingCells);
+                console.log("🎯 Selected target cell index:", targetCellIndex);
                 
                 // Вычисляем смещение от начальной позиции
                 let cellsToMove = targetCellIndex - startCellIndex;
@@ -1506,13 +1525,9 @@
                 // Используем прямую формулу, так как translateX заменяет значение, а не добавляется
                 let finalPosition = -(targetCellIndex * cellWidth) - (fullCycles * cycleSize * cellWidth) + centerOffset;
                 
-                // Добавляем случайную раскачку для более естественного вида
-                // Используем комбинацию двух случайных значений для более разнообразного результата
-                // Диапазон от -6 до +6 пикселей, но с большей вероятностью значений ближе к центру
-                const random1 = Math.random() * 6 - 3; // От -3 до +3
-                const random2 = Math.random() * 6 - 3; // От -3 до +3
-                // Усредняем для более центрального распределения, но с разнообразием
-                const wobbleAmount = (random1 + random2) / 2;
+                // Добавляем небольшую случайную раскачку для более естественного вида
+                // Очень маленький диапазон от -2 до +2 пикселей для точного центрирования
+                const wobbleAmount = (Math.random() * 4 - 2); // От -2 до +2
                 finalPosition += wobbleAmount;
 
                 console.log("🎯 Start cell index:", startCellIndex);
