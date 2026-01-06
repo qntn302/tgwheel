@@ -303,7 +303,7 @@
             position: relative;
             height: 100%;
             display: flex;
-            transition: transform 5.5s cubic-bezier(0.0, 0.0, 0.2, 1);
+            transition: transform 5.5s cubic-bezier(0.15, 0.15, 0.2, 1);
             will-change: transform;
         }
         .roulette-cell {
@@ -1553,7 +1553,7 @@
                     track.style.transition = 'none';
                     track.style.transform = `translateX(${initialPosition}px)`;
                     requestAnimationFrame(() => {
-                        track.style.transition = 'transform 5.5s cubic-bezier(0.0, 0.0, 0.2, 1)';
+                        track.style.transition = 'transform 5.5s cubic-bezier(0.15, 0.15, 0.2, 1)';
                         track.style.transform = `translateX(${finalPosition}px)`;
                         
                         const startTime = Date.now();
