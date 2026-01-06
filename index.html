@@ -1426,6 +1426,8 @@
                     return;
                 }
                 
+                // КРИТИЧНО: Сохраняем выбранный приз в currentPrize ПЕРЕД поиском ячейки
+                // Это гарантирует, что currentPrize будет содержать правильный приз
                 currentPrize = {
                     type: selectedPrize.type,
                     value: selectedPrize.value,
@@ -1437,7 +1439,10 @@
                     description_en: selectedPrize.description_en
                 };
                 
-                console.log("✅ Prize selected:", currentPrize);
+                console.log("✅ Prize selected and saved to currentPrize:", currentPrize);
+                console.log("✅ Prize type:", currentPrize.type);
+                console.log("✅ Prize value:", currentPrize.value);
+                console.log("✅ Prize name:", currentPrize.name);
                 console.log("✅ Prize index in config:", prizeIndex);
                 console.log("✅ Prize icon:", selectedPrize.icon);
 
@@ -1479,8 +1484,26 @@
                 
                 if (matchingCells.length === 0) {
                     console.error("❌ No matching cells found for prize:", currentPrize);
-                    targetCellIndex = startCellIndex;
-                } else {
+                    console.error("❌ This should not happen! Prize was selected but cell not found.");
+                    console.error("❌ Trying to find any cell with type:", currentPrize.type);
+                    // Пытаемся найти любую ячейку с таким типом
+                    for (let i = 0; i < totalCells; i++) {
+                        const cell = track.children[i];
+                        const cellType = cell.getAttribute('data-prize-type');
+                        if (cellType === currentPrize.type) {
+                            matchingCells.push(i);
+                            console.log("⚠️ Found cell with matching type at index:", i);
+                        }
+                    }
+                    if (matchingCells.length === 0) {
+                        console.error("❌ Still no matching cells! Using fallback.");
+                        targetCellIndex = startCellIndex;
+                    } else {
+                        targetCellIndex = matchingCells[0];
+                    }
+                }
+                
+                if (matchingCells.length > 0 && targetCellIndex === -1) {
                     // Выбираем ячейку, которая будет после startCellIndex с учетом циклов
                     // Нужна ячейка, которая будет достаточно далеко для эффекта прокрутки
                     const minDistance = prizesConfig.length * 2; // Минимальное расстояние для эффекта
@@ -1518,6 +1541,46 @@
                 
                 console.log("🎯 Found matching cells:", matchingCells);
                 console.log("🎯 Selected target cell index:", targetCellIndex);
+                
+                // КРИТИЧНО: Проверяем, что найденная ячейка соответствует выбранному призу
+                if (targetCellIndex >= 0 && targetCellIndex < totalCells) {
+                    const foundCell = track.children[targetCellIndex];
+                    const foundCellType = foundCell.getAttribute('data-prize-type');
+                    const foundCellValue = foundCell.getAttribute('data-prize-value') || '';
+                    const expectedValue = currentPrize.value || '';
+                    
+                    console.log("🔍 Verifying target cell:");
+                    console.log("🔍 Found cell type:", foundCellType, "Expected:", currentPrize.type);
+                    console.log("🔍 Found cell value:", foundCellValue, "Expected:", expectedValue);
+                    
+                    if (foundCellType !== currentPrize.type || foundCellValue !== expectedValue) {
+                        console.error("❌ MISMATCH! Target cell does not match selected prize!");
+                        console.error("❌ Selected prize:", currentPrize);
+                        console.error("❌ Found cell type:", foundCellType, "value:", foundCellValue);
+                        
+                        // КРИТИЧНО: Если ячейка не соответствует, обновляем currentPrize по найденной ячейке
+                        // Это гарантирует, что отправленный приз будет соответствовать визуальному
+                        const foundPrize = prizesConfig.find(p => p.type === foundCellType && (p.value || '') === foundCellValue);
+                        if (foundPrize) {
+                            console.log("⚠️ Updating currentPrize to match found cell:", foundPrize);
+                            currentPrize = {
+                                type: foundPrize.type,
+                                value: foundPrize.value,
+                                name: foundPrize.name,
+                                name_ru: foundPrize.name_ru,
+                                barColor: foundPrize.barColor,
+                                icon: foundPrize.icon,
+                                description_ru: foundPrize.description_ru,
+                                description_en: foundPrize.description_en
+                            };
+                            console.log("✅ currentPrize updated to:", currentPrize);
+                        } else {
+                            console.error("❌ Could not find prize config for found cell!");
+                        }
+                    } else {
+                        console.log("✅ Target cell matches selected prize!");
+                    }
+                }
                 
                 // Вычисляем смещение от начальной позиции
                 let cellsToMove = targetCellIndex - startCellIndex;
@@ -1721,6 +1784,18 @@
             }));
             
             // Отправляем данные о призе на сервер
+            // КРИТИЧНО: Используем currentPrize, который был установлен при выборе приза
+            if (!currentPrize) {
+                console.error("❌ currentPrize is null when trying to send to server!");
+                return;
+            }
+            
+            console.log("📤 Preparing to send prize data to server:");
+            console.log("📤 currentPrize:", currentPrize);
+            console.log("📤 currentPrize.type:", currentPrize.type);
+            console.log("📤 currentPrize.value:", currentPrize.value);
+            console.log("📤 currentPrize.name:", currentPrize.name);
+            
             if (typeof Telegram !== 'undefined' && Telegram.WebApp && Telegram.WebApp.sendData) {
                 try {
                     const prizeData = JSON.stringify({
@@ -1737,6 +1812,8 @@
                 } catch (e) {
                     console.error("❌ Error sending prize data:", e);
                 }
+            } else {
+                console.warn("⚠️ Telegram.WebApp.sendData is not available");
             }
         }
         
