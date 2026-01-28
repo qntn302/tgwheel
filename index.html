@@ -1466,253 +1466,76 @@
                 }
                 
                 const containerWidth = container.offsetWidth;
-                // Ячейка имеет width: 140px + margin: 0 5px = общая ширина 150px
-                const cellWidth = 150;
-                // Точный расчет центра: указатель находится точно по центру контейнера (50%)
-                // Центрируем ячейку так, чтобы центр ячейки (75px от левого края) совпадал с центром контейнера
+                const cellWidth = 150; // width: 140px + margin: 0 5px = 150px
                 const centerOffset = containerWidth / 2 - cellWidth / 2;
                 const totalCells = track.children.length;
+                const startCellIndex = 100; // Начальная ячейка под указателем
                 
-                // Начальная позиция под указателем - ячейка 100 (середина из 200)
-                const startCellIndex = 100;
+                // ПРОСТАЯ ЛОГИКА: Находим ячейку с нужным призом в диапазоне [startCellIndex + 30, startCellIndex + 70)
+                // Это гарантирует минимум 3 полных оборота (30 ячеек = 3 * 10 призов)
+                const minTargetIndex = startCellIndex + 30;
+                const maxTargetIndex = Math.min(startCellIndex + 70, totalCells);
                 
-                // Находим ячейку на колесе, которая соответствует выбранному призу
-                // Ищем все ячейки с правильным типом и значением приза
                 let targetCellIndex = -1;
-                const matchingCells = [];
+                const prizeValue = currentPrize.value || '';
                 
-                // Собираем все подходящие ячейки
-                for (let i = 0; i < totalCells; i++) {
+                // Ищем подходящую ячейку в нужном диапазоне
+                for (let i = minTargetIndex; i < maxTargetIndex; i++) {
                     const cell = track.children[i];
                     const cellType = cell.getAttribute('data-prize-type');
                     const cellValue = cell.getAttribute('data-prize-value') || '';
-                    const prizeValue = currentPrize.value || '';
                     
                     if (cellType === currentPrize.type && cellValue === prizeValue) {
-                        matchingCells.push(i);
+                        targetCellIndex = i;
+                        break;
                     }
                 }
                 
-                if (matchingCells.length === 0) {
-                    console.error("❌ No matching cells found for prize:", currentPrize);
-                    console.error("❌ This should not happen! Prize was selected but cell not found.");
-                    console.error("❌ Prize type:", currentPrize.type, "value:", currentPrize.value);
-                    // КРИТИЧНО: Не используем fallback с другим призом - это вызовет расхождение
-                    // Вместо этого используем первую ячейку с правильным типом и значением из следующего цикла
-                    // или просто используем startCellIndex, но НЕ изменяем currentPrize
-                    console.error("❌ Using startCellIndex as fallback, but keeping currentPrize unchanged");
-                    targetCellIndex = startCellIndex;
-                }
-                
-                if (matchingCells.length > 0 && targetCellIndex === -1) {
-                    // Выбираем ячейку, которая будет после startCellIndex с учетом циклов
-                    // Нужна ячейка, которая будет достаточно далеко для эффекта прокрутки
-                    const minDistance = prizesConfig.length * 2; // Минимальное расстояние для эффекта
-                    let bestCell = null;
-                    let bestDistance = Infinity;
-                    
-                    for (const cellIndex of matchingCells) {
-                        let distance = cellIndex - startCellIndex;
-                        if (distance < 0) {
-                            distance += totalCells;
-                        }
-                        // Если расстояние достаточное и меньше текущего лучшего
-                        if (distance >= minDistance && distance < bestDistance) {
-                            bestDistance = distance;
-                            bestCell = cellIndex;
-                        }
-                    }
-                    
-                    // Если не нашли с достаточным расстоянием, берем ближайшую после startCellIndex
-                    if (bestCell === null) {
-                        for (const cellIndex of matchingCells) {
-                            let distance = cellIndex - startCellIndex;
-                            if (distance < 0) {
-                                distance += totalCells;
-                            }
-                            if (distance < bestDistance) {
-                                bestDistance = distance;
-                                bestCell = cellIndex;
-                            }
-                        }
-                    }
-                    
-                    targetCellIndex = bestCell !== null ? bestCell : matchingCells[0];
-                }
-                
-                console.log("🎯 Found matching cells:", matchingCells);
-                console.log("🎯 Selected target cell index:", targetCellIndex);
-                
-                // КРИТИЧНО: Проверяем, что найденная ячейка соответствует выбранному призу
-                if (targetCellIndex >= 0 && targetCellIndex < totalCells) {
-                    const foundCell = track.children[targetCellIndex];
-                    const foundCellType = foundCell.getAttribute('data-prize-type');
-                    const foundCellValue = foundCell.getAttribute('data-prize-value') || '';
-                    const expectedValue = currentPrize.value || '';
-                    
-                    console.log("🔍 Verifying target cell:");
-                    console.log("🔍 Found cell type:", foundCellType, "Expected:", currentPrize.type);
-                    console.log("🔍 Found cell value:", foundCellValue, "Expected:", expectedValue);
-                    
-                    if (foundCellType !== currentPrize.type || foundCellValue !== expectedValue) {
-                        console.error("❌ CRITICAL MISMATCH! Target cell does not match selected prize!");
-                        console.error("❌ Selected prize type:", currentPrize.type, "value:", currentPrize.value);
-                        console.error("❌ Found cell type:", foundCellType, "value:", foundCellValue);
-                        console.error("❌ This should not happen! Re-searching for correct cell...");
+                // Если не нашли в диапазоне, ищем первую подходящую после startCellIndex
+                if (targetCellIndex === -1) {
+                    for (let i = startCellIndex + 1; i < totalCells; i++) {
+                        const cell = track.children[i];
+                        const cellType = cell.getAttribute('data-prize-type');
+                        const cellValue = cell.getAttribute('data-prize-value') || '';
                         
-                        // КРИТИЧНО: Переищем правильную ячейку с точным совпадением
-                        matchingCells.length = 0;
-                        for (let i = 0; i < totalCells; i++) {
-                            const cell = track.children[i];
-                            const cellType = cell.getAttribute('data-prize-type');
-                            const cellValue = cell.getAttribute('data-prize-value') || '';
-                            const prizeValue = currentPrize.value || '';
-                            
-                            if (cellType === currentPrize.type && cellValue === prizeValue) {
-                                matchingCells.push(i);
-                            }
+                        if (cellType === currentPrize.type && cellValue === prizeValue) {
+                            targetCellIndex = i;
+                            break;
                         }
-                        
-                        if (matchingCells.length > 0) {
-                            // Выбираем ближайшую ячейку после startCellIndex
-                            let bestCell = null;
-                            let bestDistance = Infinity;
-                            for (const cellIndex of matchingCells) {
-                                let distance = cellIndex - startCellIndex;
-                                if (distance < 0) {
-                                    distance += totalCells;
-                                }
-                                if (distance < bestDistance) {
-                                    bestDistance = distance;
-                                    bestCell = cellIndex;
-                                }
-                            }
-                            if (bestCell !== null) {
-                                targetCellIndex = bestCell;
-                                console.log("✅ Found correct cell at index:", targetCellIndex);
-                                // Пересчитываем позицию с правильной ячейкой
-                                // Переменные будут пересчитаны ниже в основном блоке
-                                console.log("✅ Will recalculate position with correct cell in main block");
-                            }
-                        } else {
-                            console.error("❌ Still no matching cells found! This is a critical error.");
-                        }
-                    } else {
-                        console.log("✅ Target cell matches selected prize!");
                     }
                 }
                 
-                // КРИТИЧНО: Убеждаемся, что targetCellIndex установлен правильно
-                if (targetCellIndex < 0 || targetCellIndex >= totalCells) {
-                    console.error("❌ Invalid targetCellIndex:", targetCellIndex);
-                    console.error("❌ Using startCellIndex as fallback");
-                    targetCellIndex = startCellIndex;
-                }
-                
-                // Вычисляем смещение от начальной позиции
-                let cellsToMove = targetCellIndex - startCellIndex;
-                if (cellsToMove < 0) {
-                    cellsToMove += totalCells;
-                }
-                
-                // Добавляем несколько полных циклов призов для эффекта прокрутки
-                // Используем prizesConfig.length (10) как размер цикла призов
-                const fullCycles = 3;
-                const cycleSize = prizesConfig.length;
-                const totalCellsToMove = fullCycles * cycleSize + cellsToMove;
-                
-                // Вычисляем финальную позицию
-                // Начальная позиция: ячейка startCellIndex под указателем
-                const initialPosition = -(startCellIndex * cellWidth) + centerOffset;
-                // Финальная позиция: двигаемся от initialPosition на totalCellsToMove ячеек влево
-                // КРИТИЧНО: Используем относительное смещение от начальной позиции для точности
-                let finalPosition = initialPosition - (totalCellsToMove * cellWidth);
-                
-                // КРИТИЧНО: Убираем случайное смещение, так как оно может привести к расхождению
-                // В Telegram мини-приложении точность критична
-                // const wobbleAmount = 0; // Отключено для точности
-                
-                // КРИТИЧНО: Финальная проверка - убеждаемся, что ячейка под указателем соответствует currentPrize
-                console.log("🔍 Final verification before spin:");
-                console.log("🔍 currentPrize:", currentPrize);
-                console.log("🔍 targetCellIndex:", targetCellIndex);
-                if (targetCellIndex >= 0 && targetCellIndex < totalCells) {
-                    const finalCell = track.children[targetCellIndex];
-                    const finalCellType = finalCell.getAttribute('data-prize-type');
-                    const finalCellValue = finalCell.getAttribute('data-prize-value') || '';
-                    const finalExpectedValue = currentPrize.value || '';
-                    console.log("🔍 Final cell type:", finalCellType, "value:", finalCellValue);
-                    console.log("🔍 Expected type:", currentPrize.type, "value:", finalExpectedValue);
-                    if (finalCellType !== currentPrize.type || finalCellValue !== finalExpectedValue) {
-                        console.error("❌ FINAL MISMATCH DETECTED!");
-                        console.error("❌ Cell has:", finalCellType, finalCellValue);
-                        console.error("❌ Expected:", currentPrize.type, finalExpectedValue);
-                        console.error("❌ Re-searching for correct cell...");
+                // Последний fallback - ищем с начала
+                if (targetCellIndex === -1) {
+                    for (let i = 0; i < totalCells; i++) {
+                        const cell = track.children[i];
+                        const cellType = cell.getAttribute('data-prize-type');
+                        const cellValue = cell.getAttribute('data-prize-value') || '';
                         
-                        // КРИТИЧНО: Переищем правильную ячейку еще раз
-                        matchingCells.length = 0;
-                        for (let i = 0; i < totalCells; i++) {
-                            const cell = track.children[i];
-                            const cellType = cell.getAttribute('data-prize-type');
-                            const cellValue = cell.getAttribute('data-prize-value') || '';
-                            const prizeValue = currentPrize.value || '';
-                            
-                            if (cellType === currentPrize.type && cellValue === prizeValue) {
-                                matchingCells.push(i);
-                            }
+                        if (cellType === currentPrize.type && cellValue === prizeValue) {
+                            targetCellIndex = i;
+                            break;
                         }
-                        
-                        if (matchingCells.length > 0) {
-                            // Выбираем ближайшую ячейку после startCellIndex
-                            let bestCell = null;
-                            let bestDistance = Infinity;
-                            for (const cellIndex of matchingCells) {
-                                let distance = cellIndex - startCellIndex;
-                                if (distance < 0) {
-                                    distance += totalCells;
-                                }
-                                if (distance < bestDistance) {
-                                    bestDistance = distance;
-                                    bestCell = cellIndex;
-                                }
-                            }
-                            if (bestCell !== null) {
-                                targetCellIndex = bestCell;
-                                console.log("✅ Found correct cell at index:", targetCellIndex);
-                                // Пересчитываем все переменные
-                                cellsToMove = targetCellIndex - startCellIndex;
-                                if (cellsToMove < 0) {
-                                    cellsToMove += totalCells;
-                                }
-                                const totalCellsToMove = fullCycles * cycleSize + cellsToMove;
-                                finalPosition = -(targetCellIndex * cellWidth) - (fullCycles * cycleSize * cellWidth) + centerOffset;
-                                const wobbleAmount = (Math.random() * 4 - 2);
-                                finalPosition += wobbleAmount;
-                                console.log("✅ Recalculated everything with correct cell");
-                            } else {
-                                console.error("❌ Could not find correct cell! Stopping spin.");
-                                isSpinning = false;
-                                spinBtn.disabled = false;
-                                alert("Ошибка: не удалось найти правильную ячейку. Пожалуйста, попробуйте еще раз.");
-                                return;
-                            }
-                        } else {
-                            console.error("❌ No matching cells found! Stopping spin.");
-                            isSpinning = false;
-                            spinBtn.disabled = false;
-                            alert("Ошибка: не удалось найти правильную ячейку. Пожалуйста, попробуйте еще раз.");
-                            return;
-                        }
-                    } else {
-                        console.log("✅ Final verification passed - cell matches prize!");
                     }
                 }
-
-                console.log("🎯 Start cell index:", startCellIndex);
+                
+                if (targetCellIndex === -1) {
+                    console.error("❌ No matching cell found for prize:", currentPrize);
+                    isSpinning = false;
+                    spinBtn.disabled = false;
+                    return;
+                }
+                
+                console.log("🎯 Prize:", currentPrize.type, currentPrize.value);
                 console.log("🎯 Target cell index:", targetCellIndex);
-                console.log("🎯 Cells to move:", cellsToMove);
-                console.log("🎯 Full cycles:", fullCycles);
-                console.log("🎯 Total cells to move:", totalCellsToMove);
+                console.log("🎯 Target cell will show:", track.children[targetCellIndex].getAttribute('data-prize-type'));
+                
+                // ПРОСТАЯ ФОРМУЛА: Чтобы ячейка targetCellIndex была под указателем
+                // position = -(targetCellIndex * cellWidth) + centerOffset
+                const initialPosition = -(startCellIndex * cellWidth) + centerOffset;
+                const finalPosition = -(targetCellIndex * cellWidth) + centerOffset;
+                
+                console.log("🎯 Start cell:", startCellIndex);
                 console.log("🎯 Initial position:", initialPosition);
                 console.log("🎯 Final position:", finalPosition);
                 
@@ -1727,9 +1550,13 @@
                 track.style.transition = 'none';
                 track.style.transform = `translateX(${initialPosition}px)`;
                 
+                // Используем фиксированную копию targetCellIndex для использования после анимации
+                const finalTargetCellIndex = targetCellIndex;
+                
                 requestAnimationFrame(() => {
                     track.style.transition = 'none';
                     track.style.transform = `translateX(${initialPosition}px)`;
+                    
                     requestAnimationFrame(() => {
                         track.style.transition = 'transform 5.5s cubic-bezier(0.15, 0.15, 0.2, 1)';
                         track.style.transform = `translateX(${finalPosition}px)`;
@@ -1738,82 +1565,38 @@
                         const duration = 5500;
                         const containerRect = container.getBoundingClientRect();
                         const pointerX = containerRect.left + containerRect.width / 2;
-                        const cellWidthPx = 150;
                         
                         function trackRoulettePosition() {
                             const elapsed = Date.now() - startTime;
                             if (elapsed < duration) {
                                 const trackRect = track.getBoundingClientRect();
                                 const relativeX = pointerX - trackRect.left;
-                                const currentCellIndex = Math.floor(relativeX / cellWidthPx);
+                                const currentCellIndex = Math.floor(relativeX / cellWidth);
                                 if (lastCellIndex !== null && currentCellIndex !== lastCellIndex && currentCellIndex >= 0 && currentCellIndex < track.children.length) {
                                     playTick();
                                 }
                                 lastCellIndex = currentCellIndex;
                                 animationFrameId = requestAnimationFrame(trackRoulettePosition);
                             } else {
-                                // КРИТИЧНО: Принудительно устанавливаем точную финальную позицию
-                                // Это важно для Telegram мини-приложения, где могут быть проблемы с точностью анимации
+                                // После анимации - устанавливаем точную позицию
                                 track.style.transition = 'none';
-                                // Пересчитываем centerOffset на случай изменения размера контейнера
                                 const currentContainerWidth = container.offsetWidth;
                                 const currentCenterOffset = currentContainerWidth / 2 - cellWidth / 2;
-                                // Используем ту же логику, что и в основном расчете: относительное смещение от начальной позиции
-                                const currentInitialPosition = -(startCellIndex * cellWidth) + currentCenterOffset;
-                                const exactFinalPosition = currentInitialPosition - (totalCellsToMove * cellWidth);
+                                // ПРОСТАЯ ФОРМУЛА: ячейка finalTargetCellIndex под указателем
+                                const exactFinalPosition = -(finalTargetCellIndex * cellWidth) + currentCenterOffset;
                                 track.style.transform = `translateX(${exactFinalPosition}px)`;
                                 
-                                // КРИТИЧНО: Проверяем, что правильная ячейка находится под указателем
-                                // Это дополнительная проверка для Telegram мини-приложения
-                                requestAnimationFrame(() => {
-                                    // Даем браузеру время применить transform
-                                    requestAnimationFrame(() => {
-                                        const containerRect = container.getBoundingClientRect();
-                                        const pointerX = containerRect.left + containerRect.width / 2;
-                                        const trackRect = track.getBoundingClientRect();
-                                        const relativeX = pointerX - trackRect.left;
-                                        const finalCellIndex = Math.round(relativeX / cellWidth);
-                                        
-                                        if (finalCellIndex >= 0 && finalCellIndex < track.children.length) {
-                                            const finalCell = track.children[finalCellIndex];
-                                            const finalCellType = finalCell.getAttribute('data-prize-type');
-                                            const finalCellValue = finalCell.getAttribute('data-prize-value') || '';
-                                            const expectedValue = currentPrize.value || '';
-                                            
-                                            console.log("🔍 Final check after animation:");
-                                            console.log("🔍 Cell under pointer:", finalCellIndex, "type:", finalCellType, "value:", finalCellValue);
-                                            console.log("🔍 Expected:", currentPrize.type, "value:", expectedValue);
-                                            
-                                            // Если ячейка не совпадает, корректируем позицию
-                                            if (finalCellType !== currentPrize.type || finalCellValue !== expectedValue) {
-                                                console.warn("⚠️ Cell mismatch detected, adjusting position...");
-                                                // Ищем правильную ячейку и корректируем позицию
-                                                for (let i = 0; i < track.children.length; i++) {
-                                                    const cell = track.children[i];
-                                                    const cellType = cell.getAttribute('data-prize-type');
-                                                    const cellValue = cell.getAttribute('data-prize-value') || '';
-                                                    if (cellType === currentPrize.type && cellValue === expectedValue) {
-                                                        const correctPosition = -(i * cellWidth) - (fullCycles * cycleSize * cellWidth) + currentCenterOffset;
-                                                        track.style.transform = `translateX(${correctPosition}px)`;
-                                                        console.log("✅ Position corrected to cell index:", i);
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        
-                                        if (winSound) {
-                                            winSound.currentTime = 0;
-                                            winSound.play().catch(() => {});
-                                        }
-                                        if (animationFrameId) cancelAnimationFrame(animationFrameId);
-                                        
-                                        // КРИТИЧНО: Восстанавливаем currentPrize из closure перед показом
-                                        // В Telegram WebApp глобальная переменная может быть потеряна за 5.5 секунд анимации
-                                        currentPrize = selectedPrizeCopy;
-                                        showPrize();
-                                    });
-                                });
+                                console.log("✅ Animation complete. Final cell index:", finalTargetCellIndex);
+                                
+                                if (winSound) {
+                                    winSound.currentTime = 0;
+                                    winSound.play().catch(() => {});
+                                }
+                                if (animationFrameId) cancelAnimationFrame(animationFrameId);
+                                
+                                // Восстанавливаем currentPrize из closure и показываем приз
+                                currentPrize = selectedPrizeCopy;
+                                showPrize();
                             }
                         }
                         animationFrameId = requestAnimationFrame(trackRoulettePosition);
