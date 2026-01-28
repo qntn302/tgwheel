@@ -1025,6 +1025,8 @@
         let currentPromoCode = null;
         let initializationAttempts = 0;
         const MAX_INIT_ATTEMPTS = 3;
+        let currentTargetCellIndex = null; // Индекс ячейки, на которой должна остановиться рулетка
+        let resizeObserver = null; // Observer для отслеживания изменения размера контейнера
         
         // ==================== ВЕРОЯТНОСТИ ====================
         function getWheelProbabilities(drop_pace) {
@@ -1146,6 +1148,47 @@
                 ]
             }
         };
+        
+        // ==================== ПЕРЕСЧЁТ ПОЗИЦИИ РУЛЕТКИ ====================
+        // Функция для установки точной позиции рулетки на основе currentTargetCellIndex
+        function updateRoulettePosition() {
+            if (currentTargetCellIndex === null) return;
+            
+            const track = document.getElementById('rouletteTrack');
+            const container = document.querySelector('.roulette-container');
+            if (!track || !container) return;
+            
+            const cellWidth = 150;
+            const containerWidth = container.offsetWidth;
+            const centerOffset = containerWidth / 2 - cellWidth / 2;
+            const exactPosition = -(currentTargetCellIndex * cellWidth) + centerOffset;
+            
+            track.style.transition = 'none';
+            track.style.transform = `translateX(${exactPosition}px)`;
+            
+            console.log("📐 Position recalculated. Container width:", containerWidth, "Position:", exactPosition);
+        }
+        
+        // Инициализация ResizeObserver для отслеживания изменений размера контейнера
+        function initResizeObserver() {
+            const container = document.querySelector('.roulette-container');
+            if (!container) return;
+            
+            // Удаляем старый observer если есть
+            if (resizeObserver) {
+                resizeObserver.disconnect();
+            }
+            
+            resizeObserver = new ResizeObserver((entries) => {
+                // Если есть установленная позиция и рулетка не крутится, пересчитываем
+                if (currentTargetCellIndex !== null && !isSpinning) {
+                    updateRoulettePosition();
+                }
+            });
+            
+            resizeObserver.observe(container);
+            console.log("👁️ ResizeObserver initialized");
+        }
         
         // ==================== ИНИЦИАЛИЗАЦИЯ РУЛЕТКИ ====================
         function initRoulette() {
@@ -1340,6 +1383,7 @@
                     return;
                 }
                 isSpinning = true;
+                currentTargetCellIndex = null; // Сбрасываем предыдущую позицию
                 
                 const spinBtn = document.getElementById("spinBtn");
                 const track = document.getElementById("rouletteTrack");
@@ -1566,12 +1610,16 @@
                                 animationFrameId = requestAnimationFrame(trackRoulettePosition);
                             } else {
                                 // После анимации - устанавливаем точную позицию
-                                track.style.transition = 'none';
-                                const currentContainerWidth = container.offsetWidth;
-                                const currentCenterOffset = currentContainerWidth / 2 - cellWidth / 2;
-                                // ПРОСТАЯ ФОРМУЛА: ячейка finalTargetCellIndex под указателем
-                                const exactFinalPosition = -(finalTargetCellIndex * cellWidth) + currentCenterOffset;
-                                track.style.transform = `translateX(${exactFinalPosition}px)`;
+                                // Сохраняем индекс для пересчёта при resize
+                                currentTargetCellIndex = finalTargetCellIndex;
+                                
+                                // Устанавливаем позицию сразу
+                                updateRoulettePosition();
+                                
+                                // Дополнительные пересчёты с задержками для гарантии стабильности в Telegram WebView
+                                setTimeout(updateRoulettePosition, 50);
+                                setTimeout(updateRoulettePosition, 150);
+                                setTimeout(updateRoulettePosition, 300);
                                 
                                 console.log("✅ Animation complete. Final cell index:", finalTargetCellIndex);
                                 
@@ -1843,12 +1891,21 @@
                     console.log("✅ Spin button found");
                 }
                 
+                // Инициализируем ResizeObserver для корректного отображения в Telegram WebView
+                initResizeObserver();
+                
                 if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
                     Telegram.WebApp.ready();
                     Telegram.WebApp.expand();
                     const userLang = Telegram.WebApp.initDataUnsafe.user?.language_code || 'en';
                     const savedLang = localStorage.getItem('wheel_lang') || (userLang === 'ru' ? 'ru' : 'en');
                     setLanguage(savedLang);
+                    
+                    // В Telegram WebView размеры могут устанавливаться с задержкой
+                    // Пересчитываем позицию несколько раз после загрузки
+                    setTimeout(updateRoulettePosition, 100);
+                    setTimeout(updateRoulettePosition, 500);
+                    setTimeout(updateRoulettePosition, 1000);
                 } else {
                     const savedLang = localStorage.getItem('wheel_lang') || 'en';
                     setLanguage(savedLang);
