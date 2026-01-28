@@ -1150,6 +1150,22 @@
         };
         
         // ==================== ПЕРЕСЧЁТ ПОЗИЦИИ РУЛЕТКИ ====================
+        // Функция для получения РЕАЛЬНОЙ ширины ячейки (с учётом масштабирования viewport)
+        function getRealCellWidth() {
+            const track = document.getElementById('rouletteTrack');
+            if (!track || track.children.length < 2) return 150; // fallback
+            
+            // Вычисляем реальную ширину по разнице позиций двух соседних ячеек
+            const cell0Rect = track.children[0].getBoundingClientRect();
+            const cell1Rect = track.children[1].getBoundingClientRect();
+            const realWidth = cell1Rect.left - cell0Rect.left;
+            
+            // Защита от некорректных значений
+            if (realWidth <= 0 || realWidth > 300) return 150;
+            
+            return realWidth;
+        }
+        
         // Функция для установки точной позиции рулетки на основе currentTargetCellIndex
         function updateRoulettePosition() {
             if (currentTargetCellIndex === null) return;
@@ -1158,7 +1174,8 @@
             const container = document.querySelector('.roulette-container');
             if (!track || !container) return;
             
-            const cellWidth = 150;
+            // Используем РЕАЛЬНУЮ ширину ячейки, а не фиксированную
+            const cellWidth = getRealCellWidth();
             const containerWidth = container.offsetWidth;
             const centerOffset = containerWidth / 2 - cellWidth / 2;
             const exactPosition = -(currentTargetCellIndex * cellWidth) + centerOffset;
@@ -1166,7 +1183,7 @@
             track.style.transition = 'none';
             track.style.transform = `translateX(${exactPosition}px)`;
             
-            console.log("📐 Position recalculated. Container width:", containerWidth, "Position:", exactPosition);
+            console.log("📐 Position recalculated. Cell width:", cellWidth, "Container width:", containerWidth, "Position:", exactPosition);
         }
         
         // Инициализация ResizeObserver для отслеживания изменений размера контейнера
@@ -1179,16 +1196,34 @@
                 resizeObserver.disconnect();
             }
             
+            let lastWidth = container.offsetWidth;
+            
             resizeObserver = new ResizeObserver((entries) => {
-                // Если есть установленная позиция и рулетка не крутится, пересчитываем
-                if (currentTargetCellIndex !== null && !isSpinning) {
-                    updateRoulettePosition();
+                const newWidth = container.offsetWidth;
+                // Пересчитываем только если ширина реально изменилась
+                if (newWidth !== lastWidth) {
+                    lastWidth = newWidth;
+                    console.log("📐 Container resized to:", newWidth);
+                    
+                    // Если есть установленная позиция, пересчитываем
+                    // Даже во время анимации - это предотвратит "съезжание"
+                    if (currentTargetCellIndex !== null) {
+                        // Небольшая задержка, чтобы браузер успел обновить layout
+                        setTimeout(updateRoulettePosition, 10);
+                    }
                 }
             });
             
             resizeObserver.observe(container);
             console.log("👁️ ResizeObserver initialized");
         }
+        
+        // Также отслеживаем изменения размера окна (на случай если ResizeObserver не сработает)
+        window.addEventListener('resize', () => {
+            if (currentTargetCellIndex !== null) {
+                setTimeout(updateRoulettePosition, 10);
+            }
+        });
         
         // ==================== ИНИЦИАЛИЗАЦИЯ РУЛЕТКИ ====================
         function initRoulette() {
@@ -1227,13 +1262,25 @@
                 // Устанавливаем начальную позицию: ячейка 100 (середина из 200) должна быть под указателем
                 const container = document.querySelector('.roulette-container');
                 if (container) {
+                    const startCellIndex = 100;
+                    // Сохраняем начальную позицию для ResizeObserver
+                    currentTargetCellIndex = startCellIndex;
+                    
+                    // Начальное позиционирование с фиксированным значением
+                    // (ячейки ещё не отрисованы, getRealCellWidth может не работать)
                     const containerWidth = container.offsetWidth;
                     const cellWidth = 150;
                     const centerOffset = containerWidth / 2 - cellWidth / 2;
-                    const startCellIndex = 100;
                     const initialPosition = -(startCellIndex * cellWidth) + centerOffset;
                     track.style.transition = 'none';
                     track.style.transform = `translateX(${initialPosition}px)`;
+                    
+                    // Пересчитываем с реальной шириной после отрисовки
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            updateRoulettePosition();
+                        });
+                    });
                 }
                 
                 console.log("🎡 Roulette initialized: 200 cells created");
@@ -1510,10 +1557,13 @@
                 }
                 
                 const containerWidth = container.offsetWidth;
-                const cellWidth = 150; // width: 140px + margin: 0 5px = 150px
+                // Используем РЕАЛЬНУЮ ширину ячейки (с учётом масштабирования viewport в Telegram)
+                const cellWidth = getRealCellWidth();
                 const centerOffset = containerWidth / 2 - cellWidth / 2;
                 const totalCells = track.children.length;
                 const startCellIndex = 100; // Начальная ячейка под указателем
+                
+                console.log("📐 Real cell width:", cellWidth, "Container width:", containerWidth);
                 
                 // НАДЁЖНАЯ ЛОГИКА: Используем prizeIndex напрямую
                 // Ячейки создаются по формуле: ячейка[i] имеет приз prizesConfig[i % 10]
