@@ -1471,64 +1471,51 @@
                 const totalCells = track.children.length;
                 const startCellIndex = 100; // Начальная ячейка под указателем
                 
-                // ПРОСТАЯ ЛОГИКА: Находим ячейку с нужным призом в диапазоне [startCellIndex + 30, startCellIndex + 70)
-                // Это гарантирует минимум 3 полных оборота (30 ячеек = 3 * 10 призов)
-                const minTargetIndex = startCellIndex + 30;
-                const maxTargetIndex = Math.min(startCellIndex + 70, totalCells);
+                // НАДЁЖНАЯ ЛОГИКА: Используем prizeIndex напрямую
+                // Ячейки создаются по формуле: ячейка[i] имеет приз prizesConfig[i % 10]
+                // Поэтому ячейки с призом prizeIndex: prizeIndex, prizeIndex+10, prizeIndex+20, ...
                 
-                let targetCellIndex = -1;
-                const prizeValue = currentPrize.value || '';
+                // Минимальная целевая ячейка - startCellIndex + 30 (3 полных оборота)
+                const minTargetBase = startCellIndex + 30; // 130
                 
-                // Ищем подходящую ячейку в нужном диапазоне
-                for (let i = minTargetIndex; i < maxTargetIndex; i++) {
-                    const cell = track.children[i];
-                    const cellType = cell.getAttribute('data-prize-type');
-                    const cellValue = cell.getAttribute('data-prize-value') || '';
-                    
-                    if (cellType === currentPrize.type && cellValue === prizeValue) {
-                        targetCellIndex = i;
-                        break;
-                    }
+                // Находим ближайшую ячейку >= minTargetBase с нужным prizeIndex
+                // Формула: targetCellIndex = minTargetBase + ((prizeIndex - minTargetBase % 10) + 10) % 10
+                const remainder = minTargetBase % 10; // 130 % 10 = 0
+                let offset = prizeIndex - remainder;
+                if (offset < 0) {
+                    offset += 10;
+                }
+                let targetCellIndex = minTargetBase + offset;
+                
+                // Проверяем, что ячейка в пределах массива
+                if (targetCellIndex >= totalCells) {
+                    // Если вышли за пределы, ищем предыдущую подходящую
+                    targetCellIndex = prizeIndex + Math.floor((totalCells - 1 - prizeIndex) / 10) * 10;
                 }
                 
-                // Если не нашли в диапазоне, ищем первую подходящую после startCellIndex
-                if (targetCellIndex === -1) {
-                    for (let i = startCellIndex + 1; i < totalCells; i++) {
-                        const cell = track.children[i];
-                        const cellType = cell.getAttribute('data-prize-type');
-                        const cellValue = cell.getAttribute('data-prize-value') || '';
-                        
-                        if (cellType === currentPrize.type && cellValue === prizeValue) {
-                            targetCellIndex = i;
-                            break;
-                        }
-                    }
-                }
-                
-                // Последний fallback - ищем с начала
-                if (targetCellIndex === -1) {
-                    for (let i = 0; i < totalCells; i++) {
-                        const cell = track.children[i];
-                        const cellType = cell.getAttribute('data-prize-type');
-                        const cellValue = cell.getAttribute('data-prize-value') || '';
-                        
-                        if (cellType === currentPrize.type && cellValue === prizeValue) {
-                            targetCellIndex = i;
-                            break;
-                        }
-                    }
-                }
-                
-                if (targetCellIndex === -1) {
-                    console.error("❌ No matching cell found for prize:", currentPrize);
+                // Проверяем корректность
+                if (targetCellIndex < 0 || targetCellIndex >= totalCells) {
+                    console.error("❌ Invalid targetCellIndex:", targetCellIndex);
                     isSpinning = false;
                     spinBtn.disabled = false;
                     return;
                 }
                 
                 console.log("🎯 Prize:", currentPrize.type, currentPrize.value);
+                console.log("🎯 Prize index in config:", prizeIndex);
                 console.log("🎯 Target cell index:", targetCellIndex);
-                console.log("🎯 Target cell will show:", track.children[targetCellIndex].getAttribute('data-prize-type'));
+                console.log("🎯 Target cell % 10 =", targetCellIndex % 10, "(should equal prizeIndex)");
+                
+                // Верификация: убеждаемся, что ячейка соответствует призу
+                const verifyCell = track.children[targetCellIndex];
+                const verifyCellPrizeIndex = targetCellIndex % 10;
+                const expectedPrize = prizesConfig[verifyCellPrizeIndex];
+                console.log("🎯 Verification - Cell prize:", expectedPrize.type, expectedPrize.value);
+                console.log("🎯 Verification - Current prize:", currentPrize.type, currentPrize.value);
+                
+                if (verifyCellPrizeIndex !== prizeIndex) {
+                    console.error("❌ MISMATCH! verifyCellPrizeIndex:", verifyCellPrizeIndex, "prizeIndex:", prizeIndex);
+                }
                 
                 // ПРОСТАЯ ФОРМУЛА: Чтобы ячейка targetCellIndex была под указателем
                 // position = -(targetCellIndex * cellWidth) + centerOffset
