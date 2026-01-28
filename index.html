@@ -1807,6 +1807,10 @@
                                             winSound.play().catch(() => {});
                                         }
                                         if (animationFrameId) cancelAnimationFrame(animationFrameId);
+                                        
+                                        // КРИТИЧНО: Восстанавливаем currentPrize из closure перед показом
+                                        // В Telegram WebApp глобальная переменная может быть потеряна за 5.5 секунд анимации
+                                        currentPrize = selectedPrizeCopy;
                                         showPrize();
                                     });
                                 });
@@ -1826,27 +1830,22 @@
         
         // ==================== ПОКАЗ ПРИЗА ====================
         function showPrize() {
-            // КРИТИЧНО: Проверяем и восстанавливаем currentPrize если он потерян
+            // КРИТИЧНО: Проверяем currentPrize - он должен быть установлен из closure перед вызовом
             if (!currentPrize) {
-                console.error("❌ No currentPrize to show! Trying to restore from localStorage...");
-                try {
-                    const savedPrize = localStorage.getItem('last_selected_prize');
-                    if (savedPrize) {
-                        currentPrize = JSON.parse(savedPrize);
-                        console.log("✅ Restored currentPrize from localStorage:", currentPrize);
-                    } else {
-                        console.error("❌ No saved prize in localStorage either!");
-                        return;
-                    }
-                } catch (e) {
-                    console.error("❌ Error restoring prize from localStorage:", e);
-                    return;
-                }
+                console.error("❌ No currentPrize to show! This should not happen.");
+                console.error("❌ currentPrize must be set from closure before calling showPrize()");
+                isSpinning = false;
+                const spinBtn = document.getElementById("spinBtn");
+                if (spinBtn) spinBtn.disabled = false;
+                return;
             }
             
             // КРИТИЧНО: Проверяем, что currentPrize содержит правильные данные
             if (!currentPrize.type || !currentPrize.name) {
                 console.error("❌ currentPrize is invalid:", currentPrize);
+                isSpinning = false;
+                const spinBtn = document.getElementById("spinBtn");
+                if (spinBtn) spinBtn.disabled = false;
                 return;
             }
             
@@ -1960,30 +1959,7 @@
             }));
             
             // Отправляем данные о призе на сервер
-            // КРИТИЧНО: Используем currentPrize, который был установлен при выборе приза
-            if (!currentPrize) {
-                console.error("❌ currentPrize is null when trying to send to server!");
-                // Пытаемся восстановить из localStorage
-                try {
-                    const savedPrize = localStorage.getItem('last_selected_prize');
-                    if (savedPrize) {
-                        currentPrize = JSON.parse(savedPrize);
-                        console.log("✅ Restored currentPrize from localStorage for server send:", currentPrize);
-                    } else {
-                        console.error("❌ No saved prize in localStorage either! Cannot send to server.");
-                        return;
-                    }
-                } catch (e) {
-                    console.error("❌ Error restoring prize from localStorage:", e);
-                    return;
-                }
-            }
-            
-            // КРИТИЧНО: Проверяем, что currentPrize содержит правильные данные
-            if (!currentPrize.type || !currentPrize.name) {
-                console.error("❌ currentPrize is invalid when trying to send to server:", currentPrize);
-                return;
-            }
+            // currentPrize уже проверен выше, дополнительная проверка не нужна
             
             console.log("📤 Preparing to send prize data to server:");
             console.log("📤 currentPrize:", currentPrize);
