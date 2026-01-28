@@ -1023,10 +1023,8 @@
         let lastCellIndex = null;
         let previousDropPace = null;
         let currentPromoCode = null;
-        let initializationAttempts = 0;
-        const MAX_INIT_ATTEMPTS = 3;
-        let currentTargetCellIndex = null; // Индекс ячейки, на которой должна остановиться рулетка
-        let resizeObserver = null; // Observer для отслеживания изменения размера контейнера
+        let currentTargetCellIndex = null; // Индекс ячейки для корректного позиционирования
+        let resizeObserver = null;
         
         // ==================== ВЕРОЯТНОСТИ ====================
         function getWheelProbabilities(drop_pace) {
@@ -1054,27 +1052,17 @@
                 }
             }
             
-            // Генерируем случайное число от 0 до 100
             const randomValue = Math.random() * 100;
             let cumulative = 0;
-            
-            console.log(`🎲 Drop Pace: ${drop_pace}`);
-            console.log(`🎲 Probabilities:`, probs);
-            console.log(`🎲 Random value: ${randomValue.toFixed(2)}`);
-            
             const prizeOrder = ["empty", "content", "discount_10", "discount_15", "discount_20", "access_7", "access_30"];
             
             for (const prizeType of prizeOrder) {
-                if (!(prizeType in probs)) {
-                    continue;
-                }
+                if (!(prizeType in probs)) continue;
                 const prob = probs[prizeType];
-                if (prob <= 0) {
-                    continue;
-                }
+                if (prob <= 0) continue;
+                
                 cumulative += prob;
                 if (randomValue <= cumulative) {
-                    console.log(`✅ Selected: ${prizeType} (cumulative: ${cumulative.toFixed(2)}, prob: ${prob})`);
                     if (prizeType.startsWith('discount_')) {
                         return { type: "discount", value: prizeType.split('_')[1] };
                     } else if (prizeType.startsWith('access_')) {
@@ -1082,17 +1070,8 @@
                     } else if (prizeType === 'content') {
                         const contentPrizes = prizesConfig.filter(p => p.type === "content");
                         if (contentPrizes.length > 0) {
-                            const randomIndex = Math.floor(Math.random() * contentPrizes.length);
-                            const selected = contentPrizes[randomIndex];
-                            console.log(`🎁 Selected content prize: ${selected.value} (${selected.name})`);
-                            
-                            // ВАЖНО: Проверяем, что приз существует и имеет правильную структуру
-                            if (!selected.value) {
-                                console.error("❌ Content prize has no value!");
-                                // Fallback к первому контенту
-                                return { type: "content", value: contentPrizes[0].value };
-                            }
-                            return { type: "content", value: selected.value };
+                            const selected = contentPrizes[Math.floor(Math.random() * contentPrizes.length)];
+                            return { type: "content", value: selected.value || contentPrizes[0].value };
                         }
                     } else {
                         return { type: prizeType, value: null };
@@ -1100,8 +1079,6 @@
                 }
             }
             
-            // Fallback - если ничего не выбрано, возвращаем empty
-            console.log("⚠️ No prize selected, returning empty");
             return { type: "empty", value: null };
         }
         
@@ -1150,23 +1127,19 @@
         };
         
         // ==================== ПЕРЕСЧЁТ ПОЗИЦИИ РУЛЕТКИ ====================
-        // Функция для получения РЕАЛЬНОЙ ширины ячейки (с учётом масштабирования viewport)
+        // Получение реальной ширины ячейки с учётом масштабирования viewport
         function getRealCellWidth() {
             const track = document.getElementById('rouletteTrack');
-            if (!track || track.children.length < 2) return 150; // fallback
+            if (!track || track.children.length < 2) return 150;
             
-            // Вычисляем реальную ширину по разнице позиций двух соседних ячеек
             const cell0Rect = track.children[0].getBoundingClientRect();
             const cell1Rect = track.children[1].getBoundingClientRect();
             const realWidth = cell1Rect.left - cell0Rect.left;
             
-            // Защита от некорректных значений
-            if (realWidth <= 0 || realWidth > 300) return 150;
-            
-            return realWidth;
+            return (realWidth > 0 && realWidth < 300) ? realWidth : 150;
         }
         
-        // Функция для установки точной позиции рулетки на основе currentTargetCellIndex
+        // Установка точной позиции рулетки с учётом масштаба
         function updateRoulettePosition() {
             if (currentTargetCellIndex === null) return;
             
@@ -1174,51 +1147,37 @@
             const container = document.querySelector('.roulette-container');
             if (!track || !container) return;
             
-            // Используем РЕАЛЬНУЮ ширину ячейки, а не фиксированную
             const cellWidth = getRealCellWidth();
-            const containerWidth = container.offsetWidth;
-            const centerOffset = containerWidth / 2 - cellWidth / 2;
+            const centerOffset = container.offsetWidth / 2 - cellWidth / 2;
             const exactPosition = -(currentTargetCellIndex * cellWidth) + centerOffset;
             
             track.style.transition = 'none';
             track.style.transform = `translateX(${exactPosition}px)`;
-            
-            console.log("📐 Position recalculated. Cell width:", cellWidth, "Container width:", containerWidth, "Position:", exactPosition);
         }
         
-        // Инициализация ResizeObserver для отслеживания изменений размера контейнера
+        // ResizeObserver для автоматического пересчёта при изменении размера
         function initResizeObserver() {
             const container = document.querySelector('.roulette-container');
             if (!container) return;
             
-            // Удаляем старый observer если есть
-            if (resizeObserver) {
-                resizeObserver.disconnect();
-            }
+            if (resizeObserver) resizeObserver.disconnect();
             
             let lastWidth = container.offsetWidth;
             
-            resizeObserver = new ResizeObserver((entries) => {
+            resizeObserver = new ResizeObserver(() => {
                 const newWidth = container.offsetWidth;
-                // Пересчитываем только если ширина реально изменилась
                 if (newWidth !== lastWidth) {
                     lastWidth = newWidth;
-                    console.log("📐 Container resized to:", newWidth);
-                    
-                    // Если есть установленная позиция, пересчитываем
-                    // Даже во время анимации - это предотвратит "съезжание"
                     if (currentTargetCellIndex !== null) {
-                        // Небольшая задержка, чтобы браузер успел обновить layout
                         setTimeout(updateRoulettePosition, 10);
                     }
                 }
             });
             
             resizeObserver.observe(container);
-            console.log("👁️ ResizeObserver initialized");
         }
         
-        // Также отслеживаем изменения размера окна (на случай если ResizeObserver не сработает)
+        // Дополнительный обработчик resize окна
         window.addEventListener('resize', () => {
             if (currentTargetCellIndex !== null) {
                 setTimeout(updateRoulettePosition, 10);
@@ -1227,65 +1186,37 @@
         
         // ==================== ИНИЦИАЛИЗАЦИЯ РУЛЕТКИ ====================
         function initRoulette() {
-            try {
-                const track = document.getElementById('rouletteTrack');
-                if (!track) {
-                    console.error("❌ Track element not found!");
-                    return;
-                }
+            const track = document.getElementById('rouletteTrack');
+            if (!track || !prizesConfig || prizesConfig.length === 0) return;
+            
+            track.innerHTML = '';
+            
+            // Создаём 200 ячеек
+            for (let i = 0; i < 200; i++) {
+                const prizeIndex = i % prizesConfig.length;
+                const prize = prizesConfig[prizeIndex];
+                if (!prize) continue;
                 
-                if (!prizesConfig || prizesConfig.length === 0) {
-                    console.error("❌ prizesConfig is not defined or empty!");
-                    return;
-                }
+                const cell = createCell(prize);
+                cell.setAttribute('data-prize-index', prizeIndex);
+                track.appendChild(cell);
+            }
+            
+            // Устанавливаем начальную позицию (ячейка 100 под указателем)
+            const container = document.querySelector('.roulette-container');
+            if (container) {
+                currentTargetCellIndex = 100;
                 
-                track.innerHTML = '';
-                // Создаем много ячеек для бесконечной прокрутки (200 ячеек для достаточной длины)
-                const totalCellsToCreate = 200;
-                for (let i = 0; i < totalCellsToCreate; i++) {
-                    const prizeIndex = i % prizesConfig.length;
-                    const prize = prizesConfig[prizeIndex];
-                    if (!prize) {
-                        console.error(`❌ Prize at index ${prizeIndex} is undefined!`);
-                        continue;
-                    }
-                    const cell = createCell(prize);
-                    if (cell) {
-                        cell.setAttribute('data-cell-index', i);
-                        cell.setAttribute('data-prize-index', prizeIndex);
-                        cell.setAttribute('data-prize-type', prize.type);
-                        cell.setAttribute('data-prize-value', prize.value || '');
-                        track.appendChild(cell);
-                    }
-                }
+                const containerWidth = container.offsetWidth;
+                const cellWidth = 150;
+                const centerOffset = containerWidth / 2 - cellWidth / 2;
+                track.style.transition = 'none';
+                track.style.transform = `translateX(${-(100 * cellWidth) + centerOffset}px)`;
                 
-                // Устанавливаем начальную позицию: ячейка 100 (середина из 200) должна быть под указателем
-                const container = document.querySelector('.roulette-container');
-                if (container) {
-                    const startCellIndex = 100;
-                    // Сохраняем начальную позицию для ResizeObserver
-                    currentTargetCellIndex = startCellIndex;
-                    
-                    // Начальное позиционирование с фиксированным значением
-                    // (ячейки ещё не отрисованы, getRealCellWidth может не работать)
-                    const containerWidth = container.offsetWidth;
-                    const cellWidth = 150;
-                    const centerOffset = containerWidth / 2 - cellWidth / 2;
-                    const initialPosition = -(startCellIndex * cellWidth) + centerOffset;
-                    track.style.transition = 'none';
-                    track.style.transform = `translateX(${initialPosition}px)`;
-                    
-                    // Пересчитываем с реальной шириной после отрисовки
-                    requestAnimationFrame(() => {
-                        requestAnimationFrame(() => {
-                            updateRoulettePosition();
-                        });
-                    });
-                }
-                
-                console.log("🎡 Roulette initialized: 200 cells created");
-            } catch (e) {
-                console.error("❌ Error in initRoulette:", e);
+                // Пересчитываем с реальной шириной после отрисовки
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(updateRoulettePosition);
+                });
             }
         }
         
@@ -1425,75 +1356,33 @@
         // ==================== СПИН РУЛЕТКИ ====================
         function spinRoulette() {
             try {
-                if (isSpinning) {
-                    console.log("⚠️ Already spinning, ignoring click");
-                    return;
-                }
+                if (isSpinning) return;
                 isSpinning = true;
-                currentTargetCellIndex = null; // Сбрасываем предыдущую позицию
+                currentTargetCellIndex = null;
                 
                 const spinBtn = document.getElementById("spinBtn");
                 const track = document.getElementById("rouletteTrack");
+                const container = document.querySelector('.roulette-container');
                 
-                if (!spinBtn) {
-                    console.error("❌ Spin button not found!");
+                if (!spinBtn || !track || !container || track.children.length === 0) {
                     isSpinning = false;
                     return;
-                }
-                
-                if (!track) {
-                    console.error("❌ Track element not found!");
-                    isSpinning = false;
-                    return;
-                }
-                
-                if (track.children.length === 0) {
-                    console.error("❌ No cells in track! Reinitializing...");
-                    initRoulette();
-                    if (track.children.length === 0) {
-                        console.error("❌ Still no cells after reinit!");
-                        isSpinning = false;
-                        return;
-                    }
                 }
                 
                 spinBtn.disabled = true;
                 const resultDiv = document.getElementById("result");
-                if (resultDiv) {
-                    resultDiv.style.display = "none";
-                }
+                if (resultDiv) resultDiv.style.display = "none";
                 
+                // Выбираем приз
                 const dropPace = userData.dropPace || 5;
-                const hasWonFullAccess = userData.hasWonFullAccess || false;
-                const fullAccessCooldown = userData.fullAccessCooldown || null;
+                const selectedPrizeData = selectWheelPrize(dropPace, userData.hasWonFullAccess, userData.fullAccessCooldown);
                 
-                // Отправляем spin_started на сервер перед началом спина
-                if (typeof Telegram !== 'undefined' && Telegram.WebApp && Telegram.WebApp.sendData) {
-                    try {
-                        const spinStartedData = JSON.stringify({
-                            action: "spin_started"
-                        });
-                        Telegram.WebApp.sendData(spinStartedData);
-                        console.log("📤 Sent spin_started to server");
-                    } catch (e) {
-                        console.error("❌ Error sending spin_started:", e);
-                    }
-                }
-                
-                const selectedPrizeData = selectWheelPrize(dropPace, hasWonFullAccess, fullAccessCooldown);
-                console.log("🎲 Selected prize data:", selectedPrizeData);
-                
+                // Находим приз в конфигурации
                 let selectedPrize = null;
-                let prizeIndex = -1;
-                
                 if (selectedPrizeData.type === 'empty') {
                     selectedPrize = prizesConfig.find(p => p.type === 'empty');
                 } else if (selectedPrizeData.type === 'content') {
                     selectedPrize = prizesConfig.find(p => p.type === 'content' && p.value === selectedPrizeData.value);
-                    if (!selectedPrize) {
-                        console.warn("⚠️ Content prize with value", selectedPrizeData.value, "not found, using first content");
-                        selectedPrize = prizesConfig.find(p => p.type === 'content');
-                    }
                 } else if (selectedPrizeData.type === 'discount') {
                     selectedPrize = prizesConfig.find(p => p.type === 'discount' && p.value === selectedPrizeData.value);
                 } else if (selectedPrizeData.type === 'access') {
@@ -1501,25 +1390,14 @@
                 }
                 
                 if (!selectedPrize) {
-                    console.error("❌ Prize not found! selectedPrizeData:", selectedPrizeData);
                     isSpinning = false;
                     spinBtn.disabled = false;
                     return;
                 }
                 
-                prizeIndex = prizesConfig.indexOf(selectedPrize);
-                if (prizeIndex === -1) {
-                    console.error("❌ Prize index not found!");
-                    console.error("Selected prize:", selectedPrize);
-                    console.error("Available prizes:", prizesConfig.map((p, i) => `${i}: ${p.type} ${p.value} ${p.icon}`));
-                    isSpinning = false;
-                    spinBtn.disabled = false;
-                    return;
-                }
+                const prizeIndex = prizesConfig.indexOf(selectedPrize);
                 
-                // КРИТИЧНО: Сохраняем выбранный приз в currentPrize ПЕРЕД поиском ячейки
-                // Это гарантирует, что currentPrize будет содержать правильный приз
-                // Создаем новый объект, чтобы избежать ссылочных проблем
+                // Сохраняем приз
                 const selectedPrizeCopy = {
                     type: selectedPrize.type,
                     value: selectedPrize.value,
@@ -1530,109 +1408,35 @@
                     description_ru: selectedPrize.description_ru,
                     description_en: selectedPrize.description_en
                 };
-                
-                // КРИТИЧНО: Устанавливаем currentPrize ОДИН РАЗ и больше не изменяем
                 currentPrize = selectedPrizeCopy;
                 
-                console.log("✅ Prize selected and saved to currentPrize:", currentPrize);
-                console.log("✅ Prize type:", currentPrize.type);
-                console.log("✅ Prize value:", currentPrize.value);
-                console.log("✅ Prize name:", currentPrize.name);
-                console.log("✅ Prize index in config:", prizeIndex);
-                console.log("✅ Prize icon:", selectedPrize.icon);
-                
-                // КРИТИЧНО: Сохраняем приз в localStorage для отладки и восстановления
-                try {
-                    localStorage.setItem('last_selected_prize', JSON.stringify(currentPrize));
-                } catch (e) {
-                    console.warn("⚠️ Could not save prize to localStorage:", e);
-                }
-
-                const container = document.querySelector('.roulette-container');
-                if (!container) {
-                    console.error("❌ Container not found!");
-                    isSpinning = false;
-                    spinBtn.disabled = false;
-                    return;
-                }
-                
-                const containerWidth = container.offsetWidth;
-                // Используем РЕАЛЬНУЮ ширину ячейки (с учётом масштабирования viewport в Telegram)
+                // Вычисляем позиции с учётом реального масштаба
                 const cellWidth = getRealCellWidth();
-                const centerOffset = containerWidth / 2 - cellWidth / 2;
-                const totalCells = track.children.length;
-                const startCellIndex = 100; // Начальная ячейка под указателем
+                const centerOffset = container.offsetWidth / 2 - cellWidth / 2;
+                const startCellIndex = 100;
                 
-                console.log("📐 Real cell width:", cellWidth, "Container width:", containerWidth);
+                // Вычисляем целевую ячейку (минимум 3 полных оборота)
+                const minTargetBase = startCellIndex + 30;
+                let offset = prizeIndex - (minTargetBase % 10);
+                if (offset < 0) offset += 10;
+                const targetCellIndex = minTargetBase + offset;
                 
-                // НАДЁЖНАЯ ЛОГИКА: Используем prizeIndex напрямую
-                // Ячейки создаются по формуле: ячейка[i] имеет приз prizesConfig[i % 10]
-                // Поэтому ячейки с призом prizeIndex: prizeIndex, prizeIndex+10, prizeIndex+20, ...
-                
-                // Минимальная целевая ячейка - startCellIndex + 30 (3 полных оборота)
-                const minTargetBase = startCellIndex + 30; // 130
-                
-                // Находим ближайшую ячейку >= minTargetBase с нужным prizeIndex
-                // Формула: targetCellIndex = minTargetBase + ((prizeIndex - minTargetBase % 10) + 10) % 10
-                const remainder = minTargetBase % 10; // 130 % 10 = 0
-                let offset = prizeIndex - remainder;
-                if (offset < 0) {
-                    offset += 10;
-                }
-                let targetCellIndex = minTargetBase + offset;
-                
-                // Проверяем, что ячейка в пределах массива
-                if (targetCellIndex >= totalCells) {
-                    // Если вышли за пределы, ищем предыдущую подходящую
-                    targetCellIndex = prizeIndex + Math.floor((totalCells - 1 - prizeIndex) / 10) * 10;
-                }
-                
-                // Проверяем корректность
-                if (targetCellIndex < 0 || targetCellIndex >= totalCells) {
-                    console.error("❌ Invalid targetCellIndex:", targetCellIndex);
-                    isSpinning = false;
-                    spinBtn.disabled = false;
-                    return;
-                }
-                
-                console.log("🎯 Prize:", currentPrize.type, currentPrize.value);
-                console.log("🎯 Prize index in config:", prizeIndex);
-                console.log("🎯 Target cell index:", targetCellIndex);
-                console.log("🎯 Target cell % 10 =", targetCellIndex % 10, "(should equal prizeIndex)");
-                
-                // Верификация: убеждаемся, что ячейка соответствует призу
-                const verifyCell = track.children[targetCellIndex];
-                const verifyCellPrizeIndex = targetCellIndex % 10;
-                const expectedPrize = prizesConfig[verifyCellPrizeIndex];
-                console.log("🎯 Verification - Cell prize:", expectedPrize.type, expectedPrize.value);
-                console.log("🎯 Verification - Current prize:", currentPrize.type, currentPrize.value);
-                
-                if (verifyCellPrizeIndex !== prizeIndex) {
-                    console.error("❌ MISMATCH! verifyCellPrizeIndex:", verifyCellPrizeIndex, "prizeIndex:", prizeIndex);
-                }
-                
-                // ПРОСТАЯ ФОРМУЛА: Чтобы ячейка targetCellIndex была под указателем
-                // position = -(targetCellIndex * cellWidth) + centerOffset
+                // Вычисляем позиции
                 const initialPosition = -(startCellIndex * cellWidth) + centerOffset;
                 const finalPosition = -(targetCellIndex * cellWidth) + centerOffset;
                 
-                console.log("🎯 Start cell:", startCellIndex);
-                console.log("🎯 Initial position:", initialPosition);
-                console.log("🎯 Final position:", finalPosition);
-                
+                // Воспроизводим звук старта
                 if (spinStartSound) {
                     spinStartSound.currentTime = 0;
                     spinStartSound.play().catch(() => {});
                 }
                 
                 lastCellIndex = null;
+                const finalTargetCellIndex = targetCellIndex;
                 
-                // Устанавливаем начальную позицию
+                // Устанавливаем начальную позицию и запускаем анимацию
                 track.style.transition = 'none';
                 track.style.transform = `translateX(${initialPosition}px)`;
-                
-                // Используем фиксированную копию targetCellIndex для использования после анимации
-                const finalTargetCellIndex = targetCellIndex;
                 
                 requestAnimationFrame(() => {
                     track.style.transition = 'none';
@@ -1644,42 +1448,36 @@
                         
                         const startTime = Date.now();
                         const duration = 5500;
-                        const containerRect = container.getBoundingClientRect();
-                        const pointerX = containerRect.left + containerRect.width / 2;
+                        const pointerX = container.getBoundingClientRect().left + container.offsetWidth / 2;
                         
                         function trackRoulettePosition() {
                             const elapsed = Date.now() - startTime;
                             if (elapsed < duration) {
+                                // Tick звуки при прохождении ячеек
                                 const trackRect = track.getBoundingClientRect();
-                                const relativeX = pointerX - trackRect.left;
-                                const currentCellIndex = Math.floor(relativeX / cellWidth);
-                                if (lastCellIndex !== null && currentCellIndex !== lastCellIndex && currentCellIndex >= 0 && currentCellIndex < track.children.length) {
+                                const currentCellIndex = Math.floor((pointerX - trackRect.left) / cellWidth);
+                                if (lastCellIndex !== null && currentCellIndex !== lastCellIndex && currentCellIndex >= 0) {
                                     playTick();
                                 }
                                 lastCellIndex = currentCellIndex;
                                 animationFrameId = requestAnimationFrame(trackRoulettePosition);
                             } else {
-                                // После анимации - устанавливаем точную позицию
-                                // Сохраняем индекс для пересчёта при resize
+                                // Анимация завершена
                                 currentTargetCellIndex = finalTargetCellIndex;
                                 
-                                // Устанавливаем позицию сразу
+                                // Устанавливаем точную позицию с учётом масштаба
                                 updateRoulettePosition();
-                                
-                                // Дополнительные пересчёты с задержками для гарантии стабильности в Telegram WebView
                                 setTimeout(updateRoulettePosition, 50);
                                 setTimeout(updateRoulettePosition, 150);
-                                setTimeout(updateRoulettePosition, 300);
                                 
-                                console.log("✅ Animation complete. Final cell index:", finalTargetCellIndex);
-                                
+                                // Звук победы
                                 if (winSound) {
                                     winSound.currentTime = 0;
                                     winSound.play().catch(() => {});
                                 }
                                 if (animationFrameId) cancelAnimationFrame(animationFrameId);
                                 
-                                // Восстанавливаем currentPrize из closure и показываем приз
+                                // Показываем приз
                                 currentPrize = selectedPrizeCopy;
                                 showPrize();
                             }
@@ -1689,7 +1487,7 @@
                 });
                 
             } catch (e) {
-                console.error("❌ Error in spinRoulette:", e);
+                console.error("Error in spinRoulette:", e);
                 isSpinning = false;
                 const spinBtn = document.getElementById("spinBtn");
                 if (spinBtn) spinBtn.disabled = false;
@@ -1698,29 +1496,12 @@
         
         // ==================== ПОКАЗ ПРИЗА ====================
         function showPrize() {
-            // КРИТИЧНО: Проверяем currentPrize - он должен быть установлен из closure перед вызовом
-            if (!currentPrize) {
-                console.error("❌ No currentPrize to show! This should not happen.");
-                console.error("❌ currentPrize must be set from closure before calling showPrize()");
+            if (!currentPrize || !currentPrize.type) {
                 isSpinning = false;
                 const spinBtn = document.getElementById("spinBtn");
                 if (spinBtn) spinBtn.disabled = false;
                 return;
             }
-            
-            // КРИТИЧНО: Проверяем, что currentPrize содержит правильные данные
-            if (!currentPrize.type || !currentPrize.name) {
-                console.error("❌ currentPrize is invalid:", currentPrize);
-                isSpinning = false;
-                const spinBtn = document.getElementById("spinBtn");
-                if (spinBtn) spinBtn.disabled = false;
-                return;
-            }
-            
-            console.log("🎁 Showing prize:", currentPrize);
-            console.log("🎁 Prize type:", currentPrize.type);
-            console.log("🎁 Prize value:", currentPrize.value);
-            console.log("🎁 Prize name:", currentPrize.name);
             
             const resultDiv = document.getElementById("result");
             const prizeName = document.getElementById("prizeName");
@@ -1746,10 +1527,7 @@
             prizeRarityBadge.className = 'prize-rarity-badge ' + rarity.class;
             prizeRarityBadge.textContent = rarity.text;
             
-            console.log("🎁 Displaying prize type:", currentPrize.type, "value:", currentPrize.value, "name:", currentPrize.name);
-            
             if (currentPrize.type === 'empty') {
-                console.log("📦 Showing empty prize section");
                 const emptyMessage = document.getElementById("emptyMessage");
                 if (emptyMessage) {
                     emptyMessage.textContent = currentLang === 'ru' 
@@ -1759,35 +1537,26 @@
                 document.getElementById("emptySection").style.display = "flex";
                 prizeDesc.textContent = currentLang === 'ru' ? currentPrize.description_ru : currentPrize.description_en;
             } else if (currentPrize.type === 'content') {
-                console.log("📦 Showing content prize section:", currentPrize.value, currentPrize.name);
                 prizeDesc.textContent = currentLang === 'ru' ? currentPrize.description_ru : currentPrize.description_en;
                 const contentLinkBtn = document.getElementById("contentLinkBtn");
                 if (contentLinkBtn) {
                     contentLinkBtn.href = "https://drive.google.com/drive/folders/1NM9wyTcn-cKJp50-crX5GZoSmLojLY6n?usp=sharing";
                     contentLinkBtn.target = "_blank";
                     const span = contentLinkBtn.querySelector('span');
-                    if (span) {
-                        span.textContent = currentLang === 'ru' ? '📦 Открыть контент' : '📦 Open content';
-                    }
+                    if (span) span.textContent = currentLang === 'ru' ? '📦 Открыть контент' : '📦 Open content';
                 }
                 document.getElementById("contentSection").style.display = "flex";
             } else if (currentPrize.type === 'discount') {
-                console.log("💰 Showing discount prize section:", currentPrize.value);
                 prizeDesc.textContent = currentLang === 'ru' ? currentPrize.description_ru : currentPrize.description_en;
                 const promoStars = document.getElementById("promoStars");
-                if (promoStars) {
-                    promoStars.textContent = '★★★★★';
-                }
+                if (promoStars) promoStars.textContent = '★★★★★';
                 const copyBtn = document.getElementById("copyPromoBtn");
                 if (copyBtn) {
                     const span = copyBtn.querySelector('span');
-                    if (span) {
-                        span.textContent = currentLang === 'ru' ? '📋 Скопировать промокод' : '📋 Copy promo code';
-                    }
+                    if (span) span.textContent = currentLang === 'ru' ? '📋 Скопировать промокод' : '📋 Copy promo code';
                 }
                 document.getElementById("discountSection").style.display = "flex";
             } else if (currentPrize.type === 'access') {
-                console.log("🔑 Showing access prize section:", currentPrize.value);
                 const accessCongrats = document.getElementById("accessCongrats");
                 if (accessCongrats) {
                     accessCongrats.textContent = currentPrize.value === '7' 
@@ -1798,13 +1567,9 @@
                 const joinBtn = document.getElementById("joinChannelBtn");
                 if (joinBtn) {
                     const span = joinBtn.querySelector('span');
-                    if (span) {
-                        span.textContent = currentLang === 'ru' ? '🚪 Вступить' : '🚪 Join';
-                    }
+                    if (span) span.textContent = currentLang === 'ru' ? '🚪 Вступить' : '🚪 Join';
                 }
                 document.getElementById("accessSection").style.display = "flex";
-            } else {
-                console.error("❌ Unknown prize type:", currentPrize.type);
             }
             
             document.getElementById("closePrizeBtn").querySelector('span').textContent = currentLang === 'ru' ? '✕ Закрыть' : '✕ Close';
@@ -1827,38 +1592,14 @@
             }));
             
             // Отправляем данные о призе на сервер
-            // currentPrize уже проверен выше, дополнительная проверка не нужна
-            
-            console.log("📤 Preparing to send prize data to server:");
-            console.log("📤 currentPrize:", currentPrize);
-            console.log("📤 currentPrize.type:", currentPrize.type);
-            console.log("📤 currentPrize.value:", currentPrize.value);
-            console.log("📤 currentPrize.name:", currentPrize.name);
-            
-            // КРИТИЧНО: Создаем копию данных для отправки, чтобы избежать изменений
-            const prizeToSend = {
-                type: currentPrize.type,
-                value: currentPrize.value,
-                name: currentPrize.name
-            };
-            
             if (typeof Telegram !== 'undefined' && Telegram.WebApp && Telegram.WebApp.sendData) {
                 try {
-                    const prizeData = JSON.stringify({
+                    Telegram.WebApp.sendData(JSON.stringify({
                         action: "wheel_prize",
-                        prize: prizeToSend,
+                        prize: { type: currentPrize.type, value: currentPrize.value, name: currentPrize.name },
                         language: currentLang
-                    });
-                    Telegram.WebApp.sendData(prizeData);
-                    console.log("📤 Sent prize data to server:", prizeData);
-                    console.log("📤 Prize type sent:", prizeToSend.type);
-                    console.log("📤 Prize value sent:", prizeToSend.value);
-                    console.log("📤 Prize name sent:", prizeToSend.name);
-                } catch (e) {
-                    console.error("❌ Error sending prize data:", e);
-                }
-            } else {
-                console.warn("⚠️ Telegram.WebApp.sendData is not available");
+                    }));
+                } catch (e) {}
             }
         }
         
@@ -1903,67 +1644,22 @@
         
         // ==================== ИНИЦИАЛИЗАЦИЯ ====================
         document.addEventListener('DOMContentLoaded', function() {
-            try {
-                console.log("🚀 Initializing roulette...");
+            initSounds();
+            initRoulette();
+            loadUserData();
+            initResizeObserver();
+            
+            if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
+                Telegram.WebApp.ready();
+                Telegram.WebApp.expand();
+                const userLang = Telegram.WebApp.initDataUnsafe.user?.language_code || 'en';
+                setLanguage(localStorage.getItem('wheel_lang') || (userLang === 'ru' ? 'ru' : 'en'));
                 
-                initSounds();
-                
-                const track = document.getElementById('rouletteTrack');
-                if (!track) {
-                    console.error("❌ Track element not found in DOM!");
-                    return;
-                }
-                
-                initRoulette();
-                
-                // Проверяем, что ячейки созданы
-                if (track.children.length === 0) {
-                    console.error("❌ No cells created! Retrying...");
-                    setTimeout(() => {
-                        initRoulette();
-                        if (track.children.length === 0) {
-                            console.error("❌ Still no cells after retry!");
-                        } else {
-                            console.log("✅ Cells created after retry:", track.children.length);
-                        }
-                    }, 100);
-                } else {
-                    console.log("✅ Cells created:", track.children.length);
-                }
-                
-                loadUserData();
-                
-                // Проверяем кнопку
-                const spinBtn = document.getElementById("spinBtn");
-                if (!spinBtn) {
-                    console.error("❌ Spin button not found!");
-                } else {
-                    console.log("✅ Spin button found");
-                }
-                
-                // Инициализируем ResizeObserver для корректного отображения в Telegram WebView
-                initResizeObserver();
-                
-                if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
-                    Telegram.WebApp.ready();
-                    Telegram.WebApp.expand();
-                    const userLang = Telegram.WebApp.initDataUnsafe.user?.language_code || 'en';
-                    const savedLang = localStorage.getItem('wheel_lang') || (userLang === 'ru' ? 'ru' : 'en');
-                    setLanguage(savedLang);
-                    
-                    // В Telegram WebView размеры могут устанавливаться с задержкой
-                    // Пересчитываем позицию несколько раз после загрузки
-                    setTimeout(updateRoulettePosition, 100);
-                    setTimeout(updateRoulettePosition, 500);
-                    setTimeout(updateRoulettePosition, 1000);
-                } else {
-                    const savedLang = localStorage.getItem('wheel_lang') || 'en';
-                    setLanguage(savedLang);
-                }
-                
-                console.log("✅ Initialization complete");
-            } catch (e) {
-                console.error("❌ Error during initialization:", e);
+                // Пересчёт позиции после стабилизации размеров в Telegram
+                setTimeout(updateRoulettePosition, 100);
+                setTimeout(updateRoulettePosition, 500);
+            } else {
+                setLanguage(localStorage.getItem('wheel_lang') || 'en');
             }
         });
     </script>
