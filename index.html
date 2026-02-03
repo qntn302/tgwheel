@@ -219,7 +219,7 @@
             z-index: 1000;
         }
         
-        /* Liquid Glass - Convex 3D Effect with Edge Distortion */
+        /* Liquid Glass - Flat Style */
         .lang-btn {
             background: rgba(255, 255, 255, 0.01);
             backdrop-filter: blur(3px);
@@ -235,15 +235,12 @@
             transition: all 0.25s ease;
             position: relative;
             box-shadow: 
-                inset 2px 2px 1px rgba(255, 255, 255, 0.3),
-                inset -2px -2px 1px rgba(0, 0, 0, 0.2),
-                inset 4px 4px 8px rgba(255, 255, 255, 0.08),
-                inset -4px -4px 8px rgba(0, 0, 0, 0.15),
-                0 0 8px 2px rgba(0, 0, 0, 0.1);
+                inset 1px 1px 0 rgba(255, 255, 255, 0.2),
+                inset -1px -1px 0 rgba(0, 0, 0, 0.1);
             overflow: hidden;
         }
         
-        /* Edge highlight - top specular */
+        /* Edge highlight */
         .lang-btn::before {
             content: '';
             position: absolute;
@@ -252,11 +249,11 @@
             padding: 1px;
             background: linear-gradient(
                 135deg,
-                rgba(255, 255, 255, 0.6) 0%,
-                rgba(255, 255, 255, 0.15) 15%,
+                rgba(255, 255, 255, 0.5) 0%,
+                rgba(255, 255, 255, 0.1) 20%,
                 rgba(255, 255, 255, 0.02) 50%,
-                rgba(255, 255, 255, 0.1) 85%,
-                rgba(255, 255, 255, 0.4) 100%
+                rgba(255, 255, 255, 0.1) 80%,
+                rgba(255, 255, 255, 0.3) 100%
             );
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor;
@@ -315,28 +312,29 @@
             text-align: center;
             position: relative;
             box-shadow: 
-                inset 2px 2px 1px rgba(255, 255, 255, 0.25),
-                inset -2px -2px 1px rgba(0, 0, 0, 0.18),
-                inset 5px 5px 10px rgba(255, 255, 255, 0.05),
-                inset -5px -5px 10px rgba(0, 0, 0, 0.12),
-                0 0 12px 3px rgba(0, 0, 0, 0.08);
+                inset 1px 1px 0 rgba(255, 255, 255, 0.2),
+                inset -1px -1px 0 rgba(0, 0, 0, 0.1);
             overflow: hidden;
         }
         
-        /* Glossy highlight */
+        /* Edge highlight */
         .drop-pace-indicator::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 10%;
-            right: 10%;
-            height: 1px;
-            background: linear-gradient(90deg, 
-                transparent 0%, 
-                rgba(255, 255, 255, 0.5) 30%, 
-                rgba(255, 255, 255, 0.6) 50%, 
-                rgba(255, 255, 255, 0.5) 70%, 
-                transparent 100%);
+            inset: 0;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(
+                145deg,
+                rgba(255, 255, 255, 0.5) 0%,
+                rgba(255, 255, 255, 0.08) 15%,
+                rgba(255, 255, 255, 0.02) 50%,
+                rgba(255, 255, 255, 0.08) 85%,
+                rgba(255, 255, 255, 0.35) 100%
+            );
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
             pointer-events: none;
         }
         
@@ -410,25 +408,28 @@
             position: relative;
             overflow: hidden;
             box-shadow: 
-                inset 1px 1px 0 rgba(255, 255, 255, 0.3),
-                inset -1px -1px 0 rgba(0, 0, 0, 0.15),
-                inset 2px 2px 4px rgba(255, 255, 255, 0.06),
-                inset -2px -2px 4px rgba(0, 0, 0, 0.1),
-                0 0 6px 1px rgba(0, 0, 0, 0.08);
+                inset 1px 1px 0 rgba(255, 255, 255, 0.2),
+                inset -1px -1px 0 rgba(0, 0, 0, 0.1);
         }
         
-        /* Glossy top highlight */
+        /* Edge highlight */
         .info-btn::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 20%;
-            right: 20%;
-            height: 1px;
-            background: linear-gradient(90deg, 
-                transparent 0%, 
-                rgba(255, 255, 255, 0.5) 50%, 
-                transparent 100%);
+            inset: 0;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.45) 0%,
+                rgba(255, 255, 255, 0.06) 20%,
+                rgba(255, 255, 255, 0.02) 50%,
+                rgba(255, 255, 255, 0.06) 80%,
+                rgba(255, 255, 255, 0.3) 100%
+            );
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
             pointer-events: none;
         }
         
@@ -450,26 +451,27 @@
             padding: 20px 0;
             border: none;
             box-shadow: 
-                inset 2px 2px 1px rgba(255, 255, 255, 0.22),
-                inset -2px -2px 1px rgba(0, 0, 0, 0.15),
-                inset 5px 5px 12px rgba(255, 255, 255, 0.04),
-                inset -5px -5px 12px rgba(0, 0, 0, 0.1),
-                0 0 15px 4px rgba(0, 0, 0, 0.06);
+                inset 1px 1px 0 rgba(255, 255, 255, 0.18),
+                inset -1px -1px 0 rgba(0, 0, 0, 0.1);
         }
         
-        /* Glossy top highlight */
+        /* Edge highlight */
         .roulette-container-border {
             position: absolute;
-            top: 0;
-            left: 10%;
-            right: 10%;
-            height: 1px;
-            background: linear-gradient(90deg, 
-                transparent 0%, 
-                rgba(255, 255, 255, 0.4) 30%, 
-                rgba(255, 255, 255, 0.5) 50%, 
-                rgba(255, 255, 255, 0.4) 70%, 
-                transparent 100%);
+            inset: 0;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(
+                145deg,
+                rgba(255, 255, 255, 0.45) 0%,
+                rgba(255, 255, 255, 0.06) 15%,
+                rgba(255, 255, 255, 0.02) 50%,
+                rgba(255, 255, 255, 0.06) 85%,
+                rgba(255, 255, 255, 0.3) 100%
+            );
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
             pointer-events: none;
             z-index: 5;
         }
@@ -500,29 +502,29 @@
             position: relative;
             overflow: hidden;
             box-shadow: 
-                inset 2px 2px 1px rgba(255, 255, 255, 0.25),
-                inset -2px -2px 1px rgba(0, 0, 0, 0.15),
-                inset 4px 4px 8px rgba(255, 255, 255, 0.04),
-                inset -4px -4px 8px rgba(0, 0, 0, 0.1),
-                0 0 10px 2px rgba(0, 0, 0, 0.06);
+                inset 1px 1px 0 rgba(255, 255, 255, 0.2),
+                inset -1px -1px 0 rgba(0, 0, 0, 0.1);
         }
         
-        /* Glossy top highlight */
+        /* Edge highlight */
         .roulette-cell::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 15%;
-            right: 15%;
-            height: 1px;
-            background: linear-gradient(90deg, 
-                transparent 0%, 
-                rgba(255, 255, 255, 0.45) 30%, 
-                rgba(255, 255, 255, 0.55) 50%, 
-                rgba(255, 255, 255, 0.45) 70%, 
-                transparent 100%);
+            inset: 0;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(
+                145deg,
+                rgba(255, 255, 255, 0.5) 0%,
+                rgba(255, 255, 255, 0.08) 15%,
+                rgba(255, 255, 255, 0.02) 50%,
+                rgba(255, 255, 255, 0.08) 85%,
+                rgba(255, 255, 255, 0.35) 100%
+            );
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
             pointer-events: none;
-            z-index: 2;
         }
         
         /* Edge distortion ring */
@@ -627,27 +629,28 @@
             position: relative;
             overflow: hidden;
             box-shadow: 
-                inset 2px 2px 1px rgba(255, 255, 255, 0.3),
-                inset -2px -2px 1px rgba(0, 0, 0, 0.18),
-                inset 5px 5px 10px rgba(255, 255, 255, 0.06),
-                inset -5px -5px 10px rgba(0, 0, 0, 0.12),
-                0 0 12px 3px rgba(0, 0, 0, 0.08);
+                inset 1px 1px 0 rgba(255, 255, 255, 0.25),
+                inset -1px -1px 0 rgba(0, 0, 0, 0.12);
         }
         
-        /* Glossy top highlight */
+        /* Edge highlight */
         .spin-btn::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 15%;
-            right: 15%;
-            height: 1px;
-            background: linear-gradient(90deg, 
-                transparent 0%, 
-                rgba(255, 255, 255, 0.5) 30%, 
-                rgba(255, 255, 255, 0.6) 50%, 
-                rgba(255, 255, 255, 0.5) 70%, 
-                transparent 100%);
+            inset: 0;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(
+                145deg,
+                rgba(255, 255, 255, 0.55) 0%,
+                rgba(255, 255, 255, 0.08) 15%,
+                rgba(255, 255, 255, 0.02) 50%,
+                rgba(255, 255, 255, 0.08) 85%,
+                rgba(255, 255, 255, 0.4) 100%
+            );
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
             pointer-events: none;
         }
         
@@ -693,27 +696,28 @@
             position: relative;
             overflow: hidden;
             box-shadow: 
-                inset 2px 2px 1px rgba(255, 255, 255, 0.25),
-                inset -2px -2px 1px rgba(0, 0, 0, 0.15),
-                inset 5px 5px 12px rgba(255, 255, 255, 0.04),
-                inset -5px -5px 12px rgba(0, 0, 0, 0.1),
-                0 0 15px 4px rgba(0, 0, 0, 0.06);
+                inset 1px 1px 0 rgba(255, 255, 255, 0.2),
+                inset -1px -1px 0 rgba(0, 0, 0, 0.1);
         }
         
-        /* Glossy top highlight */
+        /* Edge highlight */
         .result::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 10%;
-            right: 10%;
-            height: 1px;
-            background: linear-gradient(90deg, 
-                transparent 0%, 
-                rgba(255, 255, 255, 0.45) 30%, 
-                rgba(255, 255, 255, 0.55) 50%, 
-                rgba(255, 255, 255, 0.45) 70%, 
-                transparent 100%);
+            inset: 0;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(
+                145deg,
+                rgba(255, 255, 255, 0.5) 0%,
+                rgba(255, 255, 255, 0.08) 15%,
+                rgba(255, 255, 255, 0.02) 50%,
+                rgba(255, 255, 255, 0.08) 85%,
+                rgba(255, 255, 255, 0.35) 100%
+            );
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
             pointer-events: none;
         }
         
@@ -759,25 +763,28 @@
             position: relative;
             overflow: hidden;
             box-shadow: 
-                inset 1px 1px 0 rgba(255, 255, 255, 0.25),
-                inset -1px -1px 0 rgba(0, 0, 0, 0.12),
-                inset 2px 2px 4px rgba(255, 255, 255, 0.05),
-                inset -2px -2px 4px rgba(0, 0, 0, 0.08),
-                0 0 6px 1px rgba(0, 0, 0, 0.06);
+                inset 1px 1px 0 rgba(255, 255, 255, 0.2),
+                inset -1px -1px 0 rgba(0, 0, 0, 0.1);
         }
         
-        /* Glossy top highlight */
+        /* Edge highlight */
         .prize-rarity-badge::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 15%;
-            right: 15%;
-            height: 1px;
-            background: linear-gradient(90deg, 
-                transparent 0%, 
-                rgba(255, 255, 255, 0.4) 50%, 
-                transparent 100%);
+            inset: 0;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.4) 0%,
+                rgba(255, 255, 255, 0.06) 20%,
+                rgba(255, 255, 255, 0.02) 50%,
+                rgba(255, 255, 255, 0.06) 80%,
+                rgba(255, 255, 255, 0.25) 100%
+            );
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
             pointer-events: none;
         }
         
@@ -808,25 +815,28 @@
             position: relative;
             overflow: hidden;
             box-shadow: 
-                inset 2px 2px 1px rgba(255, 255, 255, 0.22),
-                inset -2px -2px 1px rgba(0, 0, 0, 0.12),
-                inset 3px 3px 6px rgba(255, 255, 255, 0.04),
-                inset -3px -3px 6px rgba(0, 0, 0, 0.08),
-                0 0 8px 2px rgba(0, 0, 0, 0.06);
+                inset 1px 1px 0 rgba(255, 255, 255, 0.18),
+                inset -1px -1px 0 rgba(0, 0, 0, 0.1);
         }
         
-        /* Glossy top highlight */
+        /* Edge highlight */
         .promo-code-display::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 15%;
-            right: 15%;
-            height: 1px;
-            background: linear-gradient(90deg, 
-                transparent 0%, 
-                rgba(255, 255, 255, 0.45) 50%, 
-                transparent 100%);
+            inset: 0;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.4) 0%,
+                rgba(255, 255, 255, 0.06) 20%,
+                rgba(255, 255, 255, 0.02) 50%,
+                rgba(255, 255, 255, 0.06) 80%,
+                rgba(255, 255, 255, 0.3) 100%
+            );
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
             pointer-events: none;
         }
         
@@ -857,25 +867,28 @@
             position: relative;
             overflow: hidden;
             box-shadow: 
-                inset 2px 2px 1px rgba(255, 255, 255, 0.28),
-                inset -2px -2px 1px rgba(0, 0, 0, 0.15),
-                inset 4px 4px 8px rgba(255, 255, 255, 0.05),
-                inset -4px -4px 8px rgba(0, 0, 0, 0.1),
-                0 0 10px 2px rgba(0, 0, 0, 0.07);
+                inset 1px 1px 0 rgba(255, 255, 255, 0.22),
+                inset -1px -1px 0 rgba(0, 0, 0, 0.1);
         }
         
-        /* Glossy top highlight */
+        /* Edge highlight */
         .prize-action-btn::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 15%;
-            right: 15%;
-            height: 1px;
-            background: linear-gradient(90deg, 
-                transparent 0%, 
-                rgba(255, 255, 255, 0.5) 50%, 
-                transparent 100%);
+            inset: 0;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(
+                145deg,
+                rgba(255, 255, 255, 0.5) 0%,
+                rgba(255, 255, 255, 0.08) 15%,
+                rgba(255, 255, 255, 0.02) 50%,
+                rgba(255, 255, 255, 0.08) 85%,
+                rgba(255, 255, 255, 0.35) 100%
+            );
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
             pointer-events: none;
         }
         
@@ -924,25 +937,28 @@
             position: relative;
             overflow: hidden;
             box-shadow: 
-                inset 2px 2px 1px rgba(255, 255, 255, 0.22),
-                inset -2px -2px 1px rgba(0, 0, 0, 0.12),
-                inset 3px 3px 6px rgba(255, 255, 255, 0.04),
-                inset -3px -3px 6px rgba(0, 0, 0, 0.08),
-                0 0 8px 2px rgba(0, 0, 0, 0.06);
+                inset 1px 1px 0 rgba(255, 255, 255, 0.18),
+                inset -1px -1px 0 rgba(0, 0, 0, 0.1);
         }
         
-        /* Glossy top highlight */
+        /* Edge highlight */
         .close-prize-btn::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 15%;
-            right: 15%;
-            height: 1px;
-            background: linear-gradient(90deg, 
-                transparent 0%, 
-                rgba(255, 255, 255, 0.4) 50%, 
-                transparent 100%);
+            inset: 0;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.4) 0%,
+                rgba(255, 255, 255, 0.06) 20%,
+                rgba(255, 255, 255, 0.02) 50%,
+                rgba(255, 255, 255, 0.06) 80%,
+                rgba(255, 255, 255, 0.25) 100%
+            );
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
             pointer-events: none;
         }
         
@@ -962,27 +978,28 @@
             position: relative;
             overflow: hidden;
             box-shadow: 
-                inset 2px 2px 1px rgba(255, 255, 255, 0.25),
-                inset -2px -2px 1px rgba(0, 0, 0, 0.15),
-                inset 5px 5px 10px rgba(255, 255, 255, 0.04),
-                inset -5px -5px 10px rgba(0, 0, 0, 0.1),
-                0 0 12px 3px rgba(0, 0, 0, 0.06);
+                inset 1px 1px 0 rgba(255, 255, 255, 0.2),
+                inset -1px -1px 0 rgba(0, 0, 0, 0.1);
         }
         
-        /* Glossy top highlight */
+        /* Edge highlight */
         .prizes-info::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 10%;
-            right: 10%;
-            height: 1px;
-            background: linear-gradient(90deg, 
-                transparent 0%, 
-                rgba(255, 255, 255, 0.45) 30%, 
-                rgba(255, 255, 255, 0.55) 50%, 
-                rgba(255, 255, 255, 0.45) 70%, 
-                transparent 100%);
+            inset: 0;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(
+                145deg,
+                rgba(255, 255, 255, 0.5) 0%,
+                rgba(255, 255, 255, 0.08) 15%,
+                rgba(255, 255, 255, 0.02) 50%,
+                rgba(255, 255, 255, 0.08) 85%,
+                rgba(255, 255, 255, 0.35) 100%
+            );
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
             pointer-events: none;
         }
         
@@ -1042,27 +1059,28 @@
             line-height: 1.8;
             overflow: hidden;
             box-shadow: 
-                inset 2px 2px 1px rgba(255, 255, 255, 0.22),
-                inset -2px -2px 1px rgba(0, 0, 0, 0.15),
-                inset 5px 5px 10px rgba(255, 255, 255, 0.04),
-                inset -5px -5px 10px rgba(0, 0, 0, 0.1),
-                0 0 12px 3px rgba(0, 0, 0, 0.06);
+                inset 1px 1px 0 rgba(255, 255, 255, 0.18),
+                inset -1px -1px 0 rgba(0, 0, 0, 0.1);
         }
         
-        /* Glossy top highlight */
+        /* Edge highlight */
         .rules::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 10%;
-            right: 10%;
-            height: 1px;
-            background: linear-gradient(90deg, 
-                transparent 0%, 
-                rgba(255, 255, 255, 0.4) 30%, 
-                rgba(255, 255, 255, 0.5) 50%, 
-                rgba(255, 255, 255, 0.4) 70%, 
-                transparent 100%);
+            inset: 0;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(
+                145deg,
+                rgba(255, 255, 255, 0.45) 0%,
+                rgba(255, 255, 255, 0.06) 15%,
+                rgba(255, 255, 255, 0.02) 50%,
+                rgba(255, 255, 255, 0.06) 85%,
+                rgba(255, 255, 255, 0.3) 100%
+            );
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
             pointer-events: none;
         }
         
