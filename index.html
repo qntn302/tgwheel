@@ -221,6 +221,46 @@
             z-index: 1000;
         }
         
+        /* Glass Edge Distortion - creates lens-like refraction at edges */
+        .glass-distortion {
+            position: relative;
+            isolation: isolate;
+        }
+        
+        .glass-distortion > .edge-blur {
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            pointer-events: none;
+            z-index: 1;
+            -webkit-mask: radial-gradient(
+                ellipse 65% 55% at center,
+                transparent 0%,
+                transparent 35%,
+                rgba(0, 0, 0, 0.2) 50%,
+                rgba(0, 0, 0, 0.5) 65%,
+                rgba(0, 0, 0, 0.8) 80%,
+                rgba(0, 0, 0, 1) 100%
+            );
+            mask: radial-gradient(
+                ellipse 65% 55% at center,
+                transparent 0%,
+                transparent 35%,
+                rgba(0, 0, 0, 0.2) 50%,
+                rgba(0, 0, 0, 0.5) 65%,
+                rgba(0, 0, 0, 0.8) 80%,
+                rgba(0, 0, 0, 1) 100%
+            );
+        }
+        
+        /* Ensure content is above edge blur */
+        .glass-distortion > *:not(.edge-blur) {
+            position: relative;
+            z-index: 2;
+        }
+        
         /* Liquid Glass - Flat Style */
         .lang-btn {
             background: rgba(255, 255, 255, 0.01);
@@ -1137,6 +1177,16 @@
     </style>
 </head>
 <body>
+    <!-- SVG Filters for glass distortion effect -->
+    <svg width="0" height="0" style="position: absolute;">
+        <defs>
+            <filter id="lens-distortion" x="-20%" y="-20%" width="140%" height="140%">
+                <feTurbulence type="turbulence" baseFrequency="0.01" numOctaves="2" result="turbulence" seed="5"/>
+                <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="3" xChannelSelector="R" yChannelSelector="G"/>
+            </filter>
+        </defs>
+    </svg>
+    
     <!-- Abstract background shapes -->
     <div class="bg-shapes">
         <div class="bg-shape bg-shape-1"></div>
@@ -1161,7 +1211,8 @@
         <h1 id="title">Wheel of Drops</h1>
         <p class="subtitle" id="subtitle">Spin the wheel and see what drops today</p>
         
-        <div class="drop-pace-indicator">
+        <div class="drop-pace-indicator glass-distortion">
+            <div class="edge-blur"></div>
             <div class="drop-pace-label">
                 Drop Pace
                 <button class="info-btn" onclick="showDropPaceInfo()" title="Info">?</button>
@@ -1172,7 +1223,8 @@
             </div>
         </div>
         
-        <div class="roulette-container">
+        <div class="roulette-container glass-distortion">
+            <div class="edge-blur"></div>
             <div class="roulette-container-border"></div>
             <div class="roulette-pointer"></div>
             <div class="roulette-track" id="rouletteTrack"></div>
@@ -1180,7 +1232,8 @@
         
         <button class="spin-btn" id="spinBtn" onclick="spinRoulette()">Spin the wheel</button>
         
-        <div class="result" id="result">
+        <div class="result glass-distortion" id="result">
+            <div class="edge-blur"></div>
             <div class="prize-header">
                 <div class="prize-rarity-badge" id="prizeRarityBadge"></div>
             <div class="prize-name" id="prizeName"></div>
@@ -1219,7 +1272,8 @@
             </button>
         </div>
         
-        <div class="prizes-info" id="prizesInfo">
+        <div class="prizes-info glass-distortion" id="prizesInfo">
+            <div class="edge-blur"></div>
             <div class="prizes-title" id="prizesTitle">Что можно выиграть</div>
             <div class="prizes-list" id="prizesList">
                 <div>· Мои эксклюзивные лупы, MIDI, FLP</div>
@@ -1232,7 +1286,8 @@
             </div>
         </div>
         
-        <div class="rules" id="rules">
+        <div class="rules glass-distortion" id="rules">
+            <div class="edge-blur"></div>
             <strong>Правила</strong><br><br>
             1. Одна попытка в 24 часа<br>
             2. Скидки действуют 7 дней<br>
