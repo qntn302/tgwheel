@@ -33,18 +33,17 @@
             overflow-x: hidden;
         }
         
-        /* Film grain overlay - VHS style */
-        body::before {
-            content: '';
+        /* Film grain - part of background (gets blurred by glass) */
+        .bg-grain {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: 9999;
-            opacity: 0.06;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.5' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            z-index: 0;
+            opacity: 0.07;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
         }
         
         /* Abstract background shapes */
@@ -220,11 +219,11 @@
             z-index: 1000;
         }
         
-        /* Liquid Glass - Convex 3D Effect */
+        /* Liquid Glass - Convex 3D Effect with Edge Distortion */
         .lang-btn {
             background: rgba(255, 255, 255, 0.01);
-            backdrop-filter: blur(2px);
-            -webkit-backdrop-filter: blur(2px);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
             border: none;
             color: var(--text-secondary);
             padding: 8px 16px;
@@ -236,12 +235,15 @@
             transition: all 0.25s ease;
             position: relative;
             box-shadow: 
-                inset 1px 1px 0 rgba(255, 255, 255, 0.25),
-                inset -1px -1px 0 rgba(0, 0, 0, 0.15),
-                inset 2px 2px 4px rgba(255, 255, 255, 0.05),
-                inset -2px -2px 4px rgba(0, 0, 0, 0.1);
+                inset 2px 2px 1px rgba(255, 255, 255, 0.3),
+                inset -2px -2px 1px rgba(0, 0, 0, 0.2),
+                inset 4px 4px 8px rgba(255, 255, 255, 0.08),
+                inset -4px -4px 8px rgba(0, 0, 0, 0.15),
+                0 0 8px 2px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
         
+        /* Edge highlight - top specular */
         .lang-btn::before {
             content: '';
             position: absolute;
@@ -250,16 +252,29 @@
             padding: 1px;
             background: linear-gradient(
                 135deg,
-                rgba(255, 255, 255, 0.5) 0%,
-                rgba(255, 255, 255, 0.1) 20%,
-                rgba(255, 255, 255, 0.03) 50%,
-                rgba(255, 255, 255, 0.1) 80%,
-                rgba(255, 255, 255, 0.3) 100%
+                rgba(255, 255, 255, 0.6) 0%,
+                rgba(255, 255, 255, 0.15) 15%,
+                rgba(255, 255, 255, 0.02) 50%,
+                rgba(255, 255, 255, 0.1) 85%,
+                rgba(255, 255, 255, 0.4) 100%
             );
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor;
             mask-composite: exclude;
             pointer-events: none;
+        }
+        
+        /* Edge distortion simulation - outer blur ring */
+        .lang-btn::after {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border-radius: calc(14px + 3px);
+            background: transparent;
+            box-shadow: inset 0 0 6px 3px rgba(255, 255, 255, 0.03);
+            pointer-events: none;
+            z-index: -1;
+            filter: blur(2px);
         }
         
         .lang-btn:hover {
@@ -290,9 +305,9 @@
         }
         
         .drop-pace-indicator {
-            background: rgba(255, 255, 255, 0.01);
-            backdrop-filter: blur(3px);
-            -webkit-backdrop-filter: blur(3px);
+            background: rgba(255, 255, 255, 0.008);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
             border-radius: 24px;
             padding: 18px 24px;
             margin: 15px 0;
@@ -300,30 +315,44 @@
             text-align: center;
             position: relative;
             box-shadow: 
-                inset 1px 1px 0 rgba(255, 255, 255, 0.2),
-                inset -1px -1px 0 rgba(0, 0, 0, 0.12),
-                inset 3px 3px 6px rgba(255, 255, 255, 0.03),
-                inset -3px -3px 6px rgba(0, 0, 0, 0.08);
+                inset 2px 2px 1px rgba(255, 255, 255, 0.25),
+                inset -2px -2px 1px rgba(0, 0, 0, 0.18),
+                inset 5px 5px 10px rgba(255, 255, 255, 0.05),
+                inset -5px -5px 10px rgba(0, 0, 0, 0.12),
+                0 0 12px 3px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
         }
         
+        /* Glossy highlight */
         .drop-pace-indicator::before {
             content: '';
             position: absolute;
-            inset: 0;
-            border-radius: inherit;
-            padding: 1px;
-            background: linear-gradient(
-                145deg,
-                rgba(255, 255, 255, 0.5) 0%,
-                rgba(255, 255, 255, 0.08) 15%,
-                rgba(255, 255, 255, 0.02) 50%,
-                rgba(255, 255, 255, 0.08) 85%,
-                rgba(255, 255, 255, 0.35) 100%
-            );
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
+            top: 0;
+            left: 10%;
+            right: 10%;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0.5) 30%, 
+                rgba(255, 255, 255, 0.6) 50%, 
+                rgba(255, 255, 255, 0.5) 70%, 
+                transparent 100%);
             pointer-events: none;
+        }
+        
+        /* Edge distortion ring */
+        .drop-pace-indicator::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: calc(24px + 4px);
+            background: transparent;
+            box-shadow: 
+                inset 0 0 10px 5px rgba(0, 0, 0, 0.04),
+                inset 0 0 20px 8px rgba(0, 0, 0, 0.02);
+            pointer-events: none;
+            z-index: -1;
+            filter: blur(3px);
         }
         
         .drop-pace-label {
@@ -363,8 +392,8 @@
         
         .info-btn {
             background: rgba(255, 255, 255, 0.01);
-            backdrop-filter: blur(2px);
-            -webkit-backdrop-filter: blur(2px);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
             border: none;
             color: var(--text-secondary);
             padding: 0;
@@ -379,28 +408,27 @@
             justify-content: center;
             transition: all 0.25s ease;
             position: relative;
+            overflow: hidden;
             box-shadow: 
-                inset 1px 1px 0 rgba(255, 255, 255, 0.2),
-                inset -1px -1px 0 rgba(0, 0, 0, 0.1);
+                inset 1px 1px 0 rgba(255, 255, 255, 0.3),
+                inset -1px -1px 0 rgba(0, 0, 0, 0.15),
+                inset 2px 2px 4px rgba(255, 255, 255, 0.06),
+                inset -2px -2px 4px rgba(0, 0, 0, 0.1),
+                0 0 6px 1px rgba(0, 0, 0, 0.08);
         }
         
+        /* Glossy top highlight */
         .info-btn::before {
             content: '';
             position: absolute;
-            inset: 0;
-            border-radius: inherit;
-            padding: 1px;
-            background: linear-gradient(
-                135deg,
-                rgba(255, 255, 255, 0.45) 0%,
-                rgba(255, 255, 255, 0.06) 20%,
-                rgba(255, 255, 255, 0.02) 50%,
-                rgba(255, 255, 255, 0.06) 80%,
-                rgba(255, 255, 255, 0.3) 100%
-            );
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
+            top: 0;
+            left: 20%;
+            right: 20%;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0.5) 50%, 
+                transparent 100%);
             pointer-events: none;
         }
         
@@ -415,35 +443,33 @@
             height: 200px;
             margin: 20px auto;
             overflow: hidden;
-            background: rgba(255, 255, 255, 0.008);
-            backdrop-filter: blur(3px);
-            -webkit-backdrop-filter: blur(3px);
+            background: rgba(255, 255, 255, 0.006);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
             border-radius: 28px;
             padding: 20px 0;
             border: none;
             box-shadow: 
-                inset 1px 1px 0 rgba(255, 255, 255, 0.18),
-                inset -1px -1px 0 rgba(0, 0, 0, 0.1),
-                inset 3px 3px 6px rgba(255, 255, 255, 0.02),
-                inset -3px -3px 6px rgba(0, 0, 0, 0.06);
+                inset 2px 2px 1px rgba(255, 255, 255, 0.22),
+                inset -2px -2px 1px rgba(0, 0, 0, 0.15),
+                inset 5px 5px 12px rgba(255, 255, 255, 0.04),
+                inset -5px -5px 12px rgba(0, 0, 0, 0.1),
+                0 0 15px 4px rgba(0, 0, 0, 0.06);
         }
         
+        /* Glossy top highlight */
         .roulette-container-border {
             position: absolute;
-            inset: 0;
-            border-radius: inherit;
-            padding: 1px;
-            background: linear-gradient(
-                145deg,
-                rgba(255, 255, 255, 0.45) 0%,
-                rgba(255, 255, 255, 0.06) 15%,
-                rgba(255, 255, 255, 0.02) 50%,
-                rgba(255, 255, 255, 0.06) 85%,
-                rgba(255, 255, 255, 0.3) 100%
-            );
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
+            top: 0;
+            left: 10%;
+            right: 10%;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0.4) 30%, 
+                rgba(255, 255, 255, 0.5) 50%, 
+                rgba(255, 255, 255, 0.4) 70%, 
+                transparent 100%);
             pointer-events: none;
             z-index: 5;
         }
@@ -461,9 +487,9 @@
             width: 140px;
             height: 160px;
             margin: 0 5px;
-            background: rgba(255, 255, 255, 0.01);
-            backdrop-filter: blur(2px);
-            -webkit-backdrop-filter: blur(2px);
+            background: rgba(255, 255, 255, 0.008);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
             border-radius: 22px;
             border: none;
             display: flex;
@@ -474,30 +500,43 @@
             position: relative;
             overflow: hidden;
             box-shadow: 
-                inset 1px 1px 0 rgba(255, 255, 255, 0.2),
-                inset -1px -1px 0 rgba(0, 0, 0, 0.1),
-                inset 2px 2px 4px rgba(255, 255, 255, 0.02),
-                inset -2px -2px 4px rgba(0, 0, 0, 0.05);
+                inset 2px 2px 1px rgba(255, 255, 255, 0.25),
+                inset -2px -2px 1px rgba(0, 0, 0, 0.15),
+                inset 4px 4px 8px rgba(255, 255, 255, 0.04),
+                inset -4px -4px 8px rgba(0, 0, 0, 0.1),
+                0 0 10px 2px rgba(0, 0, 0, 0.06);
         }
         
+        /* Glossy top highlight */
         .roulette-cell::before {
             content: '';
             position: absolute;
-            inset: 0;
-            border-radius: inherit;
-            padding: 1px;
-            background: linear-gradient(
-                145deg,
-                rgba(255, 255, 255, 0.5) 0%,
-                rgba(255, 255, 255, 0.08) 15%,
-                rgba(255, 255, 255, 0.02) 50%,
-                rgba(255, 255, 255, 0.08) 85%,
-                rgba(255, 255, 255, 0.35) 100%
-            );
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
+            top: 0;
+            left: 15%;
+            right: 15%;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0.45) 30%, 
+                rgba(255, 255, 255, 0.55) 50%, 
+                rgba(255, 255, 255, 0.45) 70%, 
+                transparent 100%);
             pointer-events: none;
+            z-index: 2;
+        }
+        
+        /* Edge distortion ring */
+        .roulette-cell::after {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border-radius: calc(22px + 3px);
+            background: transparent;
+            box-shadow: 
+                inset 0 0 8px 4px rgba(0, 0, 0, 0.04);
+            pointer-events: none;
+            z-index: -1;
+            filter: blur(2px);
         }
         
         .roulette-cell img {
@@ -571,8 +610,8 @@
         
         .spin-btn {
             background: rgba(255, 255, 255, 0.01);
-            backdrop-filter: blur(3px);
-            -webkit-backdrop-filter: blur(3px);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
             color: var(--text-primary);
             border: none;
             padding: 18px 45px;
@@ -586,31 +625,44 @@
             max-width: 300px;
             transition: all 0.25s ease;
             position: relative;
+            overflow: hidden;
             box-shadow: 
-                inset 1px 1px 0 rgba(255, 255, 255, 0.25),
-                inset -1px -1px 0 rgba(0, 0, 0, 0.12),
-                inset 2px 2px 5px rgba(255, 255, 255, 0.03),
-                inset -2px -2px 5px rgba(0, 0, 0, 0.08);
+                inset 2px 2px 1px rgba(255, 255, 255, 0.3),
+                inset -2px -2px 1px rgba(0, 0, 0, 0.18),
+                inset 5px 5px 10px rgba(255, 255, 255, 0.06),
+                inset -5px -5px 10px rgba(0, 0, 0, 0.12),
+                0 0 12px 3px rgba(0, 0, 0, 0.08);
         }
         
+        /* Glossy top highlight */
         .spin-btn::before {
             content: '';
             position: absolute;
-            inset: 0;
-            border-radius: inherit;
-            padding: 1px;
-            background: linear-gradient(
-                145deg,
-                rgba(255, 255, 255, 0.55) 0%,
-                rgba(255, 255, 255, 0.08) 15%,
-                rgba(255, 255, 255, 0.02) 50%,
-                rgba(255, 255, 255, 0.08) 85%,
-                rgba(255, 255, 255, 0.4) 100%
-            );
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
+            top: 0;
+            left: 15%;
+            right: 15%;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0.5) 30%, 
+                rgba(255, 255, 255, 0.6) 50%, 
+                rgba(255, 255, 255, 0.5) 70%, 
+                transparent 100%);
             pointer-events: none;
+        }
+        
+        /* Edge distortion ring */
+        .spin-btn::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: calc(22px + 4px);
+            background: transparent;
+            box-shadow: 
+                inset 0 0 10px 5px rgba(0, 0, 0, 0.04);
+            pointer-events: none;
+            z-index: -1;
+            filter: blur(3px);
         }
         
         .spin-btn:hover {
@@ -630,40 +682,53 @@
         }
         
         .result {
-            background: rgba(255, 255, 255, 0.01);
-            backdrop-filter: blur(3px);
-            -webkit-backdrop-filter: blur(3px);
+            background: rgba(255, 255, 255, 0.008);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
             border-radius: 28px;
             padding: 28px 24px;
             margin: 20px 0;
             border: none;
             display: none;
             position: relative;
+            overflow: hidden;
             box-shadow: 
-                inset 1px 1px 0 rgba(255, 255, 255, 0.2),
-                inset -1px -1px 0 rgba(0, 0, 0, 0.1),
-                inset 3px 3px 6px rgba(255, 255, 255, 0.02),
-                inset -3px -3px 6px rgba(0, 0, 0, 0.06);
+                inset 2px 2px 1px rgba(255, 255, 255, 0.25),
+                inset -2px -2px 1px rgba(0, 0, 0, 0.15),
+                inset 5px 5px 12px rgba(255, 255, 255, 0.04),
+                inset -5px -5px 12px rgba(0, 0, 0, 0.1),
+                0 0 15px 4px rgba(0, 0, 0, 0.06);
         }
         
+        /* Glossy top highlight */
         .result::before {
             content: '';
             position: absolute;
-            inset: 0;
-            border-radius: inherit;
-            padding: 1px;
-            background: linear-gradient(
-                145deg,
-                rgba(255, 255, 255, 0.5) 0%,
-                rgba(255, 255, 255, 0.08) 15%,
-                rgba(255, 255, 255, 0.02) 50%,
-                rgba(255, 255, 255, 0.08) 85%,
-                rgba(255, 255, 255, 0.35) 100%
-            );
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
+            top: 0;
+            left: 10%;
+            right: 10%;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0.45) 30%, 
+                rgba(255, 255, 255, 0.55) 50%, 
+                rgba(255, 255, 255, 0.45) 70%, 
+                transparent 100%);
             pointer-events: none;
+        }
+        
+        /* Edge distortion ring */
+        .result::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: calc(28px + 4px);
+            background: transparent;
+            box-shadow: 
+                inset 0 0 12px 6px rgba(0, 0, 0, 0.04);
+            pointer-events: none;
+            z-index: -1;
+            filter: blur(3px);
         }
         
         .prize-name {
@@ -689,31 +754,30 @@
             margin-bottom: 12px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            background: rgba(255, 255, 255, 0.01);
-            backdrop-filter: blur(2px);
+            background: rgba(255, 255, 255, 0.008);
+            backdrop-filter: blur(3px);
             position: relative;
+            overflow: hidden;
             box-shadow: 
-                inset 1px 1px 0 rgba(255, 255, 255, 0.15),
-                inset -1px -1px 0 rgba(0, 0, 0, 0.08);
+                inset 1px 1px 0 rgba(255, 255, 255, 0.25),
+                inset -1px -1px 0 rgba(0, 0, 0, 0.12),
+                inset 2px 2px 4px rgba(255, 255, 255, 0.05),
+                inset -2px -2px 4px rgba(0, 0, 0, 0.08),
+                0 0 6px 1px rgba(0, 0, 0, 0.06);
         }
         
+        /* Glossy top highlight */
         .prize-rarity-badge::before {
             content: '';
             position: absolute;
-            inset: 0;
-            border-radius: inherit;
-            padding: 1px;
-            background: linear-gradient(
-                135deg,
-                rgba(255, 255, 255, 0.4) 0%,
-                rgba(255, 255, 255, 0.06) 20%,
-                rgba(255, 255, 255, 0.02) 50%,
-                rgba(255, 255, 255, 0.06) 80%,
-                rgba(255, 255, 255, 0.25) 100%
-            );
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
+            top: 0;
+            left: 15%;
+            right: 15%;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0.4) 50%, 
+                transparent 100%);
             pointer-events: none;
         }
         
@@ -734,36 +798,35 @@
         }
         
         .promo-code-display {
-            background: rgba(255, 255, 255, 0.01);
-            backdrop-filter: blur(2px);
-            -webkit-backdrop-filter: blur(2px);
+            background: rgba(255, 255, 255, 0.008);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
             border-radius: 16px;
             padding: 16px 28px;
             margin: 8px 0;
             border: none;
             position: relative;
+            overflow: hidden;
             box-shadow: 
-                inset 1px 1px 0 rgba(255, 255, 255, 0.18),
-                inset -1px -1px 0 rgba(0, 0, 0, 0.1);
+                inset 2px 2px 1px rgba(255, 255, 255, 0.22),
+                inset -2px -2px 1px rgba(0, 0, 0, 0.12),
+                inset 3px 3px 6px rgba(255, 255, 255, 0.04),
+                inset -3px -3px 6px rgba(0, 0, 0, 0.08),
+                0 0 8px 2px rgba(0, 0, 0, 0.06);
         }
         
+        /* Glossy top highlight */
         .promo-code-display::before {
             content: '';
             position: absolute;
-            inset: 0;
-            border-radius: inherit;
-            padding: 1px;
-            background: linear-gradient(
-                135deg,
-                rgba(255, 255, 255, 0.4) 0%,
-                rgba(255, 255, 255, 0.06) 20%,
-                rgba(255, 255, 255, 0.02) 50%,
-                rgba(255, 255, 255, 0.06) 80%,
-                rgba(255, 255, 255, 0.3) 100%
-            );
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
+            top: 0;
+            left: 15%;
+            right: 15%;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0.45) 50%, 
+                transparent 100%);
             pointer-events: none;
         }
         
@@ -775,9 +838,9 @@
         }
         
         .prize-action-btn {
-            background: rgba(255, 255, 255, 0.01);
-            backdrop-filter: blur(2px);
-            -webkit-backdrop-filter: blur(2px);
+            background: rgba(255, 255, 255, 0.008);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
             color: var(--text-primary);
             border: none;
             padding: 14px 28px;
@@ -792,43 +855,40 @@
             text-align: center;
             transition: all 0.25s ease;
             position: relative;
+            overflow: hidden;
             box-shadow: 
-                inset 1px 1px 0 rgba(255, 255, 255, 0.22),
-                inset -1px -1px 0 rgba(0, 0, 0, 0.1),
-                inset 2px 2px 4px rgba(255, 255, 255, 0.02),
-                inset -2px -2px 4px rgba(0, 0, 0, 0.06);
+                inset 2px 2px 1px rgba(255, 255, 255, 0.28),
+                inset -2px -2px 1px rgba(0, 0, 0, 0.15),
+                inset 4px 4px 8px rgba(255, 255, 255, 0.05),
+                inset -4px -4px 8px rgba(0, 0, 0, 0.1),
+                0 0 10px 2px rgba(0, 0, 0, 0.07);
         }
         
+        /* Glossy top highlight */
         .prize-action-btn::before {
             content: '';
             position: absolute;
-            inset: 0;
-            border-radius: inherit;
-            padding: 1px;
-            background: linear-gradient(
-                145deg,
-                rgba(255, 255, 255, 0.5) 0%,
-                rgba(255, 255, 255, 0.08) 15%,
-                rgba(255, 255, 255, 0.02) 50%,
-                rgba(255, 255, 255, 0.08) 85%,
-                rgba(255, 255, 255, 0.35) 100%
-            );
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
+            top: 0;
+            left: 15%;
+            right: 15%;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0.5) 50%, 
+                transparent 100%);
             pointer-events: none;
         }
         
         .prize-action-btn:hover {
-            background: rgba(255, 255, 255, 0.025);
+            background: rgba(255, 255, 255, 0.02);
         }
         
         .prize-action-btn.access-btn {
-            background: rgba(255, 255, 255, 0.01);
+            background: rgba(255, 255, 255, 0.008);
         }
         
         .prize-action-btn.access-btn:hover {
-            background: rgba(255, 255, 255, 0.025);
+            background: rgba(255, 255, 255, 0.02);
         }
         
         .access-congrats {
@@ -849,9 +909,9 @@
         }
         
         .close-prize-btn {
-            background: rgba(255, 255, 255, 0.01);
-            backdrop-filter: blur(2px);
-            -webkit-backdrop-filter: blur(2px);
+            background: rgba(255, 255, 255, 0.008);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
             color: var(--text-secondary);
             border: none;
             padding: 10px 20px;
@@ -862,70 +922,82 @@
             margin-top: 16px;
             transition: all 0.25s ease;
             position: relative;
+            overflow: hidden;
             box-shadow: 
-                inset 1px 1px 0 rgba(255, 255, 255, 0.18),
-                inset -1px -1px 0 rgba(0, 0, 0, 0.1);
+                inset 2px 2px 1px rgba(255, 255, 255, 0.22),
+                inset -2px -2px 1px rgba(0, 0, 0, 0.12),
+                inset 3px 3px 6px rgba(255, 255, 255, 0.04),
+                inset -3px -3px 6px rgba(0, 0, 0, 0.08),
+                0 0 8px 2px rgba(0, 0, 0, 0.06);
         }
         
+        /* Glossy top highlight */
         .close-prize-btn::before {
             content: '';
             position: absolute;
-            inset: 0;
-            border-radius: inherit;
-            padding: 1px;
-            background: linear-gradient(
-                135deg,
-                rgba(255, 255, 255, 0.4) 0%,
-                rgba(255, 255, 255, 0.06) 20%,
-                rgba(255, 255, 255, 0.02) 50%,
-                rgba(255, 255, 255, 0.06) 80%,
-                rgba(255, 255, 255, 0.25) 100%
-            );
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
+            top: 0;
+            left: 15%;
+            right: 15%;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0.4) 50%, 
+                transparent 100%);
             pointer-events: none;
         }
         
         .close-prize-btn:hover {
-            background: rgba(255, 255, 255, 0.025);
+            background: rgba(255, 255, 255, 0.02);
             color: var(--text-primary);
         }
         
         .prizes-info {
-            background: rgba(255, 255, 255, 0.01);
-            backdrop-filter: blur(3px);
-            -webkit-backdrop-filter: blur(3px);
+            background: rgba(255, 255, 255, 0.008);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
             border-radius: 24px;
             padding: 22px;
             margin: 20px 0;
             border: none;
             position: relative;
+            overflow: hidden;
             box-shadow: 
-                inset 1px 1px 0 rgba(255, 255, 255, 0.2),
-                inset -1px -1px 0 rgba(0, 0, 0, 0.1),
-                inset 3px 3px 6px rgba(255, 255, 255, 0.02),
-                inset -3px -3px 6px rgba(0, 0, 0, 0.06);
+                inset 2px 2px 1px rgba(255, 255, 255, 0.25),
+                inset -2px -2px 1px rgba(0, 0, 0, 0.15),
+                inset 5px 5px 10px rgba(255, 255, 255, 0.04),
+                inset -5px -5px 10px rgba(0, 0, 0, 0.1),
+                0 0 12px 3px rgba(0, 0, 0, 0.06);
         }
         
+        /* Glossy top highlight */
         .prizes-info::before {
             content: '';
             position: absolute;
-            inset: 0;
-            border-radius: inherit;
-            padding: 1px;
-            background: linear-gradient(
-                145deg,
-                rgba(255, 255, 255, 0.5) 0%,
-                rgba(255, 255, 255, 0.08) 15%,
-                rgba(255, 255, 255, 0.02) 50%,
-                rgba(255, 255, 255, 0.08) 85%,
-                rgba(255, 255, 255, 0.35) 100%
-            );
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
+            top: 0;
+            left: 10%;
+            right: 10%;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0.45) 30%, 
+                rgba(255, 255, 255, 0.55) 50%, 
+                rgba(255, 255, 255, 0.45) 70%, 
+                transparent 100%);
             pointer-events: none;
+        }
+        
+        /* Edge distortion ring */
+        .prizes-info::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: calc(24px + 4px);
+            background: transparent;
+            box-shadow: 
+                inset 0 0 10px 5px rgba(0, 0, 0, 0.04);
+            pointer-events: none;
+            z-index: -1;
+            filter: blur(3px);
         }
         
         .prizes-title {
@@ -956,9 +1028,9 @@
         }
         
         .rules {
-            background: rgba(255, 255, 255, 0.008);
-            backdrop-filter: blur(3px);
-            -webkit-backdrop-filter: blur(3px);
+            background: rgba(255, 255, 255, 0.006);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
             border-radius: 24px;
             padding: 20px;
             margin-top: 20px;
@@ -968,31 +1040,44 @@
             border: none;
             position: relative;
             line-height: 1.8;
+            overflow: hidden;
             box-shadow: 
-                inset 1px 1px 0 rgba(255, 255, 255, 0.18),
-                inset -1px -1px 0 rgba(0, 0, 0, 0.1),
-                inset 3px 3px 6px rgba(255, 255, 255, 0.02),
-                inset -3px -3px 6px rgba(0, 0, 0, 0.06);
+                inset 2px 2px 1px rgba(255, 255, 255, 0.22),
+                inset -2px -2px 1px rgba(0, 0, 0, 0.15),
+                inset 5px 5px 10px rgba(255, 255, 255, 0.04),
+                inset -5px -5px 10px rgba(0, 0, 0, 0.1),
+                0 0 12px 3px rgba(0, 0, 0, 0.06);
         }
         
+        /* Glossy top highlight */
         .rules::before {
             content: '';
             position: absolute;
-            inset: 0;
-            border-radius: inherit;
-            padding: 1px;
-            background: linear-gradient(
-                145deg,
-                rgba(255, 255, 255, 0.45) 0%,
-                rgba(255, 255, 255, 0.06) 15%,
-                rgba(255, 255, 255, 0.02) 50%,
-                rgba(255, 255, 255, 0.06) 85%,
-                rgba(255, 255, 255, 0.3) 100%
-            );
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
+            top: 0;
+            left: 10%;
+            right: 10%;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0.4) 30%, 
+                rgba(255, 255, 255, 0.5) 50%, 
+                rgba(255, 255, 255, 0.4) 70%, 
+                transparent 100%);
             pointer-events: none;
+        }
+        
+        /* Edge distortion ring */
+        .rules::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: calc(24px + 4px);
+            background: transparent;
+            box-shadow: 
+                inset 0 0 10px 5px rgba(0, 0, 0, 0.04);
+            pointer-events: none;
+            z-index: -1;
+            filter: blur(3px);
         }
         
         .rules strong {
@@ -1043,6 +1128,9 @@
         <div class="bg-orb bg-orb-2"></div>
         <div class="bg-orb bg-orb-3"></div>
     </div>
+    
+    <!-- Film grain on background layer - gets blurred by glass -->
+    <div class="bg-grain"></div>
     
     <div class="language-switcher">
         <button class="lang-btn active" onclick="setLanguage('ru')">RU</button>
