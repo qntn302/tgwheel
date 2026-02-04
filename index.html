@@ -167,6 +167,63 @@
             filter: blur(1px);
         }
         
+        /* Additional depth orbs */
+        .bg-orb-5 {
+            width: 90px;
+            height: 90px;
+            top: 30%;
+            left: 5%;
+            animation: orbFloat2 26s ease-in-out infinite;
+            background: radial-gradient(circle at 30% 30%, 
+                rgba(70, 60, 55, 0.3) 0%, 
+                rgba(45, 40, 38, 0.5) 30%, 
+                rgba(28, 25, 24, 0.7) 60%, 
+                rgba(14, 12, 12, 0.85) 100%);
+            filter: blur(3px);
+        }
+        
+        .bg-orb-6 {
+            width: 50px;
+            height: 50px;
+            top: 15%;
+            right: 25%;
+            animation: orbFloat3 20s ease-in-out infinite reverse;
+            background: radial-gradient(circle at 35% 35%, 
+                rgba(65, 58, 52, 0.35) 0%, 
+                rgba(42, 38, 35, 0.55) 30%, 
+                rgba(25, 23, 22, 0.75) 60%, 
+                rgba(12, 11, 10, 0.9) 100%);
+            filter: blur(0.3px);
+        }
+        
+        .bg-orb-7 {
+            width: 110px;
+            height: 110px;
+            bottom: 40%;
+            right: 3%;
+            animation: orbFloat1 30s ease-in-out infinite;
+            background: radial-gradient(circle at 32% 32%, 
+                rgba(55, 50, 48, 0.25) 0%, 
+                rgba(38, 35, 34, 0.45) 30%, 
+                rgba(24, 22, 21, 0.65) 60%, 
+                rgba(12, 11, 10, 0.8) 100%);
+            filter: blur(5px);
+        }
+        
+        .bg-orb-8 {
+            width: 40px;
+            height: 40px;
+            top: 65%;
+            left: 15%;
+            animation: orbFloat3 18s ease-in-out infinite;
+            background: radial-gradient(circle at 35% 35%, 
+                rgba(50, 60, 52, 0.3) 0%, 
+                rgba(35, 45, 38, 0.5) 30%, 
+                rgba(22, 30, 25, 0.7) 60%, 
+                rgba(10, 15, 12, 0.85) 100%);
+            filter: blur(0.5px);
+        }
+        
         .bg-orb-3 {
             width: 60px;
             height: 60px;
@@ -176,12 +233,10 @@
             filter: blur(0.5px);
         }
         
-        /* SVG Botanical Leaves */
+        /* SVG Botanical Leaves - subtle, blurred */
         .svg-leaf {
             position: absolute;
             pointer-events: none;
-            opacity: 0.35;
-            filter: blur(0.5px);
         }
         
         .svg-leaf path {
@@ -189,152 +244,37 @@
         }
         
         .svg-leaf-1 {
-            width: 180px;
+            width: 160px;
             height: auto;
-            top: -20px;
-            left: -60px;
-            transform: rotate(-25deg);
-            opacity: 0.28;
-            animation: svgLeafFloat1 25s ease-in-out infinite;
+            top: -30px;
+            left: -50px;
+            transform: rotate(-20deg);
+            opacity: 0.18;
+            filter: blur(4px);
+            animation: svgLeafFloat1 28s ease-in-out infinite;
         }
         
         .svg-leaf-2 {
-            width: 140px;
+            width: 130px;
             height: auto;
-            bottom: 8%;
-            right: -45px;
-            transform: rotate(15deg) scaleX(-1);
-            opacity: 0.25;
-            animation: svgLeafFloat2 30s ease-in-out infinite;
-        }
-        
-        .svg-leaf-3 {
-            width: 100px;
-            height: auto;
-            top: 45%;
-            left: -35px;
-            transform: rotate(-10deg);
-            opacity: 0.22;
-            animation: svgLeafFloat3 28s ease-in-out infinite;
-        }
-        
-        .svg-leaf-4 {
-            width: 120px;
-            height: auto;
-            top: 20%;
+            bottom: 5%;
             right: -40px;
-            transform: rotate(30deg) scaleX(-1);
-            opacity: 0.2;
-            animation: svgLeafFloat4 32s ease-in-out infinite;
-        }
-        
-        .svg-leaf-5 {
-            width: 80px;
-            height: auto;
-            bottom: 35%;
-            left: -25px;
-            transform: rotate(5deg);
-            opacity: 0.18;
-            animation: svgLeafFloat5 26s ease-in-out infinite;
-        }
-        
-        .svg-leaf-6 {
-            width: 90px;
-            height: auto;
-            top: 70%;
-            right: -30px;
-            transform: rotate(-20deg);
-            opacity: 0.2;
-            animation: svgLeafFloat1 29s ease-in-out infinite reverse;
+            transform: rotate(20deg) scaleX(-1);
+            opacity: 0.15;
+            filter: blur(5px);
+            animation: svgLeafFloat2 32s ease-in-out infinite;
         }
         
         @keyframes svgLeafFloat1 {
-            0%, 100% { transform: rotate(-25deg) translate(0, 0); }
-            25% { transform: rotate(-22deg) translate(5px, 8px); }
-            50% { transform: rotate(-28deg) translate(-3px, 5px); }
-            75% { transform: rotate(-24deg) translate(2px, -5px); }
+            0%, 100% { transform: rotate(-20deg) translate(0, 0); }
+            50% { transform: rotate(-17deg) translate(8px, 10px); }
         }
         
         @keyframes svgLeafFloat2 {
-            0%, 100% { transform: rotate(15deg) scaleX(-1) translate(0, 0); }
-            33% { transform: rotate(18deg) scaleX(-1) translate(-8px, 6px); }
-            66% { transform: rotate(12deg) scaleX(-1) translate(4px, -4px); }
+            0%, 100% { transform: rotate(20deg) scaleX(-1) translate(0, 0); }
+            50% { transform: rotate(23deg) scaleX(-1) translate(-6px, 8px); }
         }
         
-        @keyframes svgLeafFloat3 {
-            0%, 100% { transform: rotate(-10deg) translate(0, 0); }
-            50% { transform: rotate(-7deg) translate(6px, -8px); }
-        }
-        
-        @keyframes svgLeafFloat4 {
-            0%, 100% { transform: rotate(30deg) scaleX(-1) translate(0, 0); }
-            40% { transform: rotate(33deg) scaleX(-1) translate(-5px, 10px); }
-            80% { transform: rotate(27deg) scaleX(-1) translate(3px, -6px); }
-        }
-        
-        @keyframes svgLeafFloat5 {
-            0%, 100% { transform: rotate(5deg) translate(0, 0); }
-            50% { transform: rotate(8deg) translate(4px, 6px); }
-        }
-        
-        /* Subtle green glow accents */
-        .bg-leaf-dot {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(15px);
-        }
-        
-        .bg-leaf-dot-1 {
-            width: 40px;
-            height: 40px;
-            background: radial-gradient(circle, rgba(45, 60, 48, 0.25) 0%, transparent 70%);
-            top: 35%;
-            left: 5%;
-            animation: dotFloat1 22s ease-in-out infinite;
-        }
-        
-        .bg-leaf-dot-2 {
-            width: 30px;
-            height: 30px;
-            background: radial-gradient(circle, rgba(40, 55, 45, 0.2) 0%, transparent 70%);
-            top: 65%;
-            right: 10%;
-            animation: dotFloat2 25s ease-in-out infinite;
-        }
-        
-        .bg-leaf-dot-3 {
-            width: 25px;
-            height: 25px;
-            background: radial-gradient(circle, rgba(38, 52, 42, 0.22) 0%, transparent 70%);
-            bottom: 25%;
-            left: 20%;
-            animation: dotFloat3 20s ease-in-out infinite;
-        }
-        
-        @keyframes leafFloat1 {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(10px, 15px); }
-        }
-        
-        @keyframes leafFloat2 {
-            0%, 100% { transform: translate(0, 0) rotate(-15deg); }
-            50% { transform: translate(-12px, 10px) rotate(-12deg); }
-        }
-        
-        @keyframes dotFloat1 {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(8px, -6px); }
-        }
-        
-        @keyframes dotFloat2 {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(-6px, 8px); }
-        }
-        
-        @keyframes dotFloat3 {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(5px, 5px); }
-        }
         
         @keyframes float1 {
             0%, 100% { transform: translate(0, 0) scale(1); }
@@ -1330,6 +1270,10 @@
         <div class="bg-orb bg-orb-2"></div>
         <div class="bg-orb bg-orb-3"></div>
         <div class="bg-orb bg-orb-4"></div>
+        <div class="bg-orb bg-orb-5"></div>
+        <div class="bg-orb bg-orb-6"></div>
+        <div class="bg-orb bg-orb-7"></div>
+        <div class="bg-orb bg-orb-8"></div>
         
         <!-- SVG Gradient Definition -->
         <svg width="0" height="0" style="position: absolute;">
@@ -1346,54 +1290,15 @@
             </defs>
         </svg>
         
-        <!-- Elegant curved leaf - top left -->
+        <!-- Blurred leaf - top left -->
         <svg class="svg-leaf svg-leaf-1" viewBox="0 0 100 150" xmlns="http://www.w3.org/2000/svg">
             <path d="M50,5 Q80,25 85,60 Q88,95 70,120 Q55,140 45,145 Q42,142 40,135 Q35,115 38,85 Q40,55 50,30 Q48,15 50,5 Z" fill="url(#leafGradient)"/>
-            <path d="M50,25 Q50,60 48,100 Q47,120 45,140" stroke="rgba(70,95,75,0.4)" stroke-width="1" fill="none"/>
-            <path d="M50,40 Q62,50 70,55" stroke="rgba(70,95,75,0.3)" stroke-width="0.5" fill="none"/>
-            <path d="M48,60 Q60,68 68,75" stroke="rgba(70,95,75,0.3)" stroke-width="0.5" fill="none"/>
-            <path d="M47,80 Q58,88 65,95" stroke="rgba(70,95,75,0.3)" stroke-width="0.5" fill="none"/>
         </svg>
         
-        <!-- Flowing leaf - bottom right -->
+        <!-- Blurred leaf - bottom right -->
         <svg class="svg-leaf svg-leaf-2" viewBox="0 0 100 160" xmlns="http://www.w3.org/2000/svg">
             <path d="M45,5 Q75,20 82,50 Q88,80 80,110 Q70,140 50,155 Q45,150 42,140 Q35,110 38,75 Q40,40 50,15 Q47,8 45,5 Z" fill="url(#leafGradient2)"/>
-            <path d="M48,20 Q50,70 48,130 Q47,145 50,152" stroke="rgba(65,90,70,0.35)" stroke-width="1" fill="none"/>
-            <path d="M50,35 Q65,45 72,52" stroke="rgba(65,90,70,0.25)" stroke-width="0.5" fill="none"/>
-            <path d="M49,55 Q62,65 70,72" stroke="rgba(65,90,70,0.25)" stroke-width="0.5" fill="none"/>
-            <path d="M48,78 Q60,88 68,98" stroke="rgba(65,90,70,0.25)" stroke-width="0.5" fill="none"/>
         </svg>
-        
-        <!-- Small accent leaf - middle left -->
-        <svg class="svg-leaf svg-leaf-3" viewBox="0 0 80 120" xmlns="http://www.w3.org/2000/svg">
-            <path d="M40,5 Q65,20 70,45 Q72,70 60,90 Q50,108 38,115 Q35,110 34,100 Q30,75 35,50 Q38,25 40,5 Z" fill="url(#leafGradient)"/>
-            <path d="M40,15 Q42,50 40,95 Q39,105 38,112" stroke="rgba(60,85,65,0.3)" stroke-width="0.8" fill="none"/>
-        </svg>
-        
-        <!-- Decorative leaf - top right -->
-        <svg class="svg-leaf svg-leaf-4" viewBox="0 0 90 140" xmlns="http://www.w3.org/2000/svg">
-            <path d="M42,5 Q70,18 78,48 Q84,78 72,105 Q60,130 45,138 Q42,132 40,120 Q34,90 38,58 Q40,28 42,5 Z" fill="url(#leafGradient2)"/>
-            <path d="M44,18 Q46,60 44,110 Q43,125 45,135" stroke="rgba(55,80,60,0.3)" stroke-width="0.8" fill="none"/>
-            <path d="M45,35 Q58,42 65,48" stroke="rgba(55,80,60,0.2)" stroke-width="0.5" fill="none"/>
-            <path d="M44,58 Q56,66 64,74" stroke="rgba(55,80,60,0.2)" stroke-width="0.5" fill="none"/>
-        </svg>
-        
-        <!-- Small leaf - lower left -->
-        <svg class="svg-leaf svg-leaf-5" viewBox="0 0 60 90" xmlns="http://www.w3.org/2000/svg">
-            <path d="M30,5 Q50,15 55,35 Q58,55 48,70 Q40,82 28,88 Q26,82 25,72 Q22,52 26,32 Q28,15 30,5 Z" fill="url(#leafGradient)"/>
-            <path d="M30,12 Q32,40 30,75 Q29,82 28,86" stroke="rgba(60,82,65,0.25)" stroke-width="0.6" fill="none"/>
-        </svg>
-        
-        <!-- Accent leaf - lower right -->
-        <svg class="svg-leaf svg-leaf-6" viewBox="0 0 70 110" xmlns="http://www.w3.org/2000/svg">
-            <path d="M35,5 Q58,18 62,42 Q66,68 55,88 Q45,102 32,108 Q30,102 28,92 Q24,68 28,42 Q30,20 35,5 Z" fill="url(#leafGradient2)"/>
-            <path d="M35,15 Q38,50 35,90 Q34,100 32,105" stroke="rgba(58,82,62,0.28)" stroke-width="0.7" fill="none"/>
-        </svg>
-        
-        <!-- Subtle green glow accents -->
-        <div class="bg-leaf-dot bg-leaf-dot-1"></div>
-        <div class="bg-leaf-dot bg-leaf-dot-2"></div>
-        <div class="bg-leaf-dot bg-leaf-dot-3"></div>
     </div>
     
     <!-- Film grain on background layer - gets blurred by glass -->
