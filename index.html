@@ -191,28 +191,23 @@
             filter: blur(0.5px);
         }
         
-        /* Hero orb - large, scrolls with content */
+        /* Hero orb - large, overlays content, parallax 50% */
         .hero-orb {
-            position: absolute;
-            width: 180px;
-            height: 180px;
-            top: 60px;
-            left: -60px;
+            position: fixed;
+            width: 280px;
+            height: 280px;
+            top: 20px;
+            left: -90px;
             border-radius: 50%;
             background: radial-gradient(circle at 30% 30%, 
-                rgba(75, 68, 62, 0.5) 0%, 
-                rgba(50, 45, 40, 0.7) 30%, 
-                rgba(32, 28, 25, 0.85) 60%, 
-                rgba(15, 13, 12, 0.95) 100%);
+                rgba(70, 64, 58, 0.4) 0%, 
+                rgba(48, 44, 40, 0.55) 30%, 
+                rgba(30, 27, 24, 0.7) 60%, 
+                rgba(14, 12, 11, 0.8) 100%);
             filter: blur(0.3px);
-            z-index: 1;
+            z-index: 100;
             pointer-events: none;
-            animation: heroOrbFloat 20s ease-in-out infinite;
-        }
-        
-        @keyframes heroOrbFloat {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(8px, 12px); }
+            will-change: transform;
         }
         
         @keyframes float1 {
@@ -1194,7 +1189,7 @@
             .bg-orb-1 { width: 70px; height: 70px; }
             .bg-orb-2 { width: 50px; height: 50px; }
             .bg-orb-3 { width: 35px; height: 35px; }
-            .hero-orb { width: 140px; height: 140px; top: 50px; left: -50px; }
+            .hero-orb { width: 220px; height: 220px; top: 15px; left: -70px; }
         }
     </style>
 </head>
@@ -1986,17 +1981,23 @@
         function initParallax() {
             const bgShapes = document.querySelector('.bg-shapes');
             const bgGrain = document.querySelector('.bg-grain');
-            const parallaxFactor = 0.35; // Background moves at 35% of scroll speed
+            const heroOrb = document.querySelector('.hero-orb');
+            const bgParallaxFactor = 0.35; // Background moves at 35% of scroll speed
+            const heroOrbFactor = 0.50; // Hero orb moves at 50% of scroll speed
             
             function updateParallax() {
                 const scrollY = window.pageYOffset || document.documentElement.scrollTop;
-                const parallaxOffset = scrollY * parallaxFactor;
+                const bgOffset = scrollY * bgParallaxFactor;
+                const heroOffset = scrollY * heroOrbFactor;
                 
                 if (bgShapes) {
-                    bgShapes.style.transform = `translateY(${-parallaxOffset}px)`;
+                    bgShapes.style.transform = `translateY(${-bgOffset}px)`;
                 }
                 if (bgGrain) {
-                    bgGrain.style.transform = `translateY(${-parallaxOffset}px)`;
+                    bgGrain.style.transform = `translateY(${-bgOffset}px)`;
+                }
+                if (heroOrb) {
+                    heroOrb.style.transform = `translateY(${-heroOffset}px)`;
                 }
             }
             
