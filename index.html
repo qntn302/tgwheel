@@ -19,11 +19,10 @@
         body {
             background: linear-gradient(145deg, 
                 #0a0a0f 0%, 
-                #0c110f 15%,
-                #0d1117 30%, 
-                #101915 50%, 
-                #0f172a 70%,
-                #0a100c 85%, 
+                #0b0e0c 20%,
+                #0d1117 40%, 
+                #0e1210 60%, 
+                #0f172a 80%,
                 #0c0c14 100%);
             background-attachment: fixed;
             color: white;
@@ -146,26 +145,26 @@
             left: 8%;
             animation: orbFloat2 18s ease-in-out infinite;
             background: radial-gradient(circle at 35% 35%, 
-                rgba(50, 70, 55, 0.4) 0%, 
-                rgba(35, 52, 42, 0.6) 30%, 
-                rgba(22, 35, 28, 0.8) 60%, 
-                rgba(10, 18, 14, 0.9) 100%);
+                rgba(55, 65, 60, 0.4) 0%, 
+                rgba(38, 48, 45, 0.6) 30%, 
+                rgba(25, 32, 30, 0.8) 60%, 
+                rgba(12, 16, 15, 0.9) 100%);
             filter: blur(0.5px);
         }
         
-        /* Green-tinted orb for color harmony */
+        /* Subtle green-tinted orb */
         .bg-orb-4 {
-            width: 100px;
-            height: 100px;
-            top: 75%;
-            right: 25%;
+            width: 70px;
+            height: 70px;
+            top: 80%;
+            right: 20%;
             animation: orbFloat1 22s ease-in-out infinite reverse;
             background: radial-gradient(circle at 35% 35%, 
-                rgba(45, 65, 50, 0.35) 0%, 
-                rgba(30, 50, 38, 0.5) 30%, 
-                rgba(20, 38, 28, 0.7) 60%, 
-                rgba(10, 20, 15, 0.85) 100%);
-            filter: blur(0.8px);
+                rgba(45, 55, 48, 0.25) 0%, 
+                rgba(32, 42, 36, 0.4) 30%, 
+                rgba(22, 32, 26, 0.6) 60%, 
+                rgba(12, 18, 14, 0.75) 100%);
+            filter: blur(1px);
         }
         
         .bg-orb-3 {
@@ -177,178 +176,96 @@
             filter: blur(0.5px);
         }
         
-        /* Green foliage shapes - premium botanical accents */
+        /* Subtle green foliage accents - minimal, point-like */
         .bg-leaf {
             position: absolute;
             pointer-events: none;
         }
         
         .bg-leaf-1 {
-            width: 280px;
-            height: 280px;
-            top: -80px;
-            left: -100px;
+            width: 120px;
+            height: 120px;
+            top: -40px;
+            left: -50px;
             background: radial-gradient(ellipse 60% 80% at 40% 30%, 
-                rgba(45, 65, 45, 0.5) 0%, 
-                rgba(30, 50, 35, 0.3) 40%, 
+                rgba(40, 55, 42, 0.2) 0%, 
+                rgba(30, 45, 35, 0.1) 40%, 
                 transparent 70%);
-            filter: blur(40px);
+            filter: blur(50px);
             animation: leafFloat1 28s ease-in-out infinite;
         }
         
         .bg-leaf-2 {
-            width: 200px;
-            height: 320px;
-            bottom: 10%;
-            right: -60px;
+            width: 100px;
+            height: 150px;
+            bottom: 15%;
+            right: -30px;
             background: radial-gradient(ellipse 70% 100% at 60% 50%, 
-                rgba(35, 55, 40, 0.45) 0%, 
-                rgba(25, 45, 30, 0.25) 50%, 
-                transparent 75%);
-            filter: blur(50px);
-            animation: leafFloat2 32s ease-in-out infinite;
-            transform: rotate(-15deg);
-        }
-        
-        .bg-leaf-3 {
-            width: 160px;
-            height: 200px;
-            top: 60%;
-            left: -40px;
-            background: radial-gradient(ellipse 80% 60% at 30% 60%, 
-                rgba(40, 60, 45, 0.4) 0%, 
-                rgba(28, 48, 35, 0.2) 50%, 
-                transparent 70%);
-            filter: blur(35px);
-            animation: leafFloat3 26s ease-in-out infinite;
-        }
-        
-        .bg-leaf-4 {
-            width: 240px;
-            height: 180px;
-            top: 25%;
-            right: -80px;
-            background: radial-gradient(ellipse 90% 70% at 70% 40%, 
-                rgba(38, 58, 42, 0.35) 0%, 
-                rgba(25, 45, 32, 0.18) 50%, 
+                rgba(35, 50, 38, 0.18) 0%, 
+                rgba(28, 42, 32, 0.08) 50%, 
                 transparent 70%);
             filter: blur(45px);
-            animation: leafFloat4 30s ease-in-out infinite;
-            transform: rotate(10deg);
-        }
-        
-        /* Organic vine-like accent */
-        .bg-vine {
-            position: absolute;
-            width: 3px;
-            background: linear-gradient(to bottom, 
-                transparent 0%, 
-                rgba(50, 75, 55, 0.3) 20%, 
-                rgba(45, 70, 50, 0.4) 50%, 
-                rgba(40, 65, 45, 0.3) 80%, 
-                transparent 100%);
-            filter: blur(1px);
-            border-radius: 3px;
-        }
-        
-        .bg-vine-1 {
-            height: 300px;
-            left: 5%;
-            top: 10%;
-            animation: vineGrow1 35s ease-in-out infinite;
-            transform: rotate(5deg);
-        }
-        
-        .bg-vine-2 {
-            height: 250px;
-            right: 8%;
-            top: 40%;
-            animation: vineGrow2 40s ease-in-out infinite;
-            transform: rotate(-8deg);
+            animation: leafFloat2 32s ease-in-out infinite;
+            transform: rotate(-15deg);
         }
         
         /* Small leaf accent dots */
         .bg-leaf-dot {
             position: absolute;
-            border-radius: 50% 50% 50% 0;
-            transform: rotate(-45deg);
-            filter: blur(2px);
+            border-radius: 50%;
+            filter: blur(15px);
         }
         
         .bg-leaf-dot-1 {
-            width: 20px;
-            height: 20px;
-            background: radial-gradient(circle at 30% 30%, rgba(55, 80, 55, 0.5), rgba(35, 55, 40, 0.2));
-            top: 20%;
-            left: 15%;
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle, rgba(45, 60, 48, 0.25) 0%, transparent 70%);
+            top: 35%;
+            left: 5%;
             animation: dotFloat1 22s ease-in-out infinite;
         }
         
         .bg-leaf-dot-2 {
-            width: 15px;
-            height: 15px;
-            background: radial-gradient(circle at 30% 30%, rgba(50, 75, 50, 0.4), rgba(30, 50, 35, 0.15));
-            top: 70%;
-            right: 20%;
+            width: 30px;
+            height: 30px;
+            background: radial-gradient(circle, rgba(40, 55, 45, 0.2) 0%, transparent 70%);
+            top: 65%;
+            right: 10%;
             animation: dotFloat2 25s ease-in-out infinite;
         }
         
         .bg-leaf-dot-3 {
-            width: 12px;
-            height: 12px;
-            background: radial-gradient(circle at 30% 30%, rgba(45, 70, 48, 0.45), rgba(28, 48, 32, 0.2));
-            bottom: 15%;
-            left: 25%;
+            width: 25px;
+            height: 25px;
+            background: radial-gradient(circle, rgba(38, 52, 42, 0.22) 0%, transparent 70%);
+            bottom: 25%;
+            left: 20%;
             animation: dotFloat3 20s ease-in-out infinite;
         }
         
         @keyframes leafFloat1 {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            25% { transform: translate(15px, 20px) rotate(3deg); }
-            50% { transform: translate(-10px, 10px) rotate(-2deg); }
-            75% { transform: translate(5px, -15px) rotate(1deg); }
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(10px, 15px); }
         }
         
         @keyframes leafFloat2 {
             0%, 100% { transform: translate(0, 0) rotate(-15deg); }
-            33% { transform: translate(-20px, 15px) rotate(-12deg); }
-            66% { transform: translate(10px, -10px) rotate(-18deg); }
-        }
-        
-        @keyframes leafFloat3 {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(20px, -15px); }
-        }
-        
-        @keyframes leafFloat4 {
-            0%, 100% { transform: translate(0, 0) rotate(10deg); }
-            40% { transform: translate(-15px, 20px) rotate(8deg); }
-            80% { transform: translate(10px, -10px) rotate(12deg); }
-        }
-        
-        @keyframes vineGrow1 {
-            0%, 100% { height: 300px; opacity: 0.6; }
-            50% { height: 350px; opacity: 0.8; }
-        }
-        
-        @keyframes vineGrow2 {
-            0%, 100% { height: 250px; opacity: 0.5; }
-            50% { height: 280px; opacity: 0.7; }
+            50% { transform: translate(-12px, 10px) rotate(-12deg); }
         }
         
         @keyframes dotFloat1 {
-            0%, 100% { transform: rotate(-45deg) translate(0, 0); }
-            50% { transform: rotate(-45deg) translate(10px, -8px); }
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(8px, -6px); }
         }
         
         @keyframes dotFloat2 {
-            0%, 100% { transform: rotate(-45deg) translate(0, 0); }
-            50% { transform: rotate(-45deg) translate(-8px, 10px); }
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(-6px, 8px); }
         }
         
         @keyframes dotFloat3 {
-            0%, 100% { transform: rotate(-45deg) translate(0, 0); }
-            50% { transform: rotate(-45deg) translate(6px, 6px); }
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(5px, 5px); }
         }
         
         @keyframes float1 {
@@ -1346,17 +1263,9 @@
         <div class="bg-orb bg-orb-3"></div>
         <div class="bg-orb bg-orb-4"></div>
         
-        <!-- Green foliage accents -->
+        <!-- Subtle green accents -->
         <div class="bg-leaf bg-leaf-1"></div>
         <div class="bg-leaf bg-leaf-2"></div>
-        <div class="bg-leaf bg-leaf-3"></div>
-        <div class="bg-leaf bg-leaf-4"></div>
-        
-        <!-- Organic vine accents -->
-        <div class="bg-vine bg-vine-1"></div>
-        <div class="bg-vine bg-vine-2"></div>
-        
-        <!-- Small leaf dots -->
         <div class="bg-leaf-dot bg-leaf-dot-1"></div>
         <div class="bg-leaf-dot bg-leaf-dot-2"></div>
         <div class="bg-leaf-dot bg-leaf-dot-3"></div>
@@ -2131,7 +2040,7 @@
         function initParallax() {
             const bgShapes = document.querySelector('.bg-shapes');
             const bgGrain = document.querySelector('.bg-grain');
-            const parallaxFactor = 0.2; // Background moves at 20% of scroll speed (slower)
+            const parallaxFactor = 0.35; // Background moves at 35% of scroll speed
             
             function updateParallax() {
                 const scrollY = window.pageYOffset || document.documentElement.scrollTop;
