@@ -18,12 +18,11 @@
         
         body {
             background: linear-gradient(145deg, 
-                #0a0a0f 0%, 
-                #0b0e0c 20%,
-                #0d1117 40%, 
-                #0e1210 60%, 
-                #0f172a 80%,
-                #0c0c14 100%);
+                #080809 0%, 
+                #0a0a0e 25%,
+                #0b0c10 50%, 
+                #090a0c 75%,
+                #08080c 100%);
             background-attachment: fixed;
             color: white;
             text-align: center;
@@ -74,45 +73,46 @@
         }
         
         .bg-shape-1 {
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle, rgba(75, 54, 33, 0.8) 0%, rgba(45, 32, 20, 0.4) 50%, transparent 70%);
+            width: 280px;
+            height: 280px;
+            background: radial-gradient(circle, rgba(50, 40, 32, 0.6) 0%, rgba(30, 24, 18, 0.3) 50%, transparent 70%);
             top: -100px;
             right: -80px;
             animation: float1 20s ease-in-out infinite;
         }
         
         .bg-shape-2 {
-            width: 250px;
-            height: 250px;
-            background: radial-gradient(circle, rgba(55, 48, 42, 0.7) 0%, rgba(35, 30, 25, 0.3) 50%, transparent 70%);
+            width: 240px;
+            height: 240px;
+            background: radial-gradient(circle, rgba(42, 38, 34, 0.5) 0%, rgba(25, 22, 18, 0.25) 50%, transparent 70%);
             bottom: 20%;
             left: -60px;
             animation: float2 25s ease-in-out infinite;
         }
         
+        /* Subtle green-tinted shape - point accent */
         .bg-shape-3 {
-            width: 180px;
-            height: 180px;
-            background: radial-gradient(circle, rgba(40, 50, 60, 0.6) 0%, rgba(25, 35, 45, 0.3) 50%, transparent 70%);
+            width: 160px;
+            height: 160px;
+            background: radial-gradient(circle, rgba(32, 42, 38, 0.45) 0%, rgba(20, 28, 24, 0.2) 50%, transparent 70%);
             top: 40%;
             right: -40px;
             animation: float3 18s ease-in-out infinite;
         }
         
         .bg-shape-4 {
-            width: 220px;
-            height: 220px;
-            background: radial-gradient(circle, rgba(60, 45, 35, 0.5) 0%, rgba(40, 30, 22, 0.2) 50%, transparent 70%);
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(45, 38, 32, 0.4) 0%, rgba(28, 22, 18, 0.18) 50%, transparent 70%);
             bottom: -50px;
             right: 30%;
             animation: float4 22s ease-in-out infinite;
         }
         
         .bg-shape-5 {
-            width: 150px;
-            height: 150px;
-            background: radial-gradient(circle, rgba(30, 40, 55, 0.6) 0%, rgba(20, 28, 40, 0.3) 50%, transparent 70%);
+            width: 140px;
+            height: 140px;
+            background: radial-gradient(circle, rgba(28, 32, 40, 0.45) 0%, rgba(16, 20, 28, 0.2) 50%, transparent 70%);
             top: 15%;
             left: 10%;
             animation: float5 24s ease-in-out infinite;
@@ -123,157 +123,72 @@
             position: absolute;
             border-radius: 50%;
             background: radial-gradient(circle at 30% 30%, 
-                rgba(80, 70, 60, 0.4) 0%, 
-                rgba(50, 45, 40, 0.6) 30%, 
-                rgba(30, 28, 25, 0.8) 60%, 
-                rgba(15, 14, 12, 0.9) 100%);
+                rgba(60, 55, 50, 0.35) 0%, 
+                rgba(38, 35, 32, 0.55) 30%, 
+                rgba(22, 20, 18, 0.75) 60%, 
+                rgba(10, 9, 8, 0.9) 100%);
         }
         
+        /* Main orb - front, clear */
         .bg-orb-1 {
-            width: 120px;
-            height: 120px;
-            top: 8%;
-            right: 5%;
-            animation: orbFloat1 15s ease-in-out infinite;
-            filter: blur(1px);
-        }
-        
-        .bg-orb-2 {
-            width: 80px;
-            height: 80px;
-            bottom: 25%;
-            left: 8%;
-            animation: orbFloat2 18s ease-in-out infinite;
-            background: radial-gradient(circle at 35% 35%, 
-                rgba(55, 65, 60, 0.4) 0%, 
-                rgba(38, 48, 45, 0.6) 30%, 
-                rgba(25, 32, 30, 0.8) 60%, 
-                rgba(12, 16, 15, 0.9) 100%);
+            width: 100px;
+            height: 100px;
+            top: 10%;
+            right: 8%;
+            animation: orbFloat1 18s ease-in-out infinite;
             filter: blur(0.5px);
         }
         
-        /* Subtle green-tinted orb */
-        .bg-orb-4 {
+        /* Secondary orb - neutral */
+        .bg-orb-2 {
             width: 70px;
             height: 70px;
-            top: 80%;
-            right: 20%;
-            animation: orbFloat1 22s ease-in-out infinite reverse;
-            background: radial-gradient(circle at 35% 35%, 
-                rgba(45, 55, 48, 0.25) 0%, 
-                rgba(32, 42, 36, 0.4) 30%, 
-                rgba(22, 32, 26, 0.6) 60%, 
-                rgba(12, 18, 14, 0.75) 100%);
+            bottom: 28%;
+            left: 10%;
+            animation: orbFloat2 22s ease-in-out infinite;
             filter: blur(1px);
         }
         
-        /* Additional depth orbs */
-        .bg-orb-5 {
-            width: 90px;
-            height: 90px;
-            top: 30%;
-            left: 5%;
-            animation: orbFloat2 26s ease-in-out infinite;
-            background: radial-gradient(circle at 30% 30%, 
-                rgba(70, 60, 55, 0.3) 0%, 
-                rgba(45, 40, 38, 0.5) 30%, 
-                rgba(28, 25, 24, 0.7) 60%, 
-                rgba(14, 12, 12, 0.85) 100%);
-            filter: blur(3px);
-        }
-        
-        .bg-orb-6 {
+        /* Small orb */
+        .bg-orb-3 {
             width: 50px;
             height: 50px;
-            top: 15%;
-            right: 25%;
-            animation: orbFloat3 20s ease-in-out infinite reverse;
-            background: radial-gradient(circle at 35% 35%, 
-                rgba(65, 58, 52, 0.35) 0%, 
-                rgba(42, 38, 35, 0.55) 30%, 
-                rgba(25, 23, 22, 0.75) 60%, 
-                rgba(12, 11, 10, 0.9) 100%);
+            top: 50%;
+            right: 15%;
+            animation: orbFloat3 20s ease-in-out infinite;
             filter: blur(0.3px);
         }
         
-        .bg-orb-7 {
-            width: 110px;
-            height: 110px;
-            bottom: 40%;
-            right: 3%;
-            animation: orbFloat1 30s ease-in-out infinite;
-            background: radial-gradient(circle at 32% 32%, 
-                rgba(55, 50, 48, 0.25) 0%, 
-                rgba(38, 35, 34, 0.45) 30%, 
-                rgba(24, 22, 21, 0.65) 60%, 
-                rgba(12, 11, 10, 0.8) 100%);
-            filter: blur(5px);
-        }
-        
-        .bg-orb-8 {
-            width: 40px;
-            height: 40px;
-            top: 65%;
-            left: 15%;
-            animation: orbFloat3 18s ease-in-out infinite;
+        /* Subtle green accent orb - single point */
+        .bg-orb-4 {
+            width: 55px;
+            height: 55px;
+            top: 75%;
+            left: 18%;
+            animation: orbFloat1 25s ease-in-out infinite reverse;
             background: radial-gradient(circle at 35% 35%, 
-                rgba(50, 60, 52, 0.3) 0%, 
-                rgba(35, 45, 38, 0.5) 30%, 
-                rgba(22, 30, 25, 0.7) 60%, 
-                rgba(10, 15, 12, 0.85) 100%);
-            filter: blur(0.5px);
+                rgba(40, 50, 42, 0.2) 0%, 
+                rgba(28, 38, 30, 0.35) 30%, 
+                rgba(18, 25, 20, 0.55) 60%, 
+                rgba(8, 12, 9, 0.7) 100%);
+            filter: blur(1.5px);
         }
         
-        .bg-orb-3 {
-            width: 60px;
-            height: 60px;
-            top: 55%;
-            right: 12%;
-            animation: orbFloat3 20s ease-in-out infinite;
-            filter: blur(0.5px);
-        }
-        
-        /* SVG Botanical Leaves - subtle, blurred */
-        .svg-leaf {
-            position: absolute;
-            pointer-events: none;
-        }
-        
-        .svg-leaf path {
-            fill: url(#leafGradient);
-        }
-        
-        .svg-leaf-1 {
-            width: 160px;
-            height: auto;
-            top: -30px;
-            left: -50px;
-            transform: rotate(-20deg);
-            opacity: 0.18;
-            filter: blur(4px);
-            animation: svgLeafFloat1 28s ease-in-out infinite;
-        }
-        
-        .svg-leaf-2 {
-            width: 130px;
-            height: auto;
-            bottom: 5%;
-            right: -40px;
-            transform: rotate(20deg) scaleX(-1);
-            opacity: 0.15;
+        /* Depth orb - blurred, back */
+        .bg-orb-5 {
+            width: 90px;
+            height: 90px;
+            bottom: 45%;
+            right: 3%;
+            animation: orbFloat2 28s ease-in-out infinite;
+            background: radial-gradient(circle at 30% 30%, 
+                rgba(45, 42, 40, 0.18) 0%, 
+                rgba(30, 28, 26, 0.35) 30%, 
+                rgba(18, 16, 15, 0.5) 60%, 
+                rgba(8, 7, 6, 0.65) 100%);
             filter: blur(5px);
-            animation: svgLeafFloat2 32s ease-in-out infinite;
         }
         
-        @keyframes svgLeafFloat1 {
-            0%, 100% { transform: rotate(-20deg) translate(0, 0); }
-            50% { transform: rotate(-17deg) translate(8px, 10px); }
-        }
-        
-        @keyframes svgLeafFloat2 {
-            0%, 100% { transform: rotate(20deg) scaleX(-1) translate(0, 0); }
-            50% { transform: rotate(23deg) scaleX(-1) translate(-6px, 8px); }
-        }
         
         
         @keyframes float1 {
@@ -1251,10 +1166,12 @@
             .result { border-radius: 22px; }
             .prizes-info { border-radius: 20px; }
             .rules { border-radius: 20px; }
-            .bg-shape-1, .bg-shape-2 { width: 200px; height: 200px; }
-            .bg-orb-1 { width: 80px; height: 80px; }
+            .bg-shape-1, .bg-shape-2 { width: 180px; height: 180px; }
+            .bg-orb-1 { width: 70px; height: 70px; }
             .bg-orb-2 { width: 50px; height: 50px; }
-            .bg-orb-3 { width: 40px; height: 40px; }
+            .bg-orb-3 { width: 35px; height: 35px; }
+            .bg-orb-4 { width: 40px; height: 40px; }
+            .bg-orb-5 { width: 60px; height: 60px; }
         }
     </style>
 </head>
@@ -1271,34 +1188,7 @@
         <div class="bg-orb bg-orb-3"></div>
         <div class="bg-orb bg-orb-4"></div>
         <div class="bg-orb bg-orb-5"></div>
-        <div class="bg-orb bg-orb-6"></div>
-        <div class="bg-orb bg-orb-7"></div>
-        <div class="bg-orb bg-orb-8"></div>
         
-        <!-- SVG Gradient Definition -->
-        <svg width="0" height="0" style="position: absolute;">
-            <defs>
-                <linearGradient id="leafGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" style="stop-color:rgb(55,75,58);stop-opacity:1" />
-                    <stop offset="50%" style="stop-color:rgb(40,58,45);stop-opacity:1" />
-                    <stop offset="100%" style="stop-color:rgb(28,42,32);stop-opacity:1" />
-                </linearGradient>
-                <linearGradient id="leafGradient2" x1="100%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" style="stop-color:rgb(50,70,55);stop-opacity:1" />
-                    <stop offset="100%" style="stop-color:rgb(32,48,38);stop-opacity:1" />
-                </linearGradient>
-            </defs>
-        </svg>
-        
-        <!-- Blurred leaf - top left -->
-        <svg class="svg-leaf svg-leaf-1" viewBox="0 0 100 150" xmlns="http://www.w3.org/2000/svg">
-            <path d="M50,5 Q80,25 85,60 Q88,95 70,120 Q55,140 45,145 Q42,142 40,135 Q35,115 38,85 Q40,55 50,30 Q48,15 50,5 Z" fill="url(#leafGradient)"/>
-        </svg>
-        
-        <!-- Blurred leaf - bottom right -->
-        <svg class="svg-leaf svg-leaf-2" viewBox="0 0 100 160" xmlns="http://www.w3.org/2000/svg">
-            <path d="M45,5 Q75,20 82,50 Q88,80 80,110 Q70,140 50,155 Q45,150 42,140 Q35,110 38,75 Q40,40 50,15 Q47,8 45,5 Z" fill="url(#leafGradient2)"/>
-        </svg>
     </div>
     
     <!-- Film grain on background layer - gets blurred by glass -->
